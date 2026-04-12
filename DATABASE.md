@@ -182,3 +182,28 @@ Stores the product and content context for one customer project.
   "tone": "direct",
   "style_notes": "simple, punchy, no jargon"
 }
+
+---
+
+## Billing/access additions (MVP packaging slice)
+
+### `subscriptions`
+- tracks billing-ready state for a user
+- supports nullable Stripe identifiers and period windows
+- used for deriving effective starter access
+
+### `access_requests`
+- stores invite-only beta requests from gated users
+- enables manual approval flow in early beta
+
+### `users` additions
+- `is_beta_approved` boolean default false
+- `beta_approved_at` timestamptz nullable
+
+### Usage enforcement notes
+- `usage_counters` are incremented by:
+  - post generation (weekly + monthly)
+  - manual regeneration (weekly)
+  - render completion (monthly)
+  - publish completion (monthly)
+- limit checks are applied server-side before mutating workflows.
