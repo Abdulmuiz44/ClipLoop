@@ -2,119 +2,241 @@
 
 ClipLoop is a lean AI-powered growth automation tool for indie apps and small SaaS products.
 
-It generates weekly packs of short-form slideshow videos, schedules them for publishing, tracks clicks, signups, and revenue, and improves future content based on what performs best.
+## MVP slices currently implemented
 
-The goal is simple:
+- Week 1 generation loop (project → strategy → 5 drafts → single regeneration)
+- Rendering loop (render one or all posts to local MP4 + thumbnail)
+- Approval + scheduling + DB-backed publish queue (mock publisher)
+- Tracked links + click logging + conversion/revenue ingestion + performance rollups
+- Manual iteration engine (analyze winners/losers → generate next cycle)
 
-Turn short-form content into a repeatable weekly growth loop for small software products.
+## Tech stack
+- Next.js App Router + TypeScript
+- Tailwind CSS
+- Postgres
+- Drizzle ORM
+- Zod validation
+- FFmpeg (system dependency for rendering)
 
-## Who it is for
+## Local setup
 
-ClipLoop is built for:
+1. Install dependencies
+```bash
+npm install
+```
 
-- Indie hackers
-- Solo founders
-- Small SaaS builders
-- App creators who want distribution without becoming full-time content marketers
+2. Configure env
+```bash
+cp .env.example .env
+```
 
-## Core loop
+3. Ensure Postgres is running and `DATABASE_URL` is valid.
 
-1. The user adds their product, niche, audience, offer, and CTA.
-2. ClipLoop generates a weekly content strategy.
-3. ClipLoop turns that strategy into short-form slideshow-style promo posts.
-4. ClipLoop renders the posts into vertical videos.
-5. ClipLoop schedules and publishes the posts.
-6. ClipLoop tracks clicks, signups, and revenue.
-7. ClipLoop identifies winners and improves the next weekly batch.
+4. Run migrations
+```bash
+npm run db:migrate
+```
 
-## MVP focus
+5. Optional seed
+```bash
+npm run db:seed
+```
 
-ClipLoop is intentionally narrow.
+6. Start app
+```bash
+npm run dev
+```
 
-The MVP exists to prove one thing:
+Open `http://localhost:3000`.
 
-A single founder with a single product on a single platform can use AI-generated short-form content to drive measurable clicks, signups, or revenue on a simple weekly loop.
+## Rendering prerequisite: FFmpeg
 
-### In scope for v1
+- macOS (Homebrew): `brew install ffmpeg`
+- Ubuntu/Debian: `sudo apt update && sudo apt install -y ffmpeg`
+- Windows (winget): `winget install Gyan.FFmpeg`
 
-- One user
-- One project
-- One connected social channel
-- Weekly content pack generation
-- Slideshow-style short videos
-- Scheduling and publishing
-- Basic click and conversion tracking
-- Simple winner vs loser iteration logic
-- Manual approval before publishing
-- Download fallback if publishing fails
+If FFmpeg is missing, render APIs return a clear error.
 
-### Out of scope for v1
+## Manual publish workflow (mock-only)
 
-- Multi-project workspaces
-- Team collaboration
-- Advanced analytics dashboards
-- Complex onboarding
-- TikTok native publishing in first release
-- RevenueCat-first integrations
-- Full creative editor
-- AI avatars
-- Talking-head video generation
-- Trend scraping
-- Unlimited content generation
-- Agency features
+1. Generate posts for a weekly cycle.
+2. Render each post (or render all).
+3. Approve one post (or approve all).
+4. Schedule publish times (single or bulk).
+5. Run due jobs manually from the weekly page (`Run due jobs now`).
+6. Items move through publish states and end at `published` (mock publisher).
 
-## Product positioning
+## Tracked links and attribution
 
-ClipLoop is the cheapest useful growth loop for indie apps through short-form content.
+Each content item has a tracking slug and redirect link:
+- `/r/<trackingSlug>`
 
-Instead of giving users a bloated social media suite, ClipLoop gives them one simple outcome:
+Redirect behavior:
+1. logs click event with `click_id`
+2. redirects to destination URL
+3. appends query params:
+   - `utm_source=cliploop`
+   - `utm_medium=short_form`
+   - `utm_campaign=<tracking_slug>`
+   - `clp_post=<content_item_id>`
+   - `clp_click=<click_id>`
 
-A weekly pack of conversion-focused short-form content designed to get clicks, signups, and revenue.
+Attribution priority:
+1. `clickId`
+2. `contentItemId`
+3. `projectId`
 
-## Proposed stack
+## Click ID persistence helper
 
-- Next.js
-- TypeScript
-- Node.js
-- Postgres or Supabase
-- Supabase Auth
-- Supabase Storage
-- FFmpeg for slideshow rendering
-- Background jobs via DB-backed queue and cron
-- LLM provider abstraction for generation and iteration
+Use the helper script on your site:
 
-## Core modules
+```html
+<script src="https://YOUR_CLIPLOOP_DOMAIN/api/tracking/script.js" defer></script>
+```
 
-- Product onboarding
-- Content strategy generation
-- Post generation
-- Video rendering
-- Scheduling and publishing
-- Click and conversion tracking
-- Weekly iteration engine
+It stores `clp_click` to localStorage/cookie and exposes:
+- `window.ClipLoopTracking.getClickId()`
 
-## Success criteria for the MVP
+## Conversion and revenue ingestion
 
-ClipLoop v1 is successful if a user can:
+### Conversion endpoint
+`POST /api/track/conversion`
 
-- create one project
-- generate one week of content
-- render the content into videos
-- schedule or download the videos
-- track clicks from unique links
-- send basic conversion or revenue events
-- generate the next week based on what performed best
+```json
+{
+  "clickId": "<from clp_click>",
+  "eventType": "signup",
+  "externalUserId": "user_123"
+}
+```
 
-## Vision
+### Revenue endpoint
+`POST /api/track/revenue`
 
-ClipLoop should feel like a tiny autonomous growth assistant for indie software products.
+```json
+{
+  "clickId": "<from clp_click>",
+  "source": "manual",
+  "amount": 4900,
+  "currency": "USD",
+  "eventName": "purchase"
+}
+```
 
-Not a full social media platform.
+## Manual performance rollup
 
-Not a giant analytics suite.
+- `POST /api/strategy-cycles/[strategyCycleId]/rollup`
+- `GET /api/strategy-cycles/[strategyCycleId]/performance`
 
-Just a simple system that keeps producing, testing, and improving short-form growth content every week.
+Score formula:
+- `(revenue * 100) + (signups * 20) + (clicks * 2) + (ctr * 5)`
 
-## Status
+Classification:
+- winner / neutral / loser by relative weekly ranking.
 
-Planning and MVP build phase.
+## Manual iteration workflow (MVP)
+
+1. Publish mock content.
+2. Generate clicks/conversions/revenue.
+3. Run weekly rollup.
+4. Click **Analyze this week**.
+5. Inspect winners/losers, improved hooks, and angle mutations.
+6. Click **Generate next week**.
+7. Review the next cycle and derived posts.
+
+Notes:
+- Next cycle source is `iteration`.
+- Next cycle week starts at current week + 7 days.
+- `parent_content_item_id` tracks lineage from winner posts to derived next-week posts.
+- Iteration is manual in MVP (no autonomous job runner).
+
+## Local test flow for full loop
+
+1. Publish mock content item in dashboard.
+2. Click its tracking link (`/r/<slug>`).
+3. Send conversion with returned `clp_click`.
+4. Send revenue event.
+5. Run rollup for the week.
+6. Run analysis + generate next cycle.
+7. Verify metrics/analysis on week/project pages.
+
+## Current statuses
+
+Publish statuses:
+- `draft`, `approved`, `scheduled`, `publishing`, `published`, `failed`, `skipped`
+
+Queue statuses:
+- `pending`, `running`, `completed`, `failed`, `dead`
+
+## Generated files
+
+Rendered outputs are stored locally under:
+- `public/generated/content-items/<contentItemId>/<timestamp>/rendered.mp4`
+- `public/generated/content-items/<contentItemId>/<timestamp>/thumbnail.jpg`
+
+## API routes (high-level)
+
+- Generation: projects/strategy/posts/regenerate
+- Rendering: render one/all + assets
+- Publishing workflow: approve/schedule/run jobs
+- Tracking: redirect + script + conversion/revenue ingest
+- Metrics: rollup + cycle/project performance
+- Iteration: analyze + generate-next + analysis + project next-cycle
+
+## Current limitations
+
+- Publishing is mock-only (no real Instagram/TikTok APIs yet).
+- No cron or distributed workers yet.
+- Attribution is intentionally simple.
+- No advanced analytics dashboards/charts.
+- Iteration is deterministic/mock-driven and manually triggered.
+
+## Invite-only beta + billing-ready MVP slice
+
+ClipLoop now supports invite-only product access plus hard usage enforcement for sellable MVP packaging.
+
+### Invite-only behavior
+- Controlled by `INVITE_ONLY_MODE` (default `true`).
+- When enabled, only users who are beta-approved (or paid starter) can use product workflows.
+- Non-approved users see a waitlist/request-access screen in dashboard.
+- In `MOCK_MODE`, the demo user is auto-approved to keep local dev frictionless.
+
+### Plan model (MVP)
+- `free`: account exists but product access can be gated.
+- `beta`: approved invite-only testers with production-like limits.
+- `starter`: paid $5 plan target with same hard limits in this slice.
+
+### Hard limits currently enforced server-side
+- 1 active project
+- 5 posts generated per week
+- 20 posts generated per month
+- 3 manual regenerations per week
+- 20 renders per month
+- 20 publishes per month
+- 1 connected channel (future-compatible limit placeholder)
+
+Usage counters are updated by generation/regeneration/render/publish flows and enforced in API-triggered workflows.
+
+### Billing-ready state
+- `subscriptions` table stores status plus Stripe IDs (`stripe_subscription_id`, `stripe_price_id`) and current period.
+- Effective plan is derived from user + subscription status.
+- `GET /api/me/plan` and `GET /api/me/usage` expose plan/usage for UI surfaces.
+
+### Access requests
+- `POST /api/access/request` stores waitlist/access requests.
+
+### Development approval helper
+- In mock mode only: `POST /api/dev/approve-user` with:
+
+```json
+{
+  "email": "user@example.com",
+  "plan": "beta"
+}
+```
+
+This sets beta approval and plan state without building a full admin panel.
+
+### Current billing limitations
+- No full Stripe checkout/customer portal flow yet.
+- Subscription state is persisted and read, but checkout/session wiring is intentionally deferred.
