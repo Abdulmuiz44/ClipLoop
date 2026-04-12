@@ -1,0 +1,184 @@
+# ClipLoop Database Spec
+
+## Goal
+
+Define the minimum viable database schema for ClipLoop so the full weekly loop can work:
+
+- onboarding
+- strategy generation
+- post generation
+- rendering
+- scheduling
+- publishing
+- tracking
+- iteration
+- billing limits
+
+This schema is intentionally lean.
+
+It is built for:
+- one user
+- one project
+- one primary channel
+- one weekly content cycle
+- simple attribution
+- low operational complexity
+
+## Design principles
+
+- Prefer simple normalized tables over clever abstractions.
+- Store source-of-truth entities in relational columns.
+- Use JSON only for flexible AI-generated content shapes like slides, angles, and metadata.
+- Keep raw events and aggregate metrics separate.
+- Make every major step inspectable and retryable.
+- Preserve manual fallback paths.
+
+## Recommended stack
+
+- Postgres
+- Supabase
+- Drizzle ORM
+- SQL migrations in versioned files
+
+---
+
+## Enums
+
+These can be native Postgres enums or string check constraints.
+
+### `plan_type`
+- `free`
+- `starter`
+- `beta`
+
+### `project_goal_type`
+- `clicks`
+- `signups`
+- `revenue`
+
+### `platform_type`
+- `instagram`
+- `tiktok`
+
+### `content_type`
+- `slideshow_video`
+
+### `strategy_cycle_source`
+- `initial`
+- `iteration`
+- `manual_regeneration`
+
+### `render_status`
+- `pending`
+- `queued`
+- `rendering`
+- `completed`
+- `failed`
+
+### `publish_status`
+- `draft`
+- `approved`
+- `scheduled`
+- `publishing`
+- `published`
+- `failed`
+- `skipped`
+
+### `asset_type`
+- `video`
+- `thumbnail`
+- `subtitle_json`
+
+### `event_type`
+- `signup`
+- `trial_started`
+- `purchase`
+
+### `revenue_source`
+- `stripe`
+- `revenuecat`
+- `manual`
+
+### `experiment_mutation_type`
+- `hook`
+- `cta`
+- `angle`
+- `structure`
+
+### `job_status`
+- `pending`
+- `running`
+- `completed`
+- `failed`
+- `dead`
+
+### `job_type`
+- `generate_weekly_strategy`
+- `generate_weekly_posts`
+- `render_content_item`
+- `publish_content_item`
+- `fetch_platform_metrics`
+- `compute_performance_rollup`
+- `generate_iteration_cycle`
+
+---
+
+## Tables
+
+## 1. users
+
+Represents the authenticated account owner.
+
+### Fields
+- `id` uuid primary key
+- `email` text unique not null
+- `full_name` text nullable
+- `plan` text not null default `free`
+- `billing_status` text nullable
+- `stripe_customer_id` text nullable
+- `created_at` timestamptz not null default now()
+- `updated_at` timestamptz not null default now()
+
+### Notes
+- In MVP, each user can have one active project on the base plan.
+- Billing status can stay simple in v1.
+
+### Indexes
+- unique index on `email`
+- index on `stripe_customer_id`
+
+---
+
+## 2. projects
+
+Stores the product and content context for one customer project.
+
+### Fields
+- `id` uuid primary key
+- `user_id` uuid not null references `users(id)` on delete cascade
+- `name` text not null
+- `product_name` text not null
+- `one_liner` text nullable
+- `description` text not null
+- `audience` text not null
+- `niche` text not null
+- `offer` text not null
+- `website_url` text nullable
+- `cta_url` text not null
+- `goal_type` text not null
+- `voice_prefs_json` jsonb nullable
+- `example_posts_json` jsonb nullable
+- `avoid_terms_json` jsonb nullable
+- `logo_url` text nullable
+- `brand_settings_json` jsonb nullable
+- `status` text not null default `active`
+- `created_at` timestamptz not null default now()
+- `updated_at` timestamptz not null default now()
+
+### Suggested JSON structure
+`voice_prefs_json`
+```json
+{
+  "tone": "direct",
+  "style_notes": "simple, punchy, no jargon"
+}
