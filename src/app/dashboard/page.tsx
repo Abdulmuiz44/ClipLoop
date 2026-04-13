@@ -104,11 +104,22 @@ export default async function DashboardPage() {
                     Open current week
                   </Link>
                 ) : null}
+                <Link href="/dashboard/settings" className="inline-flex rounded border bg-white px-3 py-2 text-sm">
+                  Review account limits
+                </Link>
               </div>
             </div>
           ) : (
-            <div className="mt-4 rounded border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-600">
-              No project yet. Create your first project, then generate a strategy cycle and a 5-post pack.
+            <div className="mt-4 space-y-4 rounded border border-dashed border-slate-300 bg-slate-50 p-4">
+              <div className="text-sm text-slate-600">
+                No project yet. Start with one product, then move through one weekly loop: create the project, generate the strategy, generate the 5-post pack, render it, approve it, schedule it, then track results.
+              </div>
+              <div className="grid gap-2 md:grid-cols-2 text-sm text-slate-700">
+                <div className="rounded border border-slate-200 bg-white p-3">1. Add product context and CTA</div>
+                <div className="rounded border border-slate-200 bg-white p-3">2. Generate a weekly strategy cycle</div>
+                <div className="rounded border border-slate-200 bg-white p-3">3. Turn strategy into 5 short-form posts</div>
+                <div className="rounded border border-slate-200 bg-white p-3">4. Render, approve, schedule, and track</div>
+              </div>
             </div>
           )}
         </div>
@@ -122,6 +133,25 @@ export default async function DashboardPage() {
             <li>3 manual regenerations per week.</li>
             <li>20 renders and 20 publishes per month.</li>
           </ul>
+        </div>
+      </section>
+
+      <section className="grid gap-4 md:grid-cols-2">
+        <div className="rounded border bg-white p-5">
+          <h2 className="font-semibold">How the week should run</h2>
+          <ol className="mt-3 space-y-2 text-sm text-slate-600">
+            <li>1. Create or update your product context.</li>
+            <li>2. Generate this week’s strategy and 5-post pack.</li>
+            <li>3. Render the posts, approve the keepers, and schedule the pack.</li>
+            <li>4. Publish, collect clicks and signups, then roll up results.</li>
+            <li>5. Analyze the winners and generate the next cycle.</li>
+          </ol>
+        </div>
+        <div className="rounded border bg-white p-5">
+          <h2 className="font-semibold">What happens next</h2>
+          <p className="mt-3 text-sm leading-6 text-slate-600">
+            ClipLoop is intentionally narrow. The best path is to keep one product moving through one repeatable weekly loop instead of trying to build a giant content machine on day one.
+          </p>
         </div>
       </section>
 

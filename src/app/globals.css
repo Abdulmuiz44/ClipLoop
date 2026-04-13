@@ -7,9 +7,17 @@
 }
 
 body {
-  @apply bg-slate-50 text-slate-900;
+  background:
+    radial-gradient(circle at top left, rgba(241, 245, 249, 0.95), transparent 32%),
+    radial-gradient(circle at top right, rgba(226, 232, 240, 0.9), transparent 24%),
+    linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+  @apply min-h-screen text-slate-900 antialiased;
 }
 
 a {
   @apply text-blue-600 hover:text-blue-700;
+}
+
+::selection {
+  @apply bg-slate-900 text-white;
 }

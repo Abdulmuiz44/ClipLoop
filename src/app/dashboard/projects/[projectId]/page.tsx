@@ -125,14 +125,29 @@ export default async function ProjectPage({ params }: { params: Promise<{ projec
             <h2 className="font-semibold">Next action</h2>
             <p className="mt-1 text-sm text-slate-600">Move the project into the next weekly step instead of hunting through settings.</p>
           </div>
-          {latestCycle ? (
-            <Link href={`/dashboard/projects/${project.id}/week/${latestCycle.id}`} className="inline-flex rounded border bg-white px-3 py-2 text-sm">
-              Open latest week
+          <div className="flex flex-wrap gap-3">
+            {latestCycle ? (
+              <Link href={`/dashboard/projects/${project.id}/week/${latestCycle.id}`} className="inline-flex rounded border bg-white px-3 py-2 text-sm">
+                Open latest week
+              </Link>
+            ) : null}
+            {nextCycle ? (
+              <Link href={`/dashboard/projects/${project.id}/week/${nextCycle.id}`} className="inline-flex rounded border bg-white px-3 py-2 text-sm">
+                Open next generated cycle
+              </Link>
+            ) : null}
+            <Link href="/dashboard/settings" className="inline-flex rounded border bg-white px-3 py-2 text-sm">
+              Account and limits
             </Link>
-          ) : null}
+          </div>
         </div>
         <div className="mt-4">
           <ActionButton endpoint={`/api/projects/${project.id}/generate-strategy`} label={latestCycle ? "Refresh current weekly strategy" : "Generate weekly strategy"} />
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-3 text-sm">
+          <div className="rounded border border-slate-200 bg-slate-50 p-3">If there is no strategy yet, generate the week first.</div>
+          <div className="rounded border border-slate-200 bg-slate-50 p-3">If posts exist but nothing is rendered, run the render step next.</div>
+          <div className="rounded border border-slate-200 bg-slate-50 p-3">Once posts are published, roll up performance and generate the next cycle.</div>
         </div>
       </section>
 
