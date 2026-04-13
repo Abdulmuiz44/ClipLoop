@@ -216,6 +216,7 @@ ClipLoop now supports invite-only product access plus hard usage enforcement for
 - 1 connected channel (future-compatible limit placeholder)
 
 Usage counters are updated by generation/regeneration/render/publish flows and enforced in API-triggered workflows.
+Weekly and monthly usage are stored separately, so the current window summaries do not double count cross-period actions.
 
 ### Billing-ready state
 - `subscriptions` table stores status plus Stripe IDs (`stripe_subscription_id`, `stripe_price_id`) and current period.
@@ -224,6 +225,7 @@ Usage counters are updated by generation/regeneration/render/publish flows and e
 
 ### Access requests
 - `POST /api/access/request` stores waitlist/access requests.
+- Repeat requests for the same email while still pending are deduped instead of creating noisy duplicates.
 
 ### Development approval helper
 - In mock mode only: `POST /api/dev/approve-user` with:
@@ -236,6 +238,10 @@ Usage counters are updated by generation/regeneration/render/publish flows and e
 ```
 
 This sets beta approval and plan state without building a full admin panel.
+
+### Settings and onboarding polish
+- `/dashboard/projects/new` now guides users through the workflow more clearly before their first strategy cycle.
+- `/dashboard`, `/dashboard/projects/[projectId]`, and `/dashboard/settings` show plan state, usage remaining, and product-readiness status so the MVP feels operational.
 
 ### Current billing limitations
 - No full Stripe checkout/customer portal flow yet.

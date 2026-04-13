@@ -53,6 +53,7 @@ export const subscriptionStatusEnum = pgEnum("subscription_status", [
   "unpaid",
 ]);
 export const accessRequestStatusEnum = pgEnum("access_request_status", ["pending", "approved", "rejected"]);
+export const usagePeriodTypeEnum = pgEnum("usage_period_type", ["week", "month"]);
 
 export const users = pgTable(
   "users",
@@ -177,6 +178,7 @@ export const usageCounters = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     projectId: uuid("project_id").references(() => projects.id, { onDelete: "cascade" }),
+    periodType: usagePeriodTypeEnum("period_type").notNull(),
     periodStart: date("period_start", { mode: "date" }).notNull(),
     periodEnd: date("period_end", { mode: "date" }).notNull(),
     postsGenerated: integer("posts_generated").notNull().default(0),
@@ -190,10 +192,11 @@ export const usageCounters = pgTable(
     userProjectPeriodUnique: uniqueIndex("usage_counters_user_project_period_unique").on(
       table.userId,
       table.projectId,
+      table.periodType,
       table.periodStart,
       table.periodEnd,
     ),
-    userPeriodIdx: index("usage_counters_user_period_idx").on(table.userId, table.periodStart, table.periodEnd),
+    userPeriodIdx: index("usage_counters_user_period_idx").on(table.userId, table.periodType, table.periodStart, table.periodEnd),
   }),
 );
 

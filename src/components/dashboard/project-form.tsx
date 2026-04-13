@@ -12,6 +12,7 @@ export function ProjectForm() {
   async function onSubmit(formData: FormData) {
     setLoading(true);
     setError(null);
+
     const examplePostsRaw = String(formData.get("examplePosts") ?? "");
     const payload = {
       name: String(formData.get("name") ?? ""),
@@ -37,7 +38,7 @@ export function ProjectForm() {
       body: JSON.stringify(payload),
     });
 
-    const json = await response.json();
+    const json = await response.json().catch(() => ({}));
 
     if (!response.ok) {
       setError(json.error ?? "Failed to create project");
@@ -50,42 +51,108 @@ export function ProjectForm() {
   }
 
   return (
-    <form action={onSubmit} className="space-y-5 rounded border bg-white p-4">
-      <section className="space-y-2">
-        <h2 className="text-lg font-semibold">Project basics</h2>
-        <input name="name" placeholder="Workspace name" className="w-full rounded border p-2" required />
-        <input name="productName" placeholder="Product name" className="w-full rounded border p-2" required />
-        <input name="oneLiner" placeholder="One-liner" className="w-full rounded border p-2" />
-        <textarea name="description" placeholder="Description" className="w-full rounded border p-2" required />
+    <form action={onSubmit} className="space-y-6 rounded border bg-white p-5">
+      <section className="space-y-3">
+        <div>
+          <h2 className="text-lg font-semibold">1. Product context</h2>
+          <p className="text-sm text-slate-600">Give ClipLoop enough detail to write believable weekly short-form promos.</p>
+        </div>
+        <div className="grid gap-3 md:grid-cols-2">
+          <label className="space-y-1 text-sm">
+            <span className="font-medium">Workspace name</span>
+            <input name="name" placeholder="ClipLoop HQ" className="w-full rounded border p-2" required />
+          </label>
+          <label className="space-y-1 text-sm">
+            <span className="font-medium">Product name</span>
+            <input name="productName" placeholder="ClipLoop" className="w-full rounded border p-2" required />
+          </label>
+        </div>
+        <label className="space-y-1 text-sm">
+          <span className="font-medium">One-liner</span>
+          <input name="oneLiner" placeholder="Weekly short-form growth loop for indie apps" className="w-full rounded border p-2" />
+        </label>
+        <label className="space-y-1 text-sm">
+          <span className="font-medium">Description</span>
+          <textarea
+            name="description"
+            placeholder="What the product does, who it helps, and the result users get."
+            className="min-h-28 w-full rounded border p-2"
+            required
+          />
+        </label>
       </section>
 
-      <section className="space-y-2">
-        <h3 className="font-medium">Audience + positioning</h3>
-        <input name="audience" placeholder="Audience" className="w-full rounded border p-2" required />
-        <input name="niche" placeholder="Niche" className="w-full rounded border p-2" required />
-        <input name="offer" placeholder="Offer" className="w-full rounded border p-2" required />
-        <select name="goalType" className="w-full rounded border p-2" defaultValue="clicks">
-          <option value="clicks">Clicks</option>
-          <option value="signups">Signups</option>
-          <option value="revenue">Revenue</option>
-        </select>
+      <section className="space-y-3">
+        <div>
+          <h3 className="font-semibold">2. Audience and offer</h3>
+          <p className="text-sm text-slate-600">This drives angle selection, hooks, and CTA framing.</p>
+        </div>
+        <div className="grid gap-3 md:grid-cols-2">
+          <label className="space-y-1 text-sm">
+            <span className="font-medium">Audience</span>
+            <input name="audience" placeholder="Indie hackers and small SaaS founders" className="w-full rounded border p-2" required />
+          </label>
+          <label className="space-y-1 text-sm">
+            <span className="font-medium">Niche</span>
+            <input name="niche" placeholder="B2B SaaS growth" className="w-full rounded border p-2" required />
+          </label>
+        </div>
+        <label className="space-y-1 text-sm">
+          <span className="font-medium">Offer</span>
+          <input name="offer" placeholder="$5 starter plan for one project and weekly content automation" className="w-full rounded border p-2" required />
+        </label>
+        <label className="space-y-1 text-sm">
+          <span className="font-medium">Primary goal</span>
+          <select name="goalType" className="w-full rounded border p-2" defaultValue="clicks">
+            <option value="clicks">Drive clicks</option>
+            <option value="signups">Drive signups</option>
+            <option value="revenue">Drive revenue</option>
+          </select>
+        </label>
       </section>
 
-      <section className="space-y-2">
-        <h3 className="font-medium">Destination + voice</h3>
-        <input name="websiteUrl" placeholder="Website URL" className="w-full rounded border p-2" />
-        <input name="ctaUrl" placeholder="CTA URL" className="w-full rounded border p-2" required />
-        <textarea
-          name="voiceStyleNotes"
-          placeholder="Brand voice/style notes"
-          className="w-full rounded border p-2"
-        />
-        <textarea name="examplePosts" placeholder="Example posts (one per line)" className="w-full rounded border p-2" />
+      <section className="space-y-3">
+        <div>
+          <h3 className="font-semibold">3. Destination and voice</h3>
+          <p className="text-sm text-slate-600">ClipLoop will use this when generating captions, slides, and tracked links.</p>
+        </div>
+        <div className="grid gap-3 md:grid-cols-2">
+          <label className="space-y-1 text-sm">
+            <span className="font-medium">Website URL</span>
+            <input name="websiteUrl" placeholder="https://cliploop.app" className="w-full rounded border p-2" />
+          </label>
+          <label className="space-y-1 text-sm">
+            <span className="font-medium">CTA URL</span>
+            <input name="ctaUrl" placeholder="https://cliploop.app/signup" className="w-full rounded border p-2" required />
+          </label>
+        </div>
+        <label className="space-y-1 text-sm">
+          <span className="font-medium">Voice notes</span>
+          <textarea
+            name="voiceStyleNotes"
+            placeholder="Direct, punchy, specific. Avoid marketing fluff."
+            className="min-h-24 w-full rounded border p-2"
+          />
+        </label>
+        <label className="space-y-1 text-sm">
+          <span className="font-medium">Example posts</span>
+          <textarea
+            name="examplePosts"
+            placeholder="One example per line. Use real examples or short references."
+            className="min-h-28 w-full rounded border p-2"
+          />
+        </label>
+      </section>
+
+      <section className="rounded border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700">
+        <p className="font-medium">What happens next</p>
+        <p className="mt-1">After project creation, generate this week’s strategy, generate 5 posts, render them, approve the keepers, then schedule and publish.</p>
       </section>
 
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
-      <Button type="submit" disabled={loading}>{loading ? "Creating..." : "Create project"}</Button>
-      <p className="text-xs text-slate-500">Next: generate strategy, generate 5 posts, render, approve, and schedule.</p>
+      <Button type="submit" disabled={loading}>
+        {loading ? "Creating project..." : "Create project"}
+      </Button>
     </form>
   );
 }
