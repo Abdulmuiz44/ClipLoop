@@ -52,6 +52,14 @@ export default async function WeekPage({
   const angles = (cycle.anglesJson as Array<Record<string, string>>) ?? [];
   const assetsByPost = await Promise.all(posts.map((post) => getAssetsForContentItem(post.id)));
   const jobs = await getJobsForStrategyCycle(cycle.id);
+  const latestJobByContentId = new Map<string, { job: (typeof jobs)[number]; payload: { contentItemId?: string; publishMode?: string } }>();
+  for (const job of jobs) {
+    const payload = job.payloadJson as { contentItemId?: string; publishMode?: string };
+    if (!payload.contentItemId) continue;
+    if (!latestJobByContentId.has(payload.contentItemId)) {
+      latestJobByContentId.set(payload.contentItemId, { job, payload });
+    }
+  }
   const performance = await getPerformanceForStrategyCycle(cycle.id);
   const perfByContentId = new Map(performance.map((metric) => [metric.contentItemId, metric]));
   const iterationExperiments = await getIterationExperimentsForStrategyCycle(cycle.id);
@@ -198,6 +206,10 @@ export default async function WeekPage({
               const assets = assetsByPost[index];
               const perf = perfByContentId.get(post.id);
               const trackingLink = `/r/${post.trackingSlug}`;
+              const latestJob = latestJobByContentId.get(post.id);
+              const publishMode =
+                latestJob?.payload.publishMode ??
+                (post.externalPostUrl?.includes("/mock/") || post.externalPostId?.startsWith("mock-post-") ? "mock" : post.externalPostId ? "instagram" : "n/a");
 
               return (
                 <article key={post.id} className="rounded border bg-white p-4">
@@ -256,6 +268,12 @@ export default async function WeekPage({
                         {post.externalPostId ?? post.externalPostUrl}
                       </a>
                     ) : "N/A"}
+                  </p>
+                  <p className="mt-1 text-sm">
+                    <strong>Publish mode:</strong> {publishMode}
+                  </p>
+                  <p className="mt-1 text-sm">
+                    <strong>Publish error:</strong> {latestJob?.job.lastError ?? "None"}
                   </p>
 
                   <div className="mt-3 grid gap-3 md:grid-cols-2">

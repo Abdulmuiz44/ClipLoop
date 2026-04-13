@@ -7,14 +7,12 @@ function deterministicExternalId(contentItemId: string) {
 }
 
 export const mockPublisher: PublisherAdapter = {
-  async validateContentItemReady(contentItemId) {
-    const item = await db.query.contentItems.findFirst({ where: eq(schema.contentItems.id, contentItemId) });
-    if (!item) throw new Error("Content item not found");
-    if (item.renderStatus !== "completed") throw new Error("Content item must be rendered before publishing");
+  async validateContentItemReady(contentItem) {
+    if (contentItem.renderStatus !== "completed") throw new Error("Content item must be rendered before publishing");
 
     const video = await db.query.contentAssets.findFirst({
       where: and(
-        eq(schema.contentAssets.contentItemId, contentItemId),
+        eq(schema.contentAssets.contentItemId, contentItem.id),
         eq(schema.contentAssets.assetType, "video"),
       ),
     });
@@ -25,12 +23,14 @@ export const mockPublisher: PublisherAdapter = {
   },
 
   async publishContentItem(contentItem) {
-    await this.validateContentItemReady(contentItem.id);
+    await this.validateContentItemReady(contentItem, null);
     const externalPostId = deterministicExternalId(contentItem.id);
     return {
       externalPostId,
       externalPostUrl: `https://cliploop.local/mock/${externalPostId}`,
       publishedAt: new Date(),
+      mode: "mock",
+      metadataJson: { provider: "mockPublisher" },
     };
   },
 };

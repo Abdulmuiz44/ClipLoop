@@ -1,5 +1,6 @@
 import { desc, eq, inArray } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
+import { getProjectChannelStatus } from "@/domains/channels/service";
 
 export async function getProjectSetupStatus(projectId: string) {
   const project = await db.query.projects.findFirst({ where: eq(schema.projects.id, projectId) });
@@ -21,7 +22,7 @@ export async function getProjectSetupStatus(projectId: string) {
         })
       : [];
 
-  const hasPublishedOrScheduled = posts.some((post) => ["scheduled", "published"].includes(post.publishStatus));
+  const channelStatus = await getProjectChannelStatus(projectId);
   const hasTracking = posts.length > 0 && posts.every((post) => !!post.trackingSlug);
 
   return {
@@ -29,7 +30,7 @@ export async function getProjectSetupStatus(projectId: string) {
     strategyGenerated: !!cycle,
     postsGenerated: posts.length > 0,
     rendered: assets.some((asset) => asset.assetType === "video") || posts.some((post) => post.renderStatus === "completed"),
-    publishFlowConfigured: hasPublishedOrScheduled,
+    publishFlowConfigured: channelStatus.isReady,
     trackingActive: hasTracking,
   };
 }

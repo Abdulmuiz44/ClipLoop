@@ -283,6 +283,32 @@ export const contentAssets = pgTable(
   }),
 );
 
+export const connectedChannels = pgTable(
+  "connected_channels",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    projectId: uuid("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    platform: platformEnum("platform").notNull().default("instagram"),
+    accountName: text("account_name"),
+    accountId: text("account_id"),
+    accessTokenEncrypted: text("access_token_encrypted"),
+    refreshTokenEncrypted: text("refresh_token_encrypted"),
+    tokenExpiresAt: timestamp("token_expires_at", { withTimezone: true }),
+    metadataJson: jsonb("metadata_json"),
+    isActive: boolean("is_active").notNull().default(true),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => ({
+    projectIdx: index("connected_channels_project_id_idx").on(table.projectId),
+    projectPlatformIdx: index("connected_channels_project_platform_idx").on(table.projectId, table.platform),
+    isActiveIdx: index("connected_channels_is_active_idx").on(table.isActive),
+    accountIdIdx: index("connected_channels_account_id_idx").on(table.accountId),
+  }),
+);
+
 export const jobQueue = pgTable(
   "job_queue",
   {
@@ -443,6 +469,7 @@ export const projectsRelations = relations(projects, ({ one, many }) => ({
   user: one(users, { fields: [projects.userId], references: [users.id] }),
   strategyCycles: many(strategyCycles),
   contentItems: many(contentItems),
+  connectedChannels: many(connectedChannels),
 }));
 
 export const subscriptionsRelations = relations(subscriptions, ({ one }) => ({
@@ -462,4 +489,8 @@ export const contentItemsRelations = relations(contentItems, ({ one, many }) => 
 
 export const contentAssetsRelations = relations(contentAssets, ({ one }) => ({
   contentItem: one(contentItems, { fields: [contentAssets.contentItemId], references: [contentItems.id] }),
+}));
+
+export const connectedChannelsRelations = relations(connectedChannels, ({ one }) => ({
+  project: one(projects, { fields: [connectedChannels.projectId], references: [projects.id] }),
 }));

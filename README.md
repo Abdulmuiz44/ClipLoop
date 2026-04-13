@@ -57,14 +57,38 @@ Open `http://localhost:3000`.
 
 If FFmpeg is missing, render APIs return a clear error.
 
-## Manual publish workflow (mock-only)
+## Publish workflow (real Instagram + mock fallback)
 
 1. Generate posts for a weekly cycle.
 2. Render each post (or render all).
 3. Approve one post (or approve all).
 4. Schedule publish times (single or bulk).
 5. Run due jobs manually from the weekly page (`Run due jobs now`).
-6. Items move through publish states and end at `published` (mock publisher).
+6. Items move through publish states and end at `published`.
+
+Publishing mode selection:
+- If a project has an active, valid Instagram channel, jobs use the real Instagram publisher.
+- If no valid channel exists and `MOCK_MODE=true`, jobs fall back to mock publishing.
+- If no valid channel exists and `MOCK_MODE=false`, jobs fail clearly with channel errors.
+
+## Instagram channel connection
+
+ClipLoop supports one real publishing channel per project in MVP: Instagram.
+
+Minimum setup:
+1. Set `INSTAGRAM_CLIENT_ID`, `INSTAGRAM_CLIENT_SECRET`, `INSTAGRAM_REDIRECT_URI`, and `ENCRYPTION_SECRET`.
+2. In your Meta app config, add the callback URL:
+   - `http://localhost:3000/api/integrations/instagram/callback` (local)
+3. From the project page, click **Connect Instagram**.
+4. After callback, the project page shows channel status (active/expired/invalid/disconnected).
+
+Token safety:
+- Access tokens are encrypted at rest using `ENCRYPTION_SECRET`.
+- Tokens are decrypted only during publish/connect operations.
+
+Local/dev testing:
+- With no Instagram credentials and `MOCK_MODE=true`, the weekly loop still runs via mock publisher.
+- To test real publish, connect a real Instagram channel and run due jobs from the weekly page.
 
 ## Tracked links and attribution
 
@@ -185,7 +209,8 @@ Rendered outputs are stored locally under:
 
 ## Current limitations
 
-- Publishing is mock-only (no real Instagram/TikTok APIs yet).
+- Only Instagram real publishing is supported today.
+- TikTok publishing is not implemented yet.
 - No cron or distributed workers yet.
 - Attribution is intentionally simple.
 - No advanced analytics dashboards/charts.

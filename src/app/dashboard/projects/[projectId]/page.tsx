@@ -13,6 +13,9 @@ import { getIterationExperimentsForStrategyCycle, getNextStrategyCycle } from "@
 import { canAccessProduct, getCurrentUsageSummary } from "@/domains/account/service";
 import { getProductReadinessSummary } from "@/domains/onboarding/service";
 import { AccessGate } from "@/components/dashboard/access-gate";
+import { getProjectChannelStatus } from "@/domains/channels/service";
+import { ChannelConnectButton } from "@/components/dashboard/channel-connect-button";
+import { ChannelDisconnectButton } from "@/components/dashboard/channel-disconnect-button";
 
 function ReadinessItem({ label, value }: { label: string; value: boolean }) {
   return (
@@ -47,6 +50,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ projec
   const nextCycle = latestCycle ? await getNextStrategyCycle(project.id, latestCycle.id) : null;
   const usage = await getCurrentUsageSummary(user.id);
   const readiness = await getProductReadinessSummary(project.id);
+  const channelStatus = await getProjectChannelStatus(project.id);
 
   const publishSummary = {
     total: latestPosts.length,
@@ -87,6 +91,33 @@ export default async function ProjectPage({ params }: { params: Promise<{ projec
           </div>
         </div>
         <ProjectSettingsForm project={project} />
+      </section>
+
+      <section className="rounded border bg-white p-4">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2 className="font-semibold">Publishing channel</h2>
+            <p className="mt-1 text-sm text-slate-600">Instagram is the first real publishing channel. Mock publishing is used only in local/dev fallback mode.</p>
+            <p className="mt-2 text-sm">
+              <strong>Status:</strong> {channelStatus.status}
+            </p>
+            <p className="mt-1 text-sm">
+              <strong>Platform:</strong> instagram
+            </p>
+            <p className="mt-1 text-sm">
+              <strong>Account:</strong> {channelStatus.channel?.accountName ?? "Not connected"}
+            </p>
+            <p className="mt-1 text-sm text-slate-600">{channelStatus.reason}</p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {!channelStatus.connected || channelStatus.status === "disconnected" ? (
+              <ChannelConnectButton projectId={project.id} label="Connect Instagram" />
+            ) : channelStatus.status === "expired" || channelStatus.status === "invalid" ? (
+              <ChannelConnectButton projectId={project.id} label="Reconnect Instagram" />
+            ) : null}
+            {channelStatus.connected ? <ChannelDisconnectButton projectId={project.id} /> : null}
+          </div>
+        </div>
       </section>
 
       <UsageSummary

@@ -4,6 +4,8 @@ import { getPublisher } from "@/lib/publisher";
 import { listContentItemsForStrategyCycle } from "@/domains/content-items/service";
 import { bulkScheduleBodySchema } from "@/lib/validation/publishing";
 import { assertPublishAllowed, incrementUsageCounter } from "@/domains/usage/service";
+import { env } from "@/lib/env";
+import { getChannelHealth, getProjectChannel } from "@/domains/channels/service";
 
 type PublishJobPayload = { contentItemId: string };
 
@@ -238,9 +240,17 @@ export async function processJob(jobId: string) {
       .set({ publishStatus: "publishing", updatedAt: new Date() })
       .where(eq(schema.contentItems.id, item.id));
 
-    const publisher = getPublisher();
-    await publisher.validateContentItemReady(item.id);
-    const publishResult = await publisher.publishContentItem(item);
+    const channel = await getProjectChannel(project.id, "instagram");
+    const channelHealth = getChannelHealth(channel ?? null);
+    const shouldUseMock = env.MOCK_MODE && (!channel || channelHealth.status !== "active");
+
+    if (!shouldUseMock && channelHealth.status !== "active") {
+      throw new Error(`Real publishing blocked: ${channelHealth.reason}`);
+    }
+
+    const publisher = getPublisher(shouldUseMock ? null : channel);
+    await publisher.validateContentItemReady(item, shouldUseMock ? null : channel);
+    const publishResult = await publisher.publishContentItem(item, shouldUseMock ? null : channel);
 
     await db
       .update(schema.contentItems)
@@ -252,6 +262,17 @@ export async function processJob(jobId: string) {
         updatedAt: new Date(),
       })
       .where(eq(schema.contentItems.id, item.id));
+
+    await db
+      .update(schema.jobQueue)
+      .set({
+        payloadJson: {
+          ...(running.payloadJson as Record<string, unknown>),
+          publishMode: publishResult.mode,
+          publishedExternalPostId: publishResult.externalPostId,
+        },
+      })
+      .where(eq(schema.jobQueue.id, running.id));
 
     await incrementUsageCounter({
       userId: project.userId,
