@@ -15,6 +15,18 @@ export async function GET() {
       billingStatus: state.billingStatus,
       betaApproved: state.isBetaApproved,
       inviteOnlyMode: state.inviteOnlyMode,
+      canAccessProduct: state.access,
+      betaApprovedAt: state.user.betaApprovedAt?.toISOString() ?? null,
+      subscription: state.subscription
+        ? {
+            status: state.subscription.status,
+            stripeSubscriptionId: state.subscription.stripeSubscriptionId ?? null,
+            stripePriceId: state.subscription.stripePriceId ?? null,
+            cancelAtPeriodEnd: state.subscription.cancelAtPeriodEnd,
+            currentPeriodStart: state.subscription.currentPeriodStart?.toISOString() ?? null,
+            currentPeriodEnd: state.subscription.currentPeriodEnd?.toISOString() ?? null,
+          }
+        : null,
       limits,
     });
 

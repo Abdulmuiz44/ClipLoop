@@ -33,7 +33,9 @@ export function BulkScheduleControl({ endpoint }: { endpoint: string }) {
 
     if (!response.ok) {
       const json = await response.json().catch(() => ({}));
-      setError(json.error ?? "Bulk schedule failed");
+      const limitDetail =
+        typeof json.used === "number" && typeof json.limit === "number" ? ` (${json.used}/${json.limit} used)` : "";
+      setError(`${json.error ?? "Bulk schedule failed"}${limitDetail}`);
       setLoading(false);
       return;
     }

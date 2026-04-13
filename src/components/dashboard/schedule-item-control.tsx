@@ -27,7 +27,9 @@ export function ScheduleItemControl({ endpoint }: { endpoint: string }) {
 
     if (!response.ok) {
       const json = await response.json().catch(() => ({}));
-      setError(json.error ?? "Scheduling failed");
+      const limitDetail =
+        typeof json.used === "number" && typeof json.limit === "number" ? ` (${json.used}/${json.limit} used)` : "";
+      setError(`${json.error ?? "Scheduling failed"}${limitDetail}`);
       setLoading(false);
       return;
     }

@@ -31,7 +31,9 @@ export function RenderButton({
 
     if (!response.ok) {
       const json = await response.json().catch(() => ({}));
-      setError(json.error ?? "Render failed");
+      const limitDetail =
+        typeof json.used === "number" && typeof json.limit === "number" ? ` (${json.used}/${json.limit} used)` : "";
+      setError(`${json.error ?? "Render failed"}${limitDetail}`);
       setLoading(false);
       return;
     }

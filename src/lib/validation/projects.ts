@@ -27,7 +27,9 @@ export const updateProjectSettingsInputSchema = z.object({
   offer: z.string().min(2).optional(),
   websiteUrl: z.string().url().optional().nullable(),
   ctaUrl: z.string().url().optional(),
+  goalType: goalTypeSchema.optional(),
   voiceStyleNotes: z.string().optional().nullable(),
+  examplePosts: z.array(z.string()).optional(),
 });
 
 export type CreateProjectInput = z.infer<typeof createProjectInputSchema>;

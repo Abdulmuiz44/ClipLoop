@@ -1,11 +1,14 @@
-import { eq, inArray } from "drizzle-orm";
+import { desc, eq, inArray } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
 
 export async function getProjectSetupStatus(projectId: string) {
   const project = await db.query.projects.findFirst({ where: eq(schema.projects.id, projectId) });
   if (!project) throw new Error("Project not found");
 
-  const cycle = await db.query.strategyCycles.findFirst({ where: eq(schema.strategyCycles.projectId, projectId) });
+  const cycle = await db.query.strategyCycles.findFirst({
+    where: eq(schema.strategyCycles.projectId, projectId),
+    orderBy: [desc(schema.strategyCycles.createdAt)],
+  });
   const posts = cycle
     ? await db.query.contentItems.findMany({ where: eq(schema.contentItems.strategyCycleId, cycle.id) })
     : [];

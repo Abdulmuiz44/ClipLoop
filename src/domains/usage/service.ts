@@ -1,10 +1,10 @@
-import { and, eq, gte, lte, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
 import { getPlanLimitsForUser } from "@/domains/account/service";
 
 type CounterKey = "postsGenerated" | "manualRegenerations" | "videosRendered" | "postsPublished";
-
-type Period = { periodStart: string; periodEnd: string };
+type PeriodType = "week" | "month";
+type Period = { periodType: PeriodType; periodStart: string; periodEnd: string };
 
 function getWeekPeriod(date = new Date()): Period {
   const day = date.getUTCDay();
@@ -13,13 +13,13 @@ function getWeekPeriod(date = new Date()): Period {
   start.setUTCHours(0, 0, 0, 0);
   const end = new Date(start);
   end.setUTCDate(start.getUTCDate() + 6);
-  return { periodStart: start.toISOString().slice(0, 10), periodEnd: end.toISOString().slice(0, 10) };
+  return { periodType: "week", periodStart: start.toISOString().slice(0, 10), periodEnd: end.toISOString().slice(0, 10) };
 }
 
 function getMonthPeriod(date = new Date()): Period {
   const start = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1));
   const end = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 0));
-  return { periodStart: start.toISOString().slice(0, 10), periodEnd: end.toISOString().slice(0, 10) };
+  return { periodType: "month", periodStart: start.toISOString().slice(0, 10), periodEnd: end.toISOString().slice(0, 10) };
 }
 
 export class UsageLimitError extends Error {
@@ -38,6 +38,7 @@ export async function getOrCreateUsageCounter(userId: string, projectId: string 
     where: and(
       eq(schema.usageCounters.userId, userId),
       projectId ? eq(schema.usageCounters.projectId, projectId) : sql`${schema.usageCounters.projectId} is null`,
+      eq(schema.usageCounters.periodType, period.periodType),
       eq(schema.usageCounters.periodStart, period.periodStart),
       eq(schema.usageCounters.periodEnd, period.periodEnd),
     ),
@@ -50,6 +51,7 @@ export async function getOrCreateUsageCounter(userId: string, projectId: string 
     .values({
       userId,
       projectId,
+      periodType: period.periodType,
       periodStart: period.periodStart,
       periodEnd: period.periodEnd,
     })
@@ -89,8 +91,9 @@ async function getAggregate(userId: string, period: "week" | "month") {
     .where(
       and(
         eq(schema.usageCounters.userId, userId),
-        gte(schema.usageCounters.periodStart, target.periodStart),
-        lte(schema.usageCounters.periodEnd, target.periodEnd),
+        eq(schema.usageCounters.periodType, target.periodType),
+        eq(schema.usageCounters.periodStart, target.periodStart),
+        eq(schema.usageCounters.periodEnd, target.periodEnd),
       ),
     );
 
@@ -99,7 +102,10 @@ async function getAggregate(userId: string, period: "week" | "month") {
 
 export async function assertProjectCreationAllowed(userId: string) {
   const limits = await getPlanLimitsForUser(userId);
-  const count = await db.$count(schema.projects, eq(schema.projects.userId, userId));
+  const count = await db.$count(
+    schema.projects,
+    and(eq(schema.projects.userId, userId), eq(schema.projects.status, "active")),
+  );
   if (count >= limits.activeProjects) {
     throw new UsageLimitError("Project limit reached for your current plan.", "PROJECT_LIMIT_REACHED", limits.activeProjects, count);
   }

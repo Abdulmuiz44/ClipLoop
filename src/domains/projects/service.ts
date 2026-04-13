@@ -64,9 +64,15 @@ export async function updateProjectSettings(projectId: string, userId: string, r
       offer: input.offer ?? project.offer,
       websiteUrl: input.websiteUrl ?? project.websiteUrl,
       ctaUrl: input.ctaUrl ?? project.ctaUrl,
-      voicePrefsJson: input.voiceStyleNotes
-        ? { ...((project.voicePrefsJson as Record<string, unknown> | null) ?? {}), style_notes: input.voiceStyleNotes }
-        : project.voicePrefsJson,
+      goalType: input.goalType ?? project.goalType,
+      voicePrefsJson:
+        input.voiceStyleNotes !== undefined
+          ? {
+              ...((project.voicePrefsJson as Record<string, unknown> | null) ?? {}),
+              style_notes: input.voiceStyleNotes ?? "",
+            }
+          : project.voicePrefsJson,
+      examplePostsJson: input.examplePosts ?? project.examplePostsJson,
       updatedAt: new Date(),
     })
     .where(eq(schema.projects.id, project.id))

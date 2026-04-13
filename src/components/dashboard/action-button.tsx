@@ -21,7 +21,9 @@ export function ActionButton({
     const response = await fetch(endpoint, { method: "POST" });
     if (!response.ok) {
       const json = await response.json().catch(() => ({}));
-      setError(json.error ?? "Action failed");
+      const limitDetail =
+        typeof json.used === "number" && typeof json.limit === "number" ? ` (${json.used}/${json.limit} used)` : "";
+      setError(`${json.error ?? "Action failed"}${limitDetail}`);
       setLoading(false);
       return;
     }

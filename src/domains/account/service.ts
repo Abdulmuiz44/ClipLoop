@@ -1,4 +1,4 @@
-import { and, eq, gte, lte, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
 import { env } from "@/lib/env";
 
@@ -12,6 +12,28 @@ export type PlanLimits = {
   rendersPerMonth: number;
   publishesPerMonth: number;
   connectedChannels: number;
+};
+
+export type CurrentUsageSummary = {
+  limits: PlanLimits;
+  usage: {
+    postsPerWeek: number;
+    postsPerMonth: number;
+    manualRegenerationsPerWeek: number;
+    rendersPerMonth: number;
+    publishesPerMonth: number;
+  };
+  remaining: {
+    postsPerWeek: number;
+    postsPerMonth: number;
+    manualRegenerationsPerWeek: number;
+    rendersPerMonth: number;
+    publishesPerMonth: number;
+  };
+  periods: {
+    week: { start: string; end: string };
+    month: { start: string; end: string };
+  };
 };
 
 const NO_ACCESS_LIMITS: PlanLimits = {
@@ -60,8 +82,14 @@ export async function getUserPlanState(userId: string) {
   const subscription = await getSubscriptionForUser(userId);
   const hasActiveSubscription = !!subscription && ["trialing", "active"].includes(subscription.status);
 
-  const effectivePlan: PlanType = hasActiveSubscription ? "starter" : (user.plan as PlanType);
+  const effectivePlan: PlanType =
+    hasActiveSubscription || user.plan === "starter" ? "starter" : ((user.plan as PlanType) ?? "free");
   const billingStatus = subscription?.status ?? user.billingStatus ?? (effectivePlan === "starter" ? "active" : "none");
+  const access =
+    (env.MOCK_MODE && user.email === env.DEMO_USER_EMAIL) ||
+    !env.INVITE_ONLY_MODE ||
+    user.isBetaApproved ||
+    effectivePlan === "starter";
 
   return {
     user,
@@ -70,19 +98,12 @@ export async function getUserPlanState(userId: string) {
     billingStatus,
     isBetaApproved: user.isBetaApproved,
     inviteOnlyMode: env.INVITE_ONLY_MODE,
+    access,
   };
 }
 
 export function canAccessProductFromState(state: Awaited<ReturnType<typeof getUserPlanState>>) {
-  if (env.MOCK_MODE && state.user.email === env.DEMO_USER_EMAIL) {
-    return true;
-  }
-
-  if (!state.inviteOnlyMode) {
-    return true;
-  }
-
-  return state.isBetaApproved || state.effectivePlan === "starter";
+  return state.access;
 }
 
 export async function canAccessProduct(userId: string) {
@@ -102,14 +123,14 @@ export async function requireProductAccess(userId: string) {
 
 export async function getPlanLimitsForUser(userId: string): Promise<PlanLimits> {
   const state = await getUserPlanState(userId);
-  if (!(await canAccessProduct(userId))) {
+  if (!canAccessProductFromState(state)) {
     return NO_ACCESS_LIMITS;
   }
 
   return PLAN_LIMITS[state.effectivePlan] ?? NO_ACCESS_LIMITS;
 }
 
-export async function getCurrentUsageSummary(userId: string) {
+export async function getCurrentUsageSummary(userId: string): Promise<CurrentUsageSummary> {
   const limits = await getPlanLimitsForUser(userId);
 
   const now = new Date();
@@ -132,8 +153,9 @@ export async function getCurrentUsageSummary(userId: string) {
       .where(
         and(
           eq(schema.usageCounters.userId, userId),
-          gte(schema.usageCounters.periodStart, weekStart.toISOString().slice(0, 10)),
-          lte(schema.usageCounters.periodEnd, weekEnd.toISOString().slice(0, 10)),
+          eq(schema.usageCounters.periodType, "week"),
+          eq(schema.usageCounters.periodStart, weekStart.toISOString().slice(0, 10)),
+          eq(schema.usageCounters.periodEnd, weekEnd.toISOString().slice(0, 10)),
         ),
       ),
     db
@@ -146,20 +168,34 @@ export async function getCurrentUsageSummary(userId: string) {
       .where(
         and(
           eq(schema.usageCounters.userId, userId),
-          gte(schema.usageCounters.periodStart, monthStart.toISOString().slice(0, 10)),
-          lte(schema.usageCounters.periodEnd, monthEnd.toISOString().slice(0, 10)),
+          eq(schema.usageCounters.periodType, "month"),
+          eq(schema.usageCounters.periodStart, monthStart.toISOString().slice(0, 10)),
+          eq(schema.usageCounters.periodEnd, monthEnd.toISOString().slice(0, 10)),
         ),
       ),
   ]);
 
+  const usage = {
+    postsPerWeek: weekly[0]?.postsGenerated ?? 0,
+    postsPerMonth: monthly[0]?.postsGenerated ?? 0,
+    manualRegenerationsPerWeek: weekly[0]?.manualRegenerations ?? 0,
+    rendersPerMonth: monthly[0]?.videosRendered ?? 0,
+    publishesPerMonth: monthly[0]?.postsPublished ?? 0,
+  };
+
   return {
     limits,
-    usage: {
-      postsPerWeek: weekly[0]?.postsGenerated ?? 0,
-      postsPerMonth: monthly[0]?.postsGenerated ?? 0,
-      manualRegenerationsPerWeek: weekly[0]?.manualRegenerations ?? 0,
-      rendersPerMonth: monthly[0]?.videosRendered ?? 0,
-      publishesPerMonth: monthly[0]?.postsPublished ?? 0,
+    usage,
+    remaining: {
+      postsPerWeek: Math.max(0, limits.postsPerWeek - usage.postsPerWeek),
+      postsPerMonth: Math.max(0, limits.postsPerMonth - usage.postsPerMonth),
+      manualRegenerationsPerWeek: Math.max(0, limits.manualRegenerationsPerWeek - usage.manualRegenerationsPerWeek),
+      rendersPerMonth: Math.max(0, limits.rendersPerMonth - usage.rendersPerMonth),
+      publishesPerMonth: Math.max(0, limits.publishesPerMonth - usage.publishesPerMonth),
+    },
+    periods: {
+      week: { start: weekStart.toISOString().slice(0, 10), end: weekEnd.toISOString().slice(0, 10) },
+      month: { start: monthStart.toISOString().slice(0, 10), end: monthEnd.toISOString().slice(0, 10) },
     },
   };
 }
