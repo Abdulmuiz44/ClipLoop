@@ -191,6 +191,33 @@ Rendered outputs are stored locally under:
 - No advanced analytics dashboards/charts.
 - Iteration is deterministic/mock-driven and manually triggered.
 
+## Public launch surface
+
+ClipLoop now has a public-facing launch surface intended to collect serious beta users and paid interest without overselling missing features.
+
+Public routes:
+- `/` landing page
+- `/pricing`
+- `/request-access`
+
+Public positioning:
+- short-form growth automation for indie apps
+- one weekly generated promo pack
+- render, approve, schedule, publish, track, learn, repeat
+- invite-only beta
+- cheap, opinionated, intentionally narrow
+
+Good fit:
+- indie apps
+- solo founders
+- small SaaS products
+- builders who want one weekly loop instead of a broad social suite
+
+Not a fit:
+- agencies managing many brands
+- large social teams
+- users expecting unlimited generation or fully polished multi-channel automation today
+
 ## Invite-only beta + billing-ready MVP slice
 
 ClipLoop now supports invite-only product access plus hard usage enforcement for sellable MVP packaging.
