@@ -13,6 +13,10 @@ const envSchema = z.object({
   LEMON_SQUEEZY_STORE_ID: z.string().optional(),
   LEMON_SQUEEZY_STARTER_VARIANT_ID: z.string().optional(),
   LEMON_SQUEEZY_WEBHOOK_SECRET: z.string().optional(),
+  INSTAGRAM_CLIENT_ID: z.string().optional(),
+  INSTAGRAM_CLIENT_SECRET: z.string().optional(),
+  INSTAGRAM_REDIRECT_URI: z.string().url().optional(),
+  ENCRYPTION_SECRET: z.string().optional(),
 });
 
 export const env = envSchema.parse({
@@ -28,4 +32,8 @@ export const env = envSchema.parse({
   LEMON_SQUEEZY_STORE_ID: process.env.LEMON_SQUEEZY_STORE_ID,
   LEMON_SQUEEZY_STARTER_VARIANT_ID: process.env.LEMON_SQUEEZY_STARTER_VARIANT_ID,
   LEMON_SQUEEZY_WEBHOOK_SECRET: process.env.LEMON_SQUEEZY_WEBHOOK_SECRET,
+  INSTAGRAM_CLIENT_ID: process.env.INSTAGRAM_CLIENT_ID,
+  INSTAGRAM_CLIENT_SECRET: process.env.INSTAGRAM_CLIENT_SECRET,
+  INSTAGRAM_REDIRECT_URI: process.env.INSTAGRAM_REDIRECT_URI,
+  ENCRYPTION_SECRET: process.env.ENCRYPTION_SECRET,
 });
