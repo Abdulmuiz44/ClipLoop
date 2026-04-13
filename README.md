@@ -231,7 +231,7 @@ ClipLoop now supports invite-only product access plus hard usage enforcement for
 ### Plan model (MVP)
 - `free`: account exists but product access can be gated.
 - `beta`: approved invite-only testers with production-like limits.
-- `starter`: paid $5 plan target with same hard limits in this slice.
+- `starter`: paid $5/month Starter plan with the same hard limits in this slice.
 
 ### Hard limits currently enforced server-side
 - 1 active project
@@ -245,10 +245,24 @@ ClipLoop now supports invite-only product access plus hard usage enforcement for
 Usage counters are updated by generation/regeneration/render/publish flows and enforced in API-triggered workflows.
 Weekly and monthly usage are stored separately, so the current window summaries do not double count cross-period actions.
 
-### Billing-ready state
-- `subscriptions` table stores status plus Stripe IDs (`stripe_subscription_id`, `stripe_price_id`) and current period.
-- Effective plan is derived from user + subscription status.
+### Lemon Squeezy billing
+- `POST /api/billing/checkout` creates a real hosted Lemon Squeezy checkout for the Starter variant.
+- `/pricing` now exposes a live Starter CTA.
+- `/billing/success` and `/billing/cancel` provide post-checkout return states.
+- `POST /api/webhooks/lemonsqueezy` verifies the `X-Signature` header and syncs subscription lifecycle changes into the existing account model.
+- `POST /api/billing/portal` refreshes a Lemon Squeezy customer-portal URL from the current subscription and redirects the user into self-serve billing management.
+
+### Subscription state model
+- `subscriptions` now stores Lemon Squeezy IDs, provider status, management URLs, and current period dates alongside the earlier placeholder billing fields.
+- Webhooks are the source of truth for Starter activation and downgrade decisions.
+- Effective plan is derived from user beta approval plus the synced subscription status.
 - `GET /api/me/plan` and `GET /api/me/usage` expose plan/usage for UI surfaces.
+
+### Access-state precedence
+- Active paid Starter access grants product access even when invite-only mode is enabled.
+- Beta-approved users keep beta access unless a paid Starter subscription temporarily supersedes it.
+- If a Starter subscription fully expires, access falls back to `beta` when the user is beta-approved, otherwise to gated `free`.
+- Cancel-at-period-end subscriptions keep Starter access until the synced current period end.
 
 ### Access requests
 - `POST /api/access/request` stores waitlist/access requests.
@@ -270,6 +284,33 @@ This sets beta approval and plan state without building a full admin panel.
 - `/dashboard/projects/new` now guides users through the workflow more clearly before their first strategy cycle.
 - `/dashboard`, `/dashboard/projects/[projectId]`, and `/dashboard/settings` show plan state, usage remaining, and product-readiness status so the MVP feels operational.
 
+### Billing environment variables
+Add these to `.env`:
+
+```bash
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+LEMON_SQUEEZY_API_KEY=
+LEMON_SQUEEZY_STORE_ID=
+LEMON_SQUEEZY_STARTER_VARIANT_ID=
+LEMON_SQUEEZY_WEBHOOK_SECRET=
+```
+
+### Local webhook testing
+1. Run the app locally.
+2. Expose your local app publicly with a tunnel such as ngrok or Cloudflare Tunnel.
+3. Create a Lemon Squeezy webhook pointing to:
+   - `https://YOUR_PUBLIC_URL/api/webhooks/lemonsqueezy`
+4. Subscribe at minimum to:
+   - `subscription_created`
+   - `subscription_updated`
+   - `subscription_cancelled`
+   - `subscription_resumed`
+   - `subscription_expired`
+   - `subscription_paused`
+   - `subscription_unpaused`
+5. Use a test-mode Starter variant in Lemon Squeezy if you want to exercise the flow without charging real cards.
+
 ### Current billing limitations
-- No full Stripe checkout/customer portal flow yet.
-- Subscription state is persisted and read, but checkout/session wiring is intentionally deferred.
+- ClipLoop currently supports one paid plan only: Starter monthly.
+- The app uses Lemon Squeezy hosted checkout and customer-portal links rather than a custom in-app billing portal.
+- Real auth is still minimal, so in non-mock environments the checkout launcher relies on the email entered at checkout start to create or match the account record.

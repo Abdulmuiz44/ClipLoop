@@ -8,6 +8,11 @@ export const accessRequestInputSchema = z.object({
   notes: z.string().max(1000).optional().nullable(),
 });
 
+export const starterCheckoutInputSchema = z.object({
+  email: z.string().email().optional().nullable(),
+  name: z.string().min(2).max(120).optional().nullable(),
+});
+
 export const usageLimitErrorSchema = z.object({
   code: z.string(),
   message: z.string(),
@@ -25,8 +30,12 @@ export const mePlanResponseSchema = z.object({
   subscription: z
     .object({
       status: z.string(),
-      stripeSubscriptionId: z.string().nullable(),
-      stripePriceId: z.string().nullable(),
+      lemonSqueezySubscriptionId: z.string().nullable(),
+      lemonSqueezyCustomerId: z.string().nullable(),
+      lemonSqueezyVariantId: z.string().nullable(),
+      managementUrl: z.string().nullable(),
+      updatePaymentMethodUrl: z.string().nullable(),
+      providerStatus: z.string().nullable(),
       cancelAtPeriodEnd: z.boolean(),
       currentPeriodStart: z.string().datetime().nullable(),
       currentPeriodEnd: z.string().datetime().nullable(),
@@ -63,4 +72,8 @@ export const meUsageResponseSchema = z.object({
     month: z.object({ start: z.string(), end: z.string() }),
   }),
   limits: mePlanResponseSchema.shape.limits,
+});
+
+export const checkoutStartResponseSchema = z.object({
+  url: z.string().url(),
 });

@@ -1,6 +1,7 @@
 "use client";
 
 import { AccessRequestForm } from "@/components/marketing/access-request-form";
+import { StarterCheckoutForm } from "@/components/marketing/starter-checkout-form";
 
 export function AccessGate({ email }: { email: string }) {
   return (
@@ -28,6 +29,13 @@ export function AccessGate({ email }: { email: string }) {
           <p className="mt-1 text-slate-600">Request access below. Approved beta users and paid starter users unlock the product workflow.</p>
         </div>
       </div>
+
+      <StarterCheckoutForm
+        email={email}
+        showFields={false}
+        title="Need paid access instead?"
+        description="Starter access no longer needs manual beta approval. Start the real Lemon Squeezy checkout path with the account email already shown here."
+      />
 
       <AccessRequestForm email={email} showBackHome />
     </div>

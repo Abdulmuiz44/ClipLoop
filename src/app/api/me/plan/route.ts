@@ -20,8 +20,12 @@ export async function GET() {
       subscription: state.subscription
         ? {
             status: state.subscription.status,
-            stripeSubscriptionId: state.subscription.stripeSubscriptionId ?? null,
-            stripePriceId: state.subscription.stripePriceId ?? null,
+            lemonSqueezySubscriptionId: state.subscription.lemonSqueezySubscriptionId ?? null,
+            lemonSqueezyCustomerId: state.subscription.lemonSqueezyCustomerId ?? null,
+            lemonSqueezyVariantId: state.subscription.lemonSqueezyVariantId ?? null,
+            managementUrl: state.subscription.managementUrl ?? null,
+            updatePaymentMethodUrl: state.subscription.updatePaymentMethodUrl ?? null,
+            providerStatus: state.subscription.providerStatus ?? null,
             cancelAtPeriodEnd: state.subscription.cancelAtPeriodEnd,
             currentPeriodStart: state.subscription.currentPeriodStart?.toISOString() ?? null,
             currentPeriodEnd: state.subscription.currentPeriodEnd?.toISOString() ?? null,

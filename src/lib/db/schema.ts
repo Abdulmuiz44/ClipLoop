@@ -51,6 +51,8 @@ export const subscriptionStatusEnum = pgEnum("subscription_status", [
   "past_due",
   "canceled",
   "unpaid",
+  "paused",
+  "expired",
 ]);
 export const accessRequestStatusEnum = pgEnum("access_request_status", ["pending", "approved", "rejected"]);
 export const usagePeriodTypeEnum = pgEnum("usage_period_type", ["week", "month"]);
@@ -64,6 +66,7 @@ export const users = pgTable(
     plan: planEnum("plan").notNull().default("free"),
     billingStatus: text("billing_status"),
     stripeCustomerId: text("stripe_customer_id"),
+    lemonSqueezyCustomerId: text("lemon_squeezy_customer_id"),
     isBetaApproved: boolean("is_beta_approved").notNull().default(false),
     betaApprovedAt: timestamp("beta_approved_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
@@ -72,6 +75,7 @@ export const users = pgTable(
   (table) => ({
     emailUnique: uniqueIndex("users_email_unique").on(table.email),
     stripeCustomerIdx: index("users_stripe_customer_id_idx").on(table.stripeCustomerId),
+    lemonSqueezyCustomerIdx: index("users_lemon_squeezy_customer_id_idx").on(table.lemonSqueezyCustomerId),
     betaApprovedIdx: index("users_is_beta_approved_idx").on(table.isBetaApproved),
   }),
 );
@@ -209,6 +213,14 @@ export const subscriptions = pgTable(
       .references(() => users.id, { onDelete: "cascade" }),
     stripeSubscriptionId: text("stripe_subscription_id"),
     stripePriceId: text("stripe_price_id"),
+    lemonSqueezySubscriptionId: text("lemon_squeezy_subscription_id"),
+    lemonSqueezyCustomerId: text("lemon_squeezy_customer_id"),
+    lemonSqueezyOrderId: text("lemon_squeezy_order_id"),
+    lemonSqueezyProductId: text("lemon_squeezy_product_id"),
+    lemonSqueezyVariantId: text("lemon_squeezy_variant_id"),
+    managementUrl: text("management_url"),
+    updatePaymentMethodUrl: text("update_payment_method_url"),
+    providerStatus: text("provider_status"),
     status: subscriptionStatusEnum("status").notNull().default("incomplete"),
     currentPeriodStart: timestamp("current_period_start", { withTimezone: true }),
     currentPeriodEnd: timestamp("current_period_end", { withTimezone: true }),
@@ -221,6 +233,9 @@ export const subscriptions = pgTable(
     stripeSubscriptionUnique: uniqueIndex("subscriptions_stripe_subscription_id_unique")
       .on(table.stripeSubscriptionId)
       .where(sql`${table.stripeSubscriptionId} is not null`),
+    lemonSubscriptionUnique: uniqueIndex("subscriptions_lemon_squeezy_subscription_id_unique")
+      .on(table.lemonSqueezySubscriptionId)
+      .where(sql`${table.lemonSqueezySubscriptionId} is not null`),
   }),
 );
 

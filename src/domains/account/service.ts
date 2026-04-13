@@ -1,6 +1,7 @@
 import { and, eq, sql } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
 import { env } from "@/lib/env";
+import { getLatestSubscriptionForUser, subscriptionConfersStarterAccess } from "@/domains/billing/service";
 
 export type PlanType = "free" | "starter" | "beta";
 
@@ -69,10 +70,7 @@ export class ProductAccessError extends Error {
 }
 
 export async function getSubscriptionForUser(userId: string) {
-  return db.query.subscriptions.findFirst({
-    where: eq(schema.subscriptions.userId, userId),
-    orderBy: (table, { desc }) => [desc(table.createdAt)],
-  });
+  return getLatestSubscriptionForUser(userId);
 }
 
 export async function getUserPlanState(userId: string) {
@@ -80,10 +78,11 @@ export async function getUserPlanState(userId: string) {
   if (!user) throw new Error("User not found");
 
   const subscription = await getSubscriptionForUser(userId);
-  const hasActiveSubscription = !!subscription && ["trialing", "active"].includes(subscription.status);
+  const hasStarterSubscription = subscriptionConfersStarterAccess(subscription);
+  const hasManualStarterAccess = !subscription && user.plan === "starter";
 
   const effectivePlan: PlanType =
-    hasActiveSubscription || user.plan === "starter" ? "starter" : ((user.plan as PlanType) ?? "free");
+    hasStarterSubscription || hasManualStarterAccess ? "starter" : ((user.plan as PlanType) ?? "free");
   const billingStatus = subscription?.status ?? user.billingStatus ?? (effectivePlan === "starter" ? "active" : "none");
   const access =
     (env.MOCK_MODE && user.email === env.DEMO_USER_EMAIL) ||
