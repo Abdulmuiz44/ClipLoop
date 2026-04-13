@@ -155,7 +155,7 @@ export default function HomePage() {
           <p className="text-sm font-medium uppercase tracking-[0.22em] text-slate-400">Starter pricing</p>
           <h2 className="mt-3 text-3xl font-bold tracking-tight">$5/month, intentionally capped</h2>
           <p className="mt-4 text-sm leading-7 text-slate-300">
-            One active project. Five posts per week. Hard monthly limits. Invite-only beta until the checkout path is ready for broader use.
+            One active project. Five posts per week. Hard monthly limits. Paid Starter checkout is live, and invite-only beta still exists for approval-first users.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
             <Link href="/pricing" className="inline-flex rounded-xl bg-white px-4 py-2.5 text-sm text-slate-950 hover:bg-slate-200">

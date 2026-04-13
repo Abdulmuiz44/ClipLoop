@@ -1,6 +1,8 @@
 import { getCurrentUser } from "@/lib/auth";
 import { getCurrentUsageSummary, getUserPlanState } from "@/domains/account/service";
 import { UsageSummary } from "@/components/dashboard/usage-summary";
+import { ManageBillingButton } from "@/components/dashboard/manage-billing-button";
+import { StarterCheckoutForm } from "@/components/marketing/starter-checkout-form";
 
 export default async function SettingsPage() {
   const user = await getCurrentUser();
@@ -11,8 +13,8 @@ export default async function SettingsPage() {
     <div className="mx-auto max-w-4xl space-y-6">
       <div className="space-y-2">
         <p className="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">Account and billing</p>
-        <h1 className="text-3xl font-bold">Starter-ready account state</h1>
-        <p className="text-sm text-slate-600">Billing is still intentionally lightweight in this MVP, but the account model, subscription record, and plan-aware limits are in place.</p>
+        <h1 className="text-3xl font-bold">Billing and access state</h1>
+        <p className="text-sm text-slate-600">ClipLoop keeps billing intentionally narrow: one Starter plan, invite-only beta access, and Lemon Squeezy as the source of truth for paid subscriptions.</p>
       </div>
 
       <section className="grid gap-4 md:grid-cols-2">
@@ -49,37 +51,66 @@ export default async function SettingsPage() {
         <div className="rounded border bg-white p-4 text-sm">
           <h2 className="font-semibold">Subscription record</h2>
           {state.subscription ? (
-            <dl className="mt-3 space-y-2">
-              <div className="flex items-center justify-between gap-4">
-                <dt className="text-slate-500">Status</dt>
-                <dd>{state.subscription.status}</dd>
-              </div>
-              <div className="flex items-center justify-between gap-4">
-                <dt className="text-slate-500">Stripe subscription ID</dt>
-                <dd>{state.subscription.stripeSubscriptionId ?? "not connected"}</dd>
-              </div>
-              <div className="flex items-center justify-between gap-4">
-                <dt className="text-slate-500">Stripe price ID</dt>
-                <dd>{state.subscription.stripePriceId ?? "not connected"}</dd>
-              </div>
-              <div className="flex items-center justify-between gap-4">
-                <dt className="text-slate-500">Current period</dt>
-                <dd>
-                  {state.subscription.currentPeriodStart ? state.subscription.currentPeriodStart.toISOString().slice(0, 10) : "n/a"} to{" "}
-                  {state.subscription.currentPeriodEnd ? state.subscription.currentPeriodEnd.toISOString().slice(0, 10) : "n/a"}
-                </dd>
-              </div>
-              <div className="flex items-center justify-between gap-4">
-                <dt className="text-slate-500">Cancel at period end</dt>
-                <dd>{state.subscription.cancelAtPeriodEnd ? "yes" : "no"}</dd>
-              </div>
-            </dl>
-          ) : (
-            <div className="mt-3 rounded border border-dashed border-slate-300 bg-slate-50 p-3 text-slate-600">
-              No live checkout flow yet. This project stores subscription state so starter access can be wired to Stripe cleanly in the next phase.
+            <div className="mt-3 space-y-4">
+              <dl className="space-y-2">
+                <div className="flex items-center justify-between gap-4">
+                  <dt className="text-slate-500">Status</dt>
+                  <dd>{state.subscription.status}</dd>
+                </div>
+                <div className="flex items-center justify-between gap-4">
+                  <dt className="text-slate-500">Lemon subscription ID</dt>
+                  <dd>{state.subscription.lemonSqueezySubscriptionId ?? "not connected"}</dd>
+                </div>
+                <div className="flex items-center justify-between gap-4">
+                  <dt className="text-slate-500">Lemon customer ID</dt>
+                  <dd>{state.subscription.lemonSqueezyCustomerId ?? "not connected"}</dd>
+                </div>
+                <div className="flex items-center justify-between gap-4">
+                  <dt className="text-slate-500">Variant ID</dt>
+                  <dd>{state.subscription.lemonSqueezyVariantId ?? "not connected"}</dd>
+                </div>
+                <div className="flex items-center justify-between gap-4">
+                  <dt className="text-slate-500">Current period</dt>
+                  <dd>
+                    {state.subscription.currentPeriodStart ? state.subscription.currentPeriodStart.toISOString().slice(0, 10) : "n/a"} to{" "}
+                    {state.subscription.currentPeriodEnd ? state.subscription.currentPeriodEnd.toISOString().slice(0, 10) : "n/a"}
+                  </dd>
+                </div>
+                <div className="flex items-center justify-between gap-4">
+                  <dt className="text-slate-500">Cancel at period end</dt>
+                  <dd>{state.subscription.cancelAtPeriodEnd ? "yes" : "no"}</dd>
+                </div>
+              </dl>
+
+              <p className="text-slate-600">
+                {state.effectivePlan === "starter"
+                  ? "Starter access is active through Lemon Squeezy. Use the management link below to update payment details or cancel."
+                  : "A subscription record exists, but ClipLoop currently resolves your effective plan from the synced status above."}
+              </p>
+
+              <ManageBillingButton />
             </div>
+          ) : (
+            <StarterCheckoutForm
+              email={user.email}
+              name={user.fullName ?? ""}
+              showFields={false}
+              title="Upgrade to Starter"
+              description="Paid Starter access unlocks the same weekly ClipLoop workflow without needing manual beta approval."
+              submitLabel="Start Starter checkout"
+              className="mt-3"
+            />
           )}
         </div>
+      </section>
+
+      <section className="rounded border bg-white p-5 text-sm">
+        <h2 className="font-semibold">How access is decided</h2>
+        <ul className="mt-3 space-y-2 text-slate-600">
+          <li>Paid Starter access comes from the synced Lemon Squeezy subscription state.</li>
+          <li>Beta-approved users keep beta access even if they never start paid Starter.</li>
+          <li>If a paid subscription fully expires, ClipLoop falls back to beta access when approval exists, otherwise to gated free access.</li>
+        </ul>
       </section>
 
       <UsageSummary

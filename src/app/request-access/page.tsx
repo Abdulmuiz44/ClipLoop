@@ -36,11 +36,11 @@ export default function RequestAccessPage() {
         </div>
         <div className="rounded-2xl border border-slate-200 bg-white p-4 text-sm shadow-sm">
           <p className="font-medium text-slate-950">Current starter intent</p>
-          <p className="mt-2 leading-6 text-slate-600">$5/month for one active project, hard usage caps, tracked links, and manual iteration.</p>
+          <p className="mt-2 leading-6 text-slate-600">$5/month for one active project, hard usage caps, tracked links, manual iteration, and a live Lemon Squeezy checkout path.</p>
         </div>
         <div className="rounded-2xl border border-slate-200 bg-white p-4 text-sm shadow-sm">
           <p className="font-medium text-slate-950">What happens next</p>
-          <p className="mt-2 leading-6 text-slate-600">Requests are reviewed manually. Good-fit products may get beta access before checkout is fully wired.</p>
+          <p className="mt-2 leading-6 text-slate-600">Requests are reviewed manually. Good-fit products may get beta access, while paid Starter is available for users ready to buy the current narrow workflow.</p>
         </div>
       </div>
 

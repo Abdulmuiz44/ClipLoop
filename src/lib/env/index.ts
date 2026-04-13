@@ -8,6 +8,11 @@ const envSchema = z.object({
   INVITE_ONLY_MODE: z.coerce.boolean().default(true),
   LLM_PROVIDER: z.string().default("mock"),
   LLM_API_KEY: z.string().optional(),
+  NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:3000"),
+  LEMON_SQUEEZY_API_KEY: z.string().optional(),
+  LEMON_SQUEEZY_STORE_ID: z.string().optional(),
+  LEMON_SQUEEZY_STARTER_VARIANT_ID: z.string().optional(),
+  LEMON_SQUEEZY_WEBHOOK_SECRET: z.string().optional(),
 });
 
 export const env = envSchema.parse({
@@ -18,4 +23,9 @@ export const env = envSchema.parse({
   INVITE_ONLY_MODE: process.env.INVITE_ONLY_MODE,
   LLM_PROVIDER: process.env.LLM_PROVIDER,
   LLM_API_KEY: process.env.LLM_API_KEY,
+  NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+  LEMON_SQUEEZY_API_KEY: process.env.LEMON_SQUEEZY_API_KEY,
+  LEMON_SQUEEZY_STORE_ID: process.env.LEMON_SQUEEZY_STORE_ID,
+  LEMON_SQUEEZY_STARTER_VARIANT_ID: process.env.LEMON_SQUEEZY_STARTER_VARIANT_ID,
+  LEMON_SQUEEZY_WEBHOOK_SECRET: process.env.LEMON_SQUEEZY_WEBHOOK_SECRET,
 });
