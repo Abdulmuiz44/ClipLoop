@@ -56,7 +56,7 @@ export default function PricingPage() {
           </p>
 
           <ul className="mt-5 space-y-3 text-sm">
-            <Feature>1 active project</Feature>
+            <Feature>Up to 5 active projects</Feature>
             <Feature>5 generated posts per week</Feature>
             <Feature>20 generated posts per month</Feature>
             <Feature>3 manual regenerations per week</Feature>

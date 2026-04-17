@@ -16,7 +16,7 @@ export default async function SettingsPage() {
       <div className="space-y-2">
         <p className="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">Account and billing</p>
         <h1 className="text-3xl font-bold">Billing and access state</h1>
-        <p className="text-sm text-slate-600">ClipLoop keeps billing intentionally narrow: one Starter plan, invite-only beta access, and Lemon Squeezy as the source of truth for paid subscriptions.</p>
+        <p className="text-sm text-slate-600">ClipLoop keeps billing intentionally narrow: free trial access includes one project, and Starter unlocks multi-project usage through Lemon Squeezy billing.</p>
       </div>
 
       <section className="grid gap-4 md:grid-cols-2">
@@ -109,9 +109,9 @@ export default async function SettingsPage() {
       <section className="rounded border bg-white p-5 text-sm">
         <h2 className="font-semibold">How access is decided</h2>
         <ul className="mt-3 space-y-2 text-slate-600">
+          <li>All users can start on the free plan with one active project.</li>
           <li>Paid Starter access comes from the synced Lemon Squeezy subscription state.</li>
-          <li>Beta-approved users keep beta access even if they never start paid Starter.</li>
-          <li>If a paid subscription fully expires, ClipLoop falls back to beta access when approval exists, otherwise to gated free access.</li>
+          <li>Upgrade to Starter when you need more than one active project.</li>
         </ul>
       </section>
 

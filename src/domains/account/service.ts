@@ -47,7 +47,7 @@ const NO_ACCESS_LIMITS: PlanLimits = {
   connectedChannels: 0,
 };
 
-const STARTER_LIMITS: PlanLimits = {
+const FREE_TRIAL_LIMITS: PlanLimits = {
   activeProjects: 1,
   postsPerWeek: 5,
   postsPerMonth: 20,
@@ -57,8 +57,18 @@ const STARTER_LIMITS: PlanLimits = {
   connectedChannels: 1,
 };
 
+const STARTER_LIMITS: PlanLimits = {
+  activeProjects: 5,
+  postsPerWeek: 5,
+  postsPerMonth: 20,
+  manualRegenerationsPerWeek: 3,
+  rendersPerMonth: 20,
+  publishesPerMonth: 20,
+  connectedChannels: 1,
+};
+
 const PLAN_LIMITS: Record<PlanType, PlanLimits> = {
-  free: NO_ACCESS_LIMITS,
+  free: FREE_TRIAL_LIMITS,
   starter: STARTER_LIMITS,
   beta: STARTER_LIMITS,
 };
@@ -84,11 +94,7 @@ export async function getUserPlanState(userId: string) {
   const effectivePlan: PlanType =
     hasStarterSubscription || hasManualStarterAccess ? "starter" : ((user.plan as PlanType) ?? "free");
   const billingStatus = subscription?.status ?? user.billingStatus ?? (effectivePlan === "starter" ? "active" : "none");
-  const access =
-    (env.MOCK_MODE && user.email === env.DEMO_USER_EMAIL) ||
-    !env.INVITE_ONLY_MODE ||
-    user.isBetaApproved ||
-    effectivePlan === "starter";
+  const access = true;
 
   return {
     user,

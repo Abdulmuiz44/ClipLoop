@@ -26,7 +26,7 @@ export default function BillingSuccessPage() {
         </div>
         <div className="rounded-2xl border border-slate-200 bg-white p-4 text-sm shadow-sm">
           <p className="font-medium text-slate-950">Starter limits</p>
-          <p className="mt-2 leading-6 text-slate-600">One active project, five posts per week, twenty posts per month, and the current hard render/publish caps.</p>
+          <p className="mt-2 leading-6 text-slate-600">Up to five active projects, five posts per week, twenty posts per month, and the current hard render/publish caps.</p>
         </div>
         <div className="rounded-2xl border border-slate-200 bg-white p-4 text-sm shadow-sm">
           <p className="font-medium text-slate-950">Best next step</p>

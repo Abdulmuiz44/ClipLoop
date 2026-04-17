@@ -151,7 +151,7 @@ export default async function DashboardPage() {
         <div className="rounded border bg-white p-5">
           <h2 className="font-semibold">MVP constraints</h2>
           <ul className="mt-3 space-y-2 text-sm text-slate-600">
-            <li>One active project per account.</li>
+            <li>Free plan: 1 active project. Starter/Beta: up to 5 active projects.</li>
             <li>One connected channel in the current plan model.</li>
             <li>5 posts per week and 20 per month.</li>
             <li>3 manual regenerations per week.</li>
