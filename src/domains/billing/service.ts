@@ -423,7 +423,7 @@ export async function refreshBillingManagementUrl(userId: string) {
   }
 
   const response = await lemonsqueezyFetch<LemonSubscriptionPayload>(`/v1/subscriptions/${subscription.lemonSqueezySubscriptionId}`);
-  const attributes = response.data?.attributes;
+  const attributes = response?.data?.attributes;
   const managementUrl = attributes?.urls?.customer_portal ?? subscription.managementUrl;
   const updatePaymentMethodUrl = attributes?.urls?.update_payment_method ?? subscription.updatePaymentMethodUrl;
 

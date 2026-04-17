@@ -18,6 +18,9 @@ export const planEnum = pgEnum("plan_type", ["free", "starter", "beta"]);
 export const goalTypeEnum = pgEnum("project_goal_type", ["clicks", "signups", "revenue"]);
 export const projectTypeEnum = pgEnum("project_type", ["business", "creator", "app"]);
 export const projectLanguageStyleEnum = pgEnum("project_language_style", ["english", "pidgin", "mixed"]);
+export const projectChannelEnum = pgEnum("project_channel_type", ["instagram", "tiktok", "whatsapp"]);
+export const publishStrategyEnum = pgEnum("content_publish_strategy", ["direct_instagram", "manual_export"]);
+export const manualPublishStatusEnum = pgEnum("content_manual_publish_status", ["ready_for_export", "exported", "posted"]);
 export const strategySourceEnum = pgEnum("strategy_cycle_source", ["initial", "iteration", "manual_regeneration"]);
 export const renderStatusEnum = pgEnum("render_status", ["pending", "queued", "rendering", "completed", "failed"]);
 export const publishStatusEnum = pgEnum("publish_status", [
@@ -109,6 +112,7 @@ export const projects = pgTable(
     callToAction: text("call_to_action"),
     instagramHandle: text("instagram_handle"),
     whatsappNumber: text("whatsapp_number"),
+    preferredChannelsJson: jsonb("preferred_channels_json").notNull().default(sql`'[]'::jsonb`),
     preferredChannels: text("preferred_channels"),
     languageStyle: projectLanguageStyleEnum("language_style"),
     websiteUrl: text("website_url"),
@@ -161,14 +165,19 @@ export const contentItems = pgTable(
       .references(() => strategyCycles.id, { onDelete: "cascade" }),
     parentContentItemId: uuid("parent_content_item_id").references((): any => contentItems.id, { onDelete: "set null" }),
     platform: platformEnum("platform").notNull().default("instagram"),
+    targetChannel: projectChannelEnum("target_channel").notNull().default("instagram"),
+    publishStrategy: publishStrategyEnum("publish_strategy").notNull().default("direct_instagram"),
+    manualPublishStatus: manualPublishStatusEnum("manual_publish_status").notNull().default("ready_for_export"),
     contentType: contentTypeEnum("content_type").notNull().default("slideshow_video"),
     internalTitle: text("internal_title").notNull(),
     angle: text("angle").notNull(),
     hook: text("hook").notNull(),
     slidesJson: jsonb("slides_json").notNull().default(sql`'[]'::jsonb`),
     caption: text("caption").notNull(),
+    channelCaptionsJson: jsonb("channel_captions_json"),
     hashtagsJson: jsonb("hashtags_json"),
     ctaText: text("cta_text").notNull(),
+    channelCtaTextJson: jsonb("channel_cta_text_json"),
     destinationUrl: text("destination_url").notNull(),
     trackingSlug: varchar("tracking_slug", { length: 255 }).notNull(),
     templateId: text("template_id").notNull().default("clean_dark"),

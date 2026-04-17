@@ -17,6 +17,8 @@ const envSchema = z.object({
   INSTAGRAM_CLIENT_SECRET: z.string().optional(),
   INSTAGRAM_REDIRECT_URI: z.string().url().optional(),
   ENCRYPTION_SECRET: z.string().optional(),
+  HYPERFRAMES_ENABLED: z.coerce.boolean().default(false),
+  HYPERFRAMES_BIN: z.string().default("hyperframes"),
 });
 
 export const env = envSchema.parse({
@@ -36,4 +38,6 @@ export const env = envSchema.parse({
   INSTAGRAM_CLIENT_SECRET: process.env.INSTAGRAM_CLIENT_SECRET,
   INSTAGRAM_REDIRECT_URI: process.env.INSTAGRAM_REDIRECT_URI,
   ENCRYPTION_SECRET: process.env.ENCRYPTION_SECRET,
+  HYPERFRAMES_ENABLED: process.env.HYPERFRAMES_ENABLED,
+  HYPERFRAMES_BIN: process.env.HYPERFRAMES_BIN,
 });

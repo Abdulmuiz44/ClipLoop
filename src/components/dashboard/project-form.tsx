@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { SUPPORTED_PROJECT_CHANNELS } from "@/lib/utils/channels";
 
 export function ProjectForm() {
   const router = useRouter();
@@ -23,6 +24,12 @@ export function ProjectForm() {
     const ctaUrl = String(formData.get("ctaUrl") ?? "");
     const tone = String(formData.get("tone") ?? "");
     const languageStyle = String(formData.get("languageStyle") ?? "english") as "english" | "pidgin" | "mixed";
+    const preferredChannels = formData
+      .getAll("preferredChannels")
+      .map((value) => String(value))
+      .filter((value): value is "instagram" | "tiktok" | "whatsapp" =>
+        SUPPORTED_PROJECT_CHANNELS.includes(value as (typeof SUPPORTED_PROJECT_CHANNELS)[number]),
+      );
 
     const payload = {
       name,
@@ -50,7 +57,7 @@ export function ProjectForm() {
       callToAction: String(formData.get("callToAction") ?? "") || null,
       instagramHandle: String(formData.get("instagramHandle") ?? "") || null,
       whatsappNumber: String(formData.get("whatsappNumber") ?? "") || null,
-      preferredChannels: String(formData.get("preferredChannels") ?? "") || null,
+      preferredChannels: preferredChannels.length > 0 ? preferredChannels : ["instagram"],
       languageStyle,
     };
 
@@ -158,10 +165,23 @@ export function ProjectForm() {
         <div>
           <h3 className="text-base font-semibold">Channels</h3>
         </div>
-        <label className="space-y-1 text-sm">
-          <span className="font-medium">Preferred channels</span>
-          <input name="preferredChannels" placeholder="Instagram, TikTok, WhatsApp Status" className="w-full rounded border p-2" />
-        </label>
+        <fieldset className="space-y-2 text-sm">
+          <legend className="font-medium">Preferred channels</legend>
+          <div className="grid gap-2 sm:grid-cols-3">
+            <label className="flex items-center gap-2 rounded border p-2">
+              <input type="checkbox" name="preferredChannels" value="instagram" defaultChecked />
+              Instagram
+            </label>
+            <label className="flex items-center gap-2 rounded border p-2">
+              <input type="checkbox" name="preferredChannels" value="tiktok" />
+              TikTok
+            </label>
+            <label className="flex items-center gap-2 rounded border p-2">
+              <input type="checkbox" name="preferredChannels" value="whatsapp" />
+              WhatsApp
+            </label>
+          </div>
+        </fieldset>
         <div className="grid gap-3 md:grid-cols-2">
           <label className="space-y-1 text-sm">
             <span className="font-medium">Instagram handle</span>

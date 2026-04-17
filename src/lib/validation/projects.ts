@@ -3,6 +3,7 @@ import { z } from "zod";
 export const goalTypeSchema = z.enum(["clicks", "signups", "revenue"]);
 export const projectTypeSchema = z.enum(["business", "creator", "app"]);
 export const languageStyleSchema = z.enum(["english", "pidgin", "mixed"]);
+export const projectChannelSchema = z.enum(["instagram", "tiktok", "whatsapp"]);
 
 export const createProjectInputSchema = z.object({
   name: z.string().min(2),
@@ -27,7 +28,7 @@ export const createProjectInputSchema = z.object({
   whatsappNumber: z.string().optional().nullable(),
   websiteUrl: z.string().url().optional().nullable(),
   ctaUrl: z.string().url(),
-  preferredChannels: z.string().optional().nullable(),
+  preferredChannels: z.array(projectChannelSchema).optional().default(["instagram"]),
   languageStyle: languageStyleSchema.optional().nullable(),
   goalType: goalTypeSchema,
   voiceStyleNotes: z.string().optional().nullable(),
@@ -57,7 +58,7 @@ export const updateProjectSettingsInputSchema = z.object({
   whatsappNumber: z.string().optional().nullable(),
   websiteUrl: z.string().url().optional().nullable(),
   ctaUrl: z.string().url().optional(),
-  preferredChannels: z.string().optional().nullable(),
+  preferredChannels: z.array(projectChannelSchema).optional(),
   languageStyle: languageStyleSchema.optional().nullable(),
   goalType: goalTypeSchema.optional(),
   voiceStyleNotes: z.string().optional().nullable(),

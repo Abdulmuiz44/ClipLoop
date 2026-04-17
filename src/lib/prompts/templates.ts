@@ -26,7 +26,7 @@ export type ProjectPromptContext = {
   whatsappNumber?: string | null;
   websiteUrl?: string | null;
   ctaUrl: string;
-  preferredChannels?: string | null;
+  preferredChannels?: Array<"instagram" | "tiktok" | "whatsapp">;
   languageStyle?: "english" | "pidgin" | "mixed" | null;
   goalType: "clicks" | "signups" | "revenue";
   voiceStyleNotes?: string | null;
@@ -39,12 +39,28 @@ function languageInstruction(languageStyle: ProjectPromptContext["languageStyle"
   return "Write in clear English with local Nigerian business context where relevant.";
 }
 
+function channelsInstruction(channels: ProjectPromptContext["preferredChannels"]) {
+  const normalized = channels && channels.length > 0 ? channels : ["instagram"];
+  const notes: string[] = [];
+  if (normalized.includes("instagram")) {
+    notes.push("Instagram: cleaner promo captions, polished CTA, and stronger visual promo framing.");
+  }
+  if (normalized.includes("tiktok")) {
+    notes.push("TikTok: sharper opening hooks, faster pacing, and creator-native phrasing.");
+  }
+  if (normalized.includes("whatsapp")) {
+    notes.push("WhatsApp: shorter status-friendly copy, direct sales tone, minimal marketing fluff.");
+  }
+  return { normalized, notes };
+}
+
 export function weeklyStrategyPrompt(project: ProjectPromptContext) {
   const primaryAudience = project.targetAudience ?? project.audience;
   const primaryOffer = project.primaryOffer ?? project.offer;
   const profileName = project.businessName ?? project.productName;
   const type = project.projectType ?? "app";
   const location = [project.city, project.state].filter(Boolean).join(", ");
+  const channels = channelsInstruction(project.preferredChannels);
 
   return [
     "Generate one weekly strategy JSON with exactly 5 angles.",
@@ -58,7 +74,8 @@ export function weeklyStrategyPrompt(project: ProjectPromptContext) {
     `Offer: ${primaryOffer}`,
     `Tone: ${project.tone ?? project.voiceStyleNotes ?? "direct and practical"}`,
     `CTA: ${project.callToAction ?? "Send a message or click to start"}`,
-    `Preferred channels: ${project.preferredChannels ?? "instagram,tiktok"}`,
+    `Preferred channels: ${channels.normalized.join(",")}`,
+    ...channels.notes,
     `Location: ${location || "Nigeria"}`,
     `Goal type: ${project.goalType}`,
     `Website: ${project.websiteUrl ?? "n/a"}`,
@@ -73,6 +90,7 @@ export function postGenerationPrompt(project: ProjectPromptContext, strategy: We
   const primaryOffer = project.primaryOffer ?? project.offer;
   const profileName = project.businessName ?? project.productName;
   const cta = project.callToAction ?? "Send us a DM now";
+  const channels = channelsInstruction(project.preferredChannels);
 
   return [
     "Generate exactly 5 short-form post drafts in JSON.",
@@ -84,7 +102,9 @@ export function postGenerationPrompt(project: ProjectPromptContext, strategy: We
     "- keep slides concise and mobile-friendly",
     `- tone should follow: ${project.tone ?? project.voiceStyleNotes ?? "direct and confident"}`,
     `- language style: ${project.languageStyle ?? "english"} (${languageInstruction(project.languageStyle)})`,
-    `- preferred channels: ${project.preferredChannels ?? "instagram,tiktok"}`,
+    `- preferred channels: ${channels.normalized.join(",")}`,
+    ...channels.notes.map((note) => `- ${note}`),
+    "- include per-channel fields: channel_captions and channel_cta_text with keys only from selected channels",
     `- include practical CTA style around: ${cta}`,
     `Business profile: ${profileName}`,
     `Type: ${project.projectType ?? "app"}`,
@@ -127,9 +147,10 @@ export function iterationNextPackPrompt(input: {
   primaryOffer?: string | null;
   tone?: string | null;
   callToAction?: string | null;
-  preferredChannels?: string | null;
+  preferredChannels?: Array<"instagram" | "tiktok" | "whatsapp">;
   languageStyle?: "english" | "pidgin" | "mixed" | null;
 }) {
+  const channels = channelsInstruction(input.preferredChannels);
   return [
     `Generate next-week pack improvements for ${input.productName}.`,
     `Type: ${input.projectType ?? "app"}`,
@@ -137,7 +158,8 @@ export function iterationNextPackPrompt(input: {
     `Offer: ${input.primaryOffer ?? "not specified"}`,
     `Tone: ${input.tone ?? "direct"}`,
     `CTA style: ${input.callToAction ?? "direct action"}`,
-    `Preferred channels: ${input.preferredChannels ?? "instagram,tiktok"}`,
+    `Preferred channels: ${channels.normalized.join(",")}`,
+    ...channels.notes,
     `Language style: ${input.languageStyle ?? "english"} (${languageInstruction(input.languageStyle)})`,
     "Bias the pack toward short promo, offer-first hooks, local relatability, urgency when relevant, and social proof framing.",
     `Analysis JSON: ${JSON.stringify(input.analysis)}`,

@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ClipLoop HyperFrames Promo</title>
+    <style>
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        font-family: "Inter", "Segoe UI", Arial, sans-serif;
+      }
+      .frame {
+        width: 1080px;
+        height: 1920px;
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(180deg, #0f172a 0%, #111827 100%);
+        color: #f8fafc;
+        padding: 80px 64px 110px;
+      }
+      .bg {
+        position: absolute;
+        inset: 0;
+        object-fit: cover;
+        opacity: 0.2;
+        z-index: 0;
+      }
+      .shade {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(2, 6, 23, 0.1), rgba(2, 6, 23, 0.85));
+        z-index: 1;
+      }
+      .content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+      .meta {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-size: 28px;
+        color: #bfdbfe;
+      }
+      .logo {
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
+        object-fit: cover;
+        border: 1px solid rgba(255, 255, 255, 0.35);
+      }
+      .hook {
+        margin-top: 40px;
+        font-weight: 800;
+        font-size: 68px;
+        line-height: 1.05;
+        letter-spacing: -0.02em;
+      }
+      .caption {
+        margin-top: 30px;
+        font-size: 40px;
+        line-height: 1.24;
+        color: #e2e8f0;
+      }
+      .cta {
+        margin-top: auto;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 22px 28px;
+        border-radius: 18px;
+        background: #22c55e;
+        color: #052e16;
+        font-weight: 700;
+        font-size: 34px;
+      }
+      .channel {
+        margin-top: 14px;
+        font-size: 26px;
+        color: #94a3b8;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="frame">
+      <!-- OPTIONAL_BACKGROUND -->
+      <div class="shade"></div>
+      <div class="content">
+        <div class="meta">
+          <!-- OPTIONAL_LOGO -->
+          <span>{{BUSINESS_NAME}}</span>
+        </div>
+        <div class="hook">{{HOOK}}</div>
+        <div class="caption">{{CHANNEL_CAPTION}}</div>
+        <div class="cta">{{CHANNEL_CTA}}</div>
+        <div class="channel">Optimized for {{TARGET_CHANNEL}}</div>
+      </div>
+    </div>
+  </body>
+</html>

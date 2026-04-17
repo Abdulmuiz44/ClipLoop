@@ -41,6 +41,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Link href="/request-access">Request access</Link>
               <Link href="/dashboard">Dashboard</Link>
               <Link href="/dashboard/projects/new">New Project</Link>
+              <Link href="/dashboard/manual-queue">Manual Queue</Link>
               <Link href="/dashboard/settings">Settings</Link>
             </div>
           </nav>

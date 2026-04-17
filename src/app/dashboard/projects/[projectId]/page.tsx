@@ -16,6 +16,7 @@ import { AccessGate } from "@/components/dashboard/access-gate";
 import { getProjectChannelStatus } from "@/domains/channels/service";
 import { ChannelConnectButton } from "@/components/dashboard/channel-connect-button";
 import { ChannelDisconnectButton } from "@/components/dashboard/channel-disconnect-button";
+import { normalizeProjectChannels } from "@/lib/utils/channels";
 
 function ReadinessItem({ label, value }: { label: string; value: boolean }) {
   return (
@@ -51,6 +52,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ projec
   const usage = await getCurrentUsageSummary(user.id);
   const readiness = await getProductReadinessSummary(project.id);
   const channelStatus = await getProjectChannelStatus(project.id);
+  const preferredChannels = normalizeProjectChannels(project.preferredChannelsJson, project.preferredChannels);
 
   const publishSummary = {
     total: latestPosts.length,
@@ -107,7 +109,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ projec
             <strong>Call to action:</strong> {project.callToAction ?? "Use default CTA URL"}
           </p>
           <p>
-            <strong>Preferred channels:</strong> {project.preferredChannels ?? "Instagram"}
+            <strong>Preferred channels:</strong> {preferredChannels.join(", ")}
           </p>
           <p>
             <strong>Instagram:</strong> {project.instagramHandle ?? "Not set"}
