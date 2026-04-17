@@ -221,48 +221,58 @@ export async function generateNextContentPackFromIteration(
 
   const payload = await generateStructuredObject({
     schema: postBatchOutputSchema,
-    prompt: iterationNextPackPrompt({ analysis, productName: project.productName }),
+    prompt: iterationNextPackPrompt({
+      analysis,
+      productName: project.businessName ?? project.productName,
+      projectType: project.projectType,
+      audience: project.targetAudience ?? project.audience,
+      primaryOffer: project.primaryOffer ?? project.offer,
+      tone: project.tone,
+      callToAction: project.callToAction,
+      preferredChannels: project.preferredChannels,
+      languageStyle: project.languageStyle,
+    }),
     mockFactory: () => ({
       posts: Array.from({ length: 5 }).map((_, idx) => ({
         internal_title: `Next Week Post ${idx + 1}`,
         hook: analysis.improved_hooks[idx % Math.max(analysis.improved_hooks.length, 1)] ?? `Improved hook ${idx + 1}`,
         slides: [
-          `Pain point for ${project.audience}`,
+          `Pain point for ${project.targetAudience ?? project.audience}`,
           `Mutation insight: ${analysis.angle_mutations[idx % Math.max(analysis.angle_mutations.length, 1)]?.new_angle ?? "new angle"}`,
-          `Proof: what worked last week, improved`,
-          `CTA: ${project.ctaUrl}`,
+          `Proof: local buyer response and offer pull`,
+          `CTA: ${project.callToAction ?? project.ctaUrl}`,
         ],
-        caption: `Next-cycle variant informed by winners for ${project.productName}.`,
-        cta_text: "Try the improved workflow",
-        hashtags: ["#growth", "#saas", "#iteration"],
-        why_it_should_work: "Derived from winner patterns with improved hook and clearer angle.",
+        caption: `Next-cycle variant informed by winners for ${project.businessName ?? project.productName}.`,
+        cta_text: project.callToAction ?? "Try this offer now",
+        hashtags: ["#nigeriabusiness", "#shortform", "#iteration"],
+        why_it_should_work: "Derived from winner patterns with clearer local offer and CTA.",
       })),
     }),
   });
 
+  const newContentItems: typeof schema.contentItems.$inferInsert[] = payload.posts.map((post, idx) => ({
+    projectId: project.id,
+    strategyCycleId: nextStrategyCycleId,
+    parentContentItemId: analysis.winners[idx % Math.max(analysis.winners.length, 1)]?.content_item_id ?? null,
+    platform: "instagram",
+    contentType: "slideshow_video",
+    internalTitle: post.internal_title,
+    angle: analysis.angle_mutations[idx % Math.max(analysis.angle_mutations.length, 1)]?.new_angle ?? `iteration-angle-${idx + 1}`,
+    hook: post.hook,
+    slidesJson: post.slides,
+    caption: post.caption,
+    hashtagsJson: post.hashtags,
+    ctaText: post.cta_text,
+    destinationUrl: project.ctaUrl,
+    trackingSlug: buildTrackingSlug(project.productName, `iter-${nextStrategyCycleId}-${idx + 1}`),
+    templateId: "clean_dark",
+    renderStatus: "pending",
+    publishStatus: "draft",
+  }));
+
   const inserted = await db
     .insert(schema.contentItems)
-    .values(
-      payload.posts.map((post, idx) => ({
-        projectId: project.id,
-        strategyCycleId: nextStrategyCycleId,
-        parentContentItemId: analysis.winners[idx % Math.max(analysis.winners.length, 1)]?.content_item_id ?? null,
-        platform: "instagram",
-        contentType: "slideshow_video",
-        internalTitle: post.internal_title,
-        angle: analysis.angle_mutations[idx % Math.max(analysis.angle_mutations.length, 1)]?.new_angle ?? `iteration-angle-${idx + 1}`,
-        hook: post.hook,
-        slidesJson: post.slides,
-        caption: post.caption,
-        hashtagsJson: post.hashtags,
-        ctaText: post.cta_text,
-        destinationUrl: project.ctaUrl,
-        trackingSlug: buildTrackingSlug(project.productName, `iter-${nextStrategyCycleId}-${idx + 1}`),
-        templateId: "clean_dark",
-        renderStatus: "pending",
-        publishStatus: "draft",
-      })),
-    )
+    .values(newContentItems)
     .returning();
 
   return inserted;

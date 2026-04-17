@@ -13,23 +13,45 @@ export function ProjectForm() {
     setLoading(true);
     setError(null);
 
-    const examplePostsRaw = String(formData.get("examplePosts") ?? "");
+    const name = String(formData.get("name") ?? "");
+    const projectType = String(formData.get("projectType") ?? "business") as "business" | "creator" | "app";
+    const businessName = String(formData.get("businessName") ?? "");
+    const businessCategory = String(formData.get("businessCategory") ?? "");
+    const businessDescription = String(formData.get("businessDescription") ?? "");
+    const targetAudience = String(formData.get("targetAudience") ?? "");
+    const primaryOffer = String(formData.get("primaryOffer") ?? "");
+    const ctaUrl = String(formData.get("ctaUrl") ?? "");
+    const tone = String(formData.get("tone") ?? "");
+    const languageStyle = String(formData.get("languageStyle") ?? "english") as "english" | "pidgin" | "mixed";
+
     const payload = {
-      name: String(formData.get("name") ?? ""),
-      productName: String(formData.get("productName") ?? ""),
-      oneLiner: String(formData.get("oneLiner") ?? ""),
-      description: String(formData.get("description") ?? ""),
-      audience: String(formData.get("audience") ?? ""),
-      niche: String(formData.get("niche") ?? ""),
-      offer: String(formData.get("offer") ?? ""),
-      websiteUrl: String(formData.get("websiteUrl") ?? ""),
-      ctaUrl: String(formData.get("ctaUrl") ?? ""),
-      goalType: String(formData.get("goalType") ?? "clicks"),
-      voiceStyleNotes: String(formData.get("voiceStyleNotes") ?? ""),
-      examplePosts: examplePostsRaw
-        .split("\n")
-        .map((line) => line.trim())
-        .filter(Boolean),
+      name,
+      productName: businessName || name,
+      oneLiner: businessCategory ? `${businessCategory} ${projectType}` : `${projectType} profile`,
+      description: businessDescription,
+      audience: targetAudience,
+      niche: businessCategory || projectType,
+      offer: primaryOffer,
+      websiteUrl: String(formData.get("websiteUrl") ?? "") || null,
+      ctaUrl,
+      goalType: "clicks" as const,
+      voiceStyleNotes: tone || null,
+      examplePosts: [] as string[],
+      projectType,
+      businessName: businessName || null,
+      businessCategory: businessCategory || null,
+      businessDescription: businessDescription || null,
+      city: String(formData.get("city") ?? "") || null,
+      state: String(formData.get("state") ?? "") || null,
+      targetAudience: targetAudience || null,
+      primaryOffer: primaryOffer || null,
+      priceRange: String(formData.get("priceRange") ?? "") || null,
+      tone: tone || null,
+      callToAction: String(formData.get("callToAction") ?? "") || null,
+      instagramHandle: String(formData.get("instagramHandle") ?? "") || null,
+      whatsappNumber: String(formData.get("whatsappNumber") ?? "") || null,
+      preferredChannels: String(formData.get("preferredChannels") ?? "") || null,
+      languageStyle,
     };
 
     const response = await fetch("/api/projects", {
@@ -51,32 +73,52 @@ export function ProjectForm() {
   }
 
   return (
-    <form action={onSubmit} className="space-y-6 rounded border bg-white p-5">
+    <form action={onSubmit} className="space-y-5 rounded border bg-white p-4 md:p-5">
       <section className="space-y-3">
         <div>
-          <h2 className="text-lg font-semibold">1. Product context</h2>
-          <p className="text-sm text-slate-600">Give ClipLoop enough detail to write believable weekly short-form promos.</p>
+          <h2 className="text-base font-semibold">Basics</h2>
+          <p className="text-sm text-slate-600">Create a simple business profile first. Keep this practical.</p>
         </div>
         <div className="grid gap-3 md:grid-cols-2">
           <label className="space-y-1 text-sm">
             <span className="font-medium">Workspace name</span>
-            <input name="name" placeholder="ClipLoop HQ" className="w-full rounded border p-2" required />
+            <input name="name" placeholder="Main profile" className="w-full rounded border p-2" required />
           </label>
           <label className="space-y-1 text-sm">
-            <span className="font-medium">Product name</span>
-            <input name="productName" placeholder="ClipLoop" className="w-full rounded border p-2" required />
+            <span className="font-medium">Project type</span>
+            <select name="projectType" className="w-full rounded border p-2" defaultValue="business" required>
+              <option value="business">Business</option>
+              <option value="creator">Creator</option>
+              <option value="app">App</option>
+            </select>
+          </label>
+        </div>
+        <div className="grid gap-3 md:grid-cols-2">
+          <label className="space-y-1 text-sm">
+            <span className="font-medium">Business/brand name</span>
+            <input name="businessName" placeholder="Ada Beauty Hub" className="w-full rounded border p-2" required />
+          </label>
+          <label className="space-y-1 text-sm">
+            <span className="font-medium">Category</span>
+            <input name="businessCategory" placeholder="Beauty products" className="w-full rounded border p-2" required />
+          </label>
+        </div>
+        <div className="grid gap-3 md:grid-cols-2">
+          <label className="space-y-1 text-sm">
+            <span className="font-medium">City</span>
+            <input name="city" placeholder="Lagos" className="w-full rounded border p-2" />
+          </label>
+          <label className="space-y-1 text-sm">
+            <span className="font-medium">State</span>
+            <input name="state" placeholder="Lagos State" className="w-full rounded border p-2" />
           </label>
         </div>
         <label className="space-y-1 text-sm">
-          <span className="font-medium">One-liner</span>
-          <input name="oneLiner" placeholder="Weekly short-form growth loop for indie apps" className="w-full rounded border p-2" />
-        </label>
-        <label className="space-y-1 text-sm">
-          <span className="font-medium">Description</span>
+          <span className="font-medium">Business description</span>
           <textarea
-            name="description"
-            placeholder="What the product does, who it helps, and the result users get."
-            className="min-h-28 w-full rounded border p-2"
+            name="businessDescription"
+            placeholder="What you sell, who you help, and why customers choose you."
+            className="min-h-24 w-full rounded border p-2"
             required
           />
         </label>
@@ -84,69 +126,82 @@ export function ProjectForm() {
 
       <section className="space-y-3">
         <div>
-          <h3 className="font-semibold">2. Audience and offer</h3>
-          <p className="text-sm text-slate-600">This drives angle selection, hooks, and CTA framing.</p>
-        </div>
-        <div className="grid gap-3 md:grid-cols-2">
-          <label className="space-y-1 text-sm">
-            <span className="font-medium">Audience</span>
-            <input name="audience" placeholder="Indie hackers and small SaaS founders" className="w-full rounded border p-2" required />
-          </label>
-          <label className="space-y-1 text-sm">
-            <span className="font-medium">Niche</span>
-            <input name="niche" placeholder="B2B SaaS growth" className="w-full rounded border p-2" required />
-          </label>
+          <h3 className="text-base font-semibold">Audience</h3>
         </div>
         <label className="space-y-1 text-sm">
-          <span className="font-medium">Offer</span>
-          <input name="offer" placeholder="$5 starter plan for one project and weekly content automation" className="w-full rounded border p-2" required />
-        </label>
-        <label className="space-y-1 text-sm">
-          <span className="font-medium">Primary goal</span>
-          <select name="goalType" className="w-full rounded border p-2" defaultValue="clicks">
-            <option value="clicks">Drive clicks</option>
-            <option value="signups">Drive signups</option>
-            <option value="revenue">Drive revenue</option>
-          </select>
+          <span className="font-medium">Target audience</span>
+          <input name="targetAudience" placeholder="Busy women in Lagos who want affordable beauty products" className="w-full rounded border p-2" required />
         </label>
       </section>
 
       <section className="space-y-3">
         <div>
-          <h3 className="font-semibold">3. Destination and voice</h3>
-          <p className="text-sm text-slate-600">ClipLoop will use this when generating captions, slides, and tracked links.</p>
+          <h3 className="text-base font-semibold">Offer</h3>
+        </div>
+        <label className="space-y-1 text-sm">
+          <span className="font-medium">Primary offer</span>
+          <input name="primaryOffer" placeholder="Weekend bundle: 3 products for ₦15,000" className="w-full rounded border p-2" required />
+        </label>
+        <div className="grid gap-3 md:grid-cols-2">
+          <label className="space-y-1 text-sm">
+            <span className="font-medium">Price range</span>
+            <input name="priceRange" placeholder="₦5,000 - ₦20,000" className="w-full rounded border p-2" />
+          </label>
+          <label className="space-y-1 text-sm">
+            <span className="font-medium">Call to action</span>
+            <input name="callToAction" placeholder="Send us a WhatsApp message now" className="w-full rounded border p-2" />
+          </label>
+        </div>
+      </section>
+
+      <section className="space-y-3">
+        <div>
+          <h3 className="text-base font-semibold">Channels</h3>
+        </div>
+        <label className="space-y-1 text-sm">
+          <span className="font-medium">Preferred channels</span>
+          <input name="preferredChannels" placeholder="Instagram, TikTok, WhatsApp Status" className="w-full rounded border p-2" />
+        </label>
+        <div className="grid gap-3 md:grid-cols-2">
+          <label className="space-y-1 text-sm">
+            <span className="font-medium">Instagram handle</span>
+            <input name="instagramHandle" placeholder="@adabeautyhub" className="w-full rounded border p-2" />
+          </label>
+          <label className="space-y-1 text-sm">
+            <span className="font-medium">WhatsApp number</span>
+            <input name="whatsappNumber" placeholder="+2348012345678" className="w-full rounded border p-2" />
+          </label>
         </div>
         <div className="grid gap-3 md:grid-cols-2">
           <label className="space-y-1 text-sm">
             <span className="font-medium">Website URL</span>
-            <input name="websiteUrl" placeholder="https://cliploop.app" className="w-full rounded border p-2" />
+            <input name="websiteUrl" placeholder="https://yourbusiness.com" className="w-full rounded border p-2" />
           </label>
           <label className="space-y-1 text-sm">
-            <span className="font-medium">CTA URL</span>
-            <input name="ctaUrl" placeholder="https://cliploop.app/signup" className="w-full rounded border p-2" required />
+            <span className="font-medium">Primary destination URL</span>
+            <input name="ctaUrl" placeholder="https://wa.me/2348012345678" className="w-full rounded border p-2" required />
           </label>
         </div>
-        <label className="space-y-1 text-sm">
-          <span className="font-medium">Voice notes</span>
-          <textarea
-            name="voiceStyleNotes"
-            placeholder="Direct, punchy, specific. Avoid marketing fluff."
-            className="min-h-24 w-full rounded border p-2"
-          />
-        </label>
-        <label className="space-y-1 text-sm">
-          <span className="font-medium">Example posts</span>
-          <textarea
-            name="examplePosts"
-            placeholder="One example per line. Use real examples or short references."
-            className="min-h-28 w-full rounded border p-2"
-          />
-        </label>
       </section>
 
-      <section className="rounded border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700">
-        <p className="font-medium">What happens next</p>
-        <p className="mt-1">After project creation, generate this week’s strategy, generate 5 posts, render them, approve the keepers, then schedule and publish.</p>
+      <section className="space-y-3">
+        <div>
+          <h3 className="text-base font-semibold">Style</h3>
+        </div>
+        <div className="grid gap-3 md:grid-cols-2">
+          <label className="space-y-1 text-sm">
+            <span className="font-medium">Tone</span>
+            <input name="tone" placeholder="Friendly, confident, and urgent" className="w-full rounded border p-2" />
+          </label>
+          <label className="space-y-1 text-sm">
+            <span className="font-medium">Language style</span>
+            <select name="languageStyle" className="w-full rounded border p-2" defaultValue="english">
+              <option value="english">English</option>
+              <option value="pidgin">Pidgin</option>
+              <option value="mixed">Mixed</option>
+            </select>
+          </label>
+        </div>
       </section>
 
       {error ? <p className="text-sm text-red-600">{error}</p> : null}

@@ -163,6 +163,21 @@ Stores the product and content context for one customer project.
 - `audience` text not null
 - `niche` text not null
 - `offer` text not null
+- `project_type` enum(`business`,`creator`,`app`) nullable
+- `business_name` text nullable
+- `business_category` text nullable
+- `business_description` text nullable
+- `city` text nullable
+- `state` text nullable
+- `target_audience` text nullable
+- `primary_offer` text nullable
+- `price_range` text nullable
+- `tone` text nullable
+- `call_to_action` text nullable
+- `instagram_handle` text nullable
+- `whatsapp_number` text nullable
+- `preferred_channels` text nullable
+- `language_style` enum(`english`,`pidgin`,`mixed`) nullable
 - `website_url` text nullable
 - `cta_url` text not null
 - `goal_type` text not null

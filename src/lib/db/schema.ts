@@ -16,6 +16,8 @@ import {
 
 export const planEnum = pgEnum("plan_type", ["free", "starter", "beta"]);
 export const goalTypeEnum = pgEnum("project_goal_type", ["clicks", "signups", "revenue"]);
+export const projectTypeEnum = pgEnum("project_type", ["business", "creator", "app"]);
+export const projectLanguageStyleEnum = pgEnum("project_language_style", ["english", "pidgin", "mixed"]);
 export const strategySourceEnum = pgEnum("strategy_cycle_source", ["initial", "iteration", "manual_regeneration"]);
 export const renderStatusEnum = pgEnum("render_status", ["pending", "queued", "rendering", "completed", "failed"]);
 export const publishStatusEnum = pgEnum("publish_status", [
@@ -94,6 +96,21 @@ export const projects = pgTable(
     audience: text("audience").notNull(),
     niche: text("niche").notNull(),
     offer: text("offer").notNull(),
+    projectType: projectTypeEnum("project_type"),
+    businessName: text("business_name"),
+    businessCategory: text("business_category"),
+    businessDescription: text("business_description"),
+    city: text("city"),
+    state: text("state"),
+    targetAudience: text("target_audience"),
+    primaryOffer: text("primary_offer"),
+    priceRange: text("price_range"),
+    tone: text("tone"),
+    callToAction: text("call_to_action"),
+    instagramHandle: text("instagram_handle"),
+    whatsappNumber: text("whatsapp_number"),
+    preferredChannels: text("preferred_channels"),
+    languageStyle: projectLanguageStyleEnum("language_style"),
     websiteUrl: text("website_url"),
     ctaUrl: text("cta_url").notNull(),
     goalType: goalTypeEnum("goal_type").notNull(),

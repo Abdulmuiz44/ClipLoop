@@ -48,8 +48,23 @@ export async function generatePostsForStrategyCycle(strategyCycleId: string) {
         audience: project.audience,
         niche: project.niche,
         offer: project.offer,
+        projectType: project.projectType,
+        businessName: project.businessName,
+        businessCategory: project.businessCategory,
+        businessDescription: project.businessDescription,
+        city: project.city,
+        state: project.state,
+        targetAudience: project.targetAudience,
+        primaryOffer: project.primaryOffer,
+        priceRange: project.priceRange,
+        tone: project.tone,
+        callToAction: project.callToAction,
+        instagramHandle: project.instagramHandle,
+        whatsappNumber: project.whatsappNumber,
         websiteUrl: project.websiteUrl,
         ctaUrl: project.ctaUrl,
+        preferredChannels: project.preferredChannels,
+        languageStyle: project.languageStyle,
         goalType: project.goalType,
         voiceStyleNotes: (project.voicePrefsJson as { style_notes?: string } | null)?.style_notes,
         examplePosts: (project.examplePostsJson as string[] | null) ?? [],
@@ -61,44 +76,50 @@ export async function generatePostsForStrategyCycle(strategyCycleId: string) {
     ),
     mockFactory: () => ({
       posts: Array.from({ length: 5 }).map((_, idx) => ({
-        internal_title: `Post ${idx + 1}: ${project.productName} result`,
-        hook: `Still doing ${project.niche} the hard way?`,
+        internal_title: `Post ${idx + 1}: ${project.businessName ?? project.productName} promo`,
+        hook:
+          project.languageStyle === "pidgin"
+            ? `${project.primaryOffer ?? project.offer} dey run now for ${project.targetAudience ?? project.audience}`
+            : `${project.primaryOffer ?? project.offer} for ${project.targetAudience ?? project.audience} this week`,
         slides: [
-          `Problem: ${project.audience} loses time`,
-          `Shift: Use ${project.productName} to automate`,
-          `Proof: Faster output in one weekly loop`,
-          `CTA: Try it this week`,
+          `Offer: ${project.primaryOffer ?? project.offer}`,
+          `Audience: ${project.targetAudience ?? project.audience}`,
+          `Proof: Trusted by local buyers${project.city ? ` in ${project.city}` : ""}`,
+          `CTA: ${project.callToAction ?? "Send us a DM now"}`,
         ],
-        caption: `${project.productName} helps ${project.audience} move from idea to content drafts every week.`,
-        cta_text: "Start your weekly pack",
-        hashtags: ["#saas", "#buildinpublic", "#growth"],
-        why_it_should_work: "Pain-led hook plus clear proof and CTA",
+        caption:
+          project.languageStyle === "pidgin"
+            ? `${project.businessName ?? project.productName} dey help ${project.targetAudience ?? project.audience}. ${project.callToAction ?? "Send DM make we start."}`
+            : `${project.businessName ?? project.productName} helps ${project.targetAudience ?? project.audience}. ${project.callToAction ?? "Send us a DM to get started."}`,
+        cta_text: project.callToAction ?? "Send us a DM now",
+        hashtags: ["#nigeriabusiness", "#smallbusiness", "#promo"],
+        why_it_should_work: "Offer-led local hook with direct CTA, urgency, and social-proof framing.",
       })),
     }),
   });
 
+  const newContentItems: typeof schema.contentItems.$inferInsert[] = structured.posts.map((post, idx) => ({
+    projectId: project.id,
+    strategyCycleId,
+    platform: "instagram",
+    contentType: "slideshow_video",
+    internalTitle: post.internal_title,
+    angle: `angle-${idx + 1}`,
+    hook: post.hook,
+    slidesJson: post.slides,
+    caption: post.caption,
+    hashtagsJson: post.hashtags,
+    ctaText: post.cta_text,
+    destinationUrl: project.ctaUrl,
+    trackingSlug: buildTrackingSlug(project.productName, `${strategyCycleId}-${idx + 1}`),
+    templateId: "clean_dark",
+    renderStatus: "pending",
+    publishStatus: "draft",
+  }));
+
   const inserted = await db
     .insert(schema.contentItems)
-    .values(
-      structured.posts.map((post, idx) => ({
-        projectId: project.id,
-        strategyCycleId,
-        platform: "instagram",
-        contentType: "slideshow_video",
-        internalTitle: post.internal_title,
-        angle: `angle-${idx + 1}`,
-        hook: post.hook,
-        slidesJson: post.slides,
-        caption: post.caption,
-        hashtagsJson: post.hashtags,
-        ctaText: post.cta_text,
-        destinationUrl: project.ctaUrl,
-        trackingSlug: buildTrackingSlug(project.productName, `${strategyCycleId}-${idx + 1}`),
-        templateId: "clean_dark",
-        renderStatus: "pending",
-        publishStatus: "draft",
-      })),
-    )
+    .values(newContentItems)
     .returning();
 
   await incrementUsageCounter({ userId: project.userId, projectId: project.id, period: "week", field: "postsGenerated", amount: inserted.length });
