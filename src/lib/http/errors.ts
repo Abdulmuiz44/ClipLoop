@@ -3,6 +3,7 @@ import { ZodError } from "zod";
 import { ProductAccessError } from "@/domains/account/service";
 import { BillingConfigurationError, BillingPortalError } from "@/domains/billing/service";
 import { UsageLimitError } from "@/domains/usage/service";
+import { InsufficientCreditsError } from "@/domains/credits/service";
 
 export function toErrorResponse(error: unknown) {
   if (error instanceof ZodError) {
@@ -39,6 +40,20 @@ export function toErrorResponse(error: unknown) {
         used: error.used,
       },
       { status: 429 },
+    );
+  }
+
+  if (error instanceof InsufficientCreditsError) {
+    return NextResponse.json(
+      {
+        error: error.message,
+        suggestion: "Upgrade to Pro to continue generation and rendering.",
+        code: "CREDITS_INSUFFICIENT",
+        bucket: error.bucket,
+        required: error.required,
+        available: error.available,
+      },
+      { status: 402 },
     );
   }
 

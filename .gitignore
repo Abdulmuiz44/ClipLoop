@@ -5,6 +5,7 @@ node_modules
 .DS_Store
 *.log
 public/generated
+tsconfig.tsbuildinfo
 
 # Local Netlify folder
 .netlify

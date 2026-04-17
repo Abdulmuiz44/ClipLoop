@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 export default function RequestAccessPage() {
   return (
     <div className="mx-auto max-w-4xl space-y-8">
-      <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+      <section className="cl-card p-8">
         <p className="text-sm font-medium uppercase tracking-[0.22em] text-slate-500">Access requests</p>
         <h1 className="mt-3 text-4xl font-bold tracking-tight text-slate-950">Request access to ClipLoop</h1>
         <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600">
@@ -30,15 +30,15 @@ export default function RequestAccessPage() {
       </section>
 
       <div className="grid gap-4 md:grid-cols-3">
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 text-sm shadow-sm">
+        <div className="cl-card p-4 text-sm">
           <p className="font-medium text-slate-950">Best fit</p>
           <p className="mt-2 leading-6 text-slate-600">Indie founders and small SaaS teams that want to turn one product into one weekly short-form pack.</p>
         </div>
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 text-sm shadow-sm">
+        <div className="cl-card p-4 text-sm">
           <p className="font-medium text-slate-950">Current Pro intent</p>
           <p className="mt-2 leading-6 text-slate-600">$5/month for one active project, hard usage caps, tracked links, manual iteration, and a live Lemon Squeezy checkout path.</p>
         </div>
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 text-sm shadow-sm">
+        <div className="cl-card p-4 text-sm">
           <p className="font-medium text-slate-950">What happens next</p>
           <p className="mt-2 leading-6 text-slate-600">Requests are reviewed manually. Free chat is open, while Pro is available for users who need higher credit limits.</p>
         </div>

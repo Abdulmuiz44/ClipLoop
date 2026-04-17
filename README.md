@@ -43,13 +43,29 @@ Secondary surfaces still available:
 - settings, manual queue, legacy workflow pages
 - existing backend loops remain operational and reusable by chat orchestration
 
+## UI direction (Mistral-inspired)
+
+The authenticated product shell now follows a restrained, premium visual language inspired by Mistral admin:
+- white/off-white surfaces
+- dark text and dark primary actions
+- soft borders and generous spacing
+- minimal decoration and calmer hierarchy
+- mobile-first chat layout with fixed composer and clean drawer navigation
+
 ## Credit model and plan naming
 
 ClipLoop monetization now follows:
 - Chat is free (normal conversation does not consume credits)
 - Paid value actions consume credits:
   - promo copy generation consumes generation credits
-  - video rendering consumes render credits
+  - generate-video consumes generation + render credits
+
+Credit accounting is now ledger-backed:
+- `credit_accounts` stores current generation/render balances (source of truth)
+- `credit_ledger_entries` stores immutable debits/credits with reason, amount, timestamp, and balance snapshot
+- monthly plan grants are applied as ledger credits per month window
+- chat result cards include receipt metadata for paid actions
+- settings now includes recent transaction history
 
 User-facing plan names:
 - `Free`: chat access + capped monthly credits
@@ -58,6 +74,7 @@ User-facing plan names:
 Compatibility note:
 - Some internal billing/domain identifiers still use `starter` for Lemon Squeezy/webhook compatibility.
 - UI copy and product messaging use **Pro**.
+- Existing `usage_counters` are still updated for compatibility/reporting during transition, while balances and paid-action charging use the new ledger.
 
 ## Authenticated shell direction
 
@@ -150,13 +167,14 @@ Failure behavior:
 ## LLM provider abstraction
 
 ClipLoop now routes model calls through an internal provider interface:
-- `mock` provider for deterministic local/dev behavior
-- `mistral` provider for real chat generation
+- `mistral` provider for production chat generation (default)
+- `mock` provider for deterministic local/dev behavior when explicitly enabled
 
 Environment:
-- `LLM_PROVIDER=mock|mistral`
+- `LLM_PROVIDER=mistral|mock` (default: `mistral`)
 - `MISTRAL_API_KEY=...` (required when `LLM_PROVIDER=mistral`)
 - `MISTRAL_MODEL=mistral-small-latest` (override as needed)
+- `MOCK_LLM=false` by default; mock behavior is only used when `LLM_PROVIDER=mock` or explicitly forced in non-mistral mode
 
 Business logic stays provider-agnostic so future self-hosted/open-weight backends can be swapped in without rewriting orchestration logic.
 

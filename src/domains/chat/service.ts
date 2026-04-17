@@ -13,7 +13,14 @@ import {
   type ProjectChannel,
 } from "@/lib/utils/channels";
 import { env } from "@/lib/env";
-import { assertPostGenerationAllowed, incrementUsageCounter, UsageLimitError } from "@/domains/usage/service";
+import { assertPostGenerationAllowed, assertRenderAllowed, incrementUsageCounter, UsageLimitError } from "@/domains/usage/service";
+import {
+  assertCanAffordAction,
+  chargeGenerateCopyCredits,
+  chargeGenerateVideoCredits,
+  getCreditWalletSummary,
+  InsufficientCreditsError,
+} from "@/domains/credits/service";
 
 const chatPromoOutputSchema = z.object({
   internal_title: z.string().min(6),
@@ -179,6 +186,10 @@ export async function getConversationThread(userId: string, conversationId: stri
 type ChatActionMode = "chat" | "generate_copy" | "generate_video";
 
 function formatChatFailureMessage(error: unknown) {
+  if (error instanceof InsufficientCreditsError) {
+    return `You are low on ${error.bucket} credits (${error.available} available, ${error.required} needed). Chat is still free. Upgrade to Pro for more credits.`;
+  }
+
   if (error instanceof UsageLimitError) {
     if (error.code.includes("POSTS_")) {
       return `You are out of generation credits for this period (${error.used}/${error.limit}). Chat is still free. Upgrade to Pro for more generation credits.`;
@@ -308,20 +319,18 @@ export async function sendChatMessageAndGenerate(params: {
     }
 
     await assertPostGenerationAllowed(project.userId, 1);
-    await incrementUsageCounter({
-      userId: project.userId,
-      projectId: project.id,
-      period: "week",
-      field: "postsGenerated",
-      amount: 1,
-    });
-    await incrementUsageCounter({
-      userId: project.userId,
-      projectId: project.id,
-      period: "month",
-      field: "postsGenerated",
-      amount: 1,
-    });
+    if (mode === "generate_video") {
+      await assertRenderAllowed(project.userId, 1);
+    }
+    await assertCanAffordAction(
+      project.userId,
+      mode === "generate_video"
+        ? [
+            { bucket: "generation", amount: 1 },
+            { bucket: "render", amount: 1 },
+          ]
+        : [{ bucket: "generation", amount: 1 }],
+    );
 
     const targetChannel = inferTargetChannel(params.content, context.preferredChannels);
     const promo = await generatePromoDraft({ requestText: params.content, targetChannel, context });
@@ -340,6 +349,39 @@ export async function sendChatMessageAndGenerate(params: {
         renderer: env.HYPERFRAMES_ENABLED ? "hyperframes" : "legacy",
       });
     }
+
+    let receiptEntries: Array<typeof schema.creditLedgerEntries.$inferSelect>;
+    if (mode === "generate_video") {
+      const charged = await chargeGenerateVideoCredits({
+        userId: project.userId,
+        chatJobId: job.id,
+        contentItemId: contentItem.id,
+      });
+      receiptEntries = [charged.generation, charged.render];
+    } else {
+      const charged = await chargeGenerateCopyCredits({
+        userId: project.userId,
+        chatJobId: job.id,
+        contentItemId: contentItem.id,
+      });
+      receiptEntries = [charged];
+    }
+    const wallet = await getCreditWalletSummary(project.userId);
+
+    await incrementUsageCounter({
+      userId: project.userId,
+      projectId: project.id,
+      period: "week",
+      field: "postsGenerated",
+      amount: 1,
+    });
+    await incrementUsageCounter({
+      userId: project.userId,
+      projectId: project.id,
+      period: "month",
+      field: "postsGenerated",
+      amount: 1,
+    });
 
     const [resultMessage] = await db
       .insert(schema.conversationMessages)
@@ -361,6 +403,18 @@ export async function sendChatMessageAndGenerate(params: {
           thumbnailUrl: rendered?.thumbnailAsset.storageUrl ?? null,
           downloadUrl: rendered?.videoAsset.storageUrl ?? null,
           creditsConsumed: mode === "generate_video" ? 2 : 1,
+          creditReceipts: receiptEntries.map((entry) => ({
+            transactionId: entry.id,
+            bucket: entry.bucket,
+            amount: Math.abs(entry.amountDelta),
+            reason: entry.reason,
+            createdAt: entry.createdAt.toISOString(),
+          })),
+          walletAfter: {
+            generation: wallet.generationBalance,
+            render: wallet.renderBalance,
+            periodKey: wallet.periodKey,
+          },
         },
       })
       .returning();
@@ -371,7 +425,11 @@ export async function sendChatMessageAndGenerate(params: {
         status: "completed",
         targetChannel,
         contentItemId: contentItem.id,
-        metadataJson: { promoWhy: promo.why, mode },
+        metadataJson: {
+          promoWhy: promo.why,
+          mode,
+          chargedTransactionIds: receiptEntries.map((entry) => entry.id),
+        },
         updatedAt: new Date(),
       })
       .where(eq(schema.chatJobs.id, job.id));

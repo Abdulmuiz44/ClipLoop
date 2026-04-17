@@ -32,10 +32,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
-        <header className="border-b border-slate-200 bg-white/90 backdrop-blur">
-          <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+        <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur-sm">
+          <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
             <ClipLoopLogo href="/" />
-            <div className="flex items-center gap-3 text-sm text-slate-700">
+            <div className="flex items-center gap-1.5 text-sm text-slate-700">
               <Link href="/app" className="rounded-lg px-3 py-1.5 hover:bg-slate-100">
                 Open App
               </Link>
@@ -45,7 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </div>
           </nav>
         </header>
-        <main className="mx-auto max-w-6xl px-4 py-10">{children}</main>
+        <main className="mx-auto max-w-7xl px-4 py-8 md:py-10">{children}</main>
       </body>
     </html>
   );

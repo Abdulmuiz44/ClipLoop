@@ -53,62 +53,62 @@ export function OnboardingForm() {
   }
 
   return (
-    <form action={onSubmit} className="space-y-4 rounded-2xl border bg-white p-4 md:p-6">
+    <form action={onSubmit} className="cl-card space-y-5 p-5 md:p-7">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Set up your business context</h1>
-        <p className="mt-1 text-sm text-slate-600">This powers chat requests automatically so you can ask for promo videos in natural language.</p>
+        <h1 className="text-2xl font-semibold tracking-tight text-slate-950">Set up your business context</h1>
+        <p className="mt-1.5 text-sm leading-6 text-slate-600">This powers chat requests automatically so you can ask for promo videos in natural language.</p>
       </div>
 
       <div className="grid gap-3 md:grid-cols-2">
         <label className="space-y-1 text-sm">
           <span className="font-medium">Website URL</span>
-          <input name="websiteUrl" type="url" placeholder="https://yourbusiness.com" className="w-full rounded border p-2" />
+          <input name="websiteUrl" type="url" placeholder="https://yourbusiness.com" className="cl-input" />
         </label>
         <label className="space-y-1 text-sm">
           <span className="font-medium">Business name</span>
-          <input name="businessName" required className="w-full rounded border p-2" placeholder="Ada Beauty Hub" />
+          <input name="businessName" required className="cl-input" placeholder="Ada Beauty Hub" />
         </label>
       </div>
 
       <div className="grid gap-3 md:grid-cols-2">
         <label className="space-y-1 text-sm">
           <span className="font-medium">Business category</span>
-          <input name="businessCategory" required className="w-full rounded border p-2" placeholder="Beauty products" />
+          <input name="businessCategory" required className="cl-input" placeholder="Beauty products" />
         </label>
         <label className="space-y-1 text-sm">
           <span className="font-medium">Target audience</span>
-          <input name="targetAudience" required className="w-full rounded border p-2" placeholder="Women in Lagos looking for affordable beauty essentials" />
+          <input name="targetAudience" required className="cl-input" placeholder="Women in Lagos looking for affordable beauty essentials" />
         </label>
       </div>
 
       <label className="space-y-1 text-sm">
         <span className="font-medium">Business description</span>
-        <textarea name="businessDescription" required className="min-h-24 w-full rounded border p-2" placeholder="Describe what you sell and what makes your offer useful." />
+        <textarea name="businessDescription" required className="cl-textarea" placeholder="Describe what you sell and what makes your offer useful." />
       </label>
 
       <div className="grid gap-3 md:grid-cols-2">
         <label className="space-y-1 text-sm">
           <span className="font-medium">Primary offer</span>
-          <input name="primaryOffer" required className="w-full rounded border p-2" placeholder="Weekend package: 3 products for ₦15,000" />
+          <input name="primaryOffer" required className="cl-input" placeholder="Weekend package: 3 products for ₦15,000" />
         </label>
         <label className="space-y-1 text-sm">
           <span className="font-medium">Tone</span>
-          <input name="tone" className="w-full rounded border p-2" placeholder="Warm, direct, and practical" />
+          <input name="tone" className="cl-input" placeholder="Warm, direct, and practical" />
         </label>
       </div>
 
       <fieldset className="space-y-2 text-sm">
         <legend className="font-medium">Preferred channels</legend>
         <div className="grid gap-2 sm:grid-cols-3">
-          <label className="flex items-center gap-2 rounded border p-2">
+          <label className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white p-2.5">
             <input type="checkbox" name="preferredChannels" value="instagram" defaultChecked />
             Instagram
           </label>
-          <label className="flex items-center gap-2 rounded border p-2">
+          <label className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white p-2.5">
             <input type="checkbox" name="preferredChannels" value="tiktok" />
             TikTok
           </label>
-          <label className="flex items-center gap-2 rounded border p-2">
+          <label className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white p-2.5">
             <input type="checkbox" name="preferredChannels" value="whatsapp" />
             WhatsApp
           </label>
@@ -118,18 +118,18 @@ export function OnboardingForm() {
       <div className="grid gap-3 md:grid-cols-2">
         <label className="space-y-1 text-sm">
           <span className="font-medium">Instagram handle (optional)</span>
-          <input name="instagramHandle" className="w-full rounded border p-2" placeholder="@brand" />
+          <input name="instagramHandle" className="cl-input" placeholder="@brand" />
         </label>
         <label className="space-y-1 text-sm">
           <span className="font-medium">WhatsApp number (optional)</span>
-          <input name="whatsappNumber" className="w-full rounded border p-2" placeholder="+2348012345678" />
+          <input name="whatsappNumber" className="cl-input" placeholder="+2348012345678" />
         </label>
       </div>
 
       <div className="grid gap-3 md:grid-cols-3">
         <label className="space-y-1 text-sm">
           <span className="font-medium">Project type</span>
-          <select name="projectType" className="w-full rounded border p-2" defaultValue="business">
+          <select name="projectType" className="cl-select" defaultValue="business">
             <option value="business">Business</option>
             <option value="creator">Creator</option>
             <option value="app">App</option>
@@ -137,7 +137,7 @@ export function OnboardingForm() {
         </label>
         <label className="space-y-1 text-sm">
           <span className="font-medium">Language style</span>
-          <select name="languageStyle" className="w-full rounded border p-2" defaultValue="english">
+          <select name="languageStyle" className="cl-select" defaultValue="english">
             <option value="english">English</option>
             <option value="pidgin">Pidgin</option>
             <option value="mixed">Mixed</option>
@@ -145,7 +145,7 @@ export function OnboardingForm() {
         </label>
         <label className="space-y-1 text-sm">
           <span className="font-medium">Call to action</span>
-          <input name="callToAction" className="w-full rounded border p-2" placeholder="Send a DM now" />
+          <input name="callToAction" className="cl-input" placeholder="Send a DM now" />
         </label>
       </div>
 

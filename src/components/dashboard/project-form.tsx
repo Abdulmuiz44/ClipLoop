@@ -80,7 +80,7 @@ export function ProjectForm() {
   }
 
   return (
-    <form action={onSubmit} className="space-y-5 rounded border bg-white p-4 md:p-5">
+    <form action={onSubmit} className="cl-card space-y-6 p-5 md:p-6">
       <section className="space-y-3">
         <div>
           <h2 className="text-base font-semibold">Basics</h2>
@@ -89,11 +89,11 @@ export function ProjectForm() {
         <div className="grid gap-3 md:grid-cols-2">
           <label className="space-y-1 text-sm">
             <span className="font-medium">Workspace name</span>
-            <input name="name" placeholder="Main profile" className="w-full rounded border p-2" required />
+            <input name="name" placeholder="Main profile" className="cl-input" required />
           </label>
           <label className="space-y-1 text-sm">
             <span className="font-medium">Project type</span>
-            <select name="projectType" className="w-full rounded border p-2" defaultValue="business" required>
+            <select name="projectType" className="cl-select" defaultValue="business" required>
               <option value="business">Business</option>
               <option value="creator">Creator</option>
               <option value="app">App</option>
@@ -103,21 +103,21 @@ export function ProjectForm() {
         <div className="grid gap-3 md:grid-cols-2">
           <label className="space-y-1 text-sm">
             <span className="font-medium">Business/brand name</span>
-            <input name="businessName" placeholder="Ada Beauty Hub" className="w-full rounded border p-2" required />
+            <input name="businessName" placeholder="Ada Beauty Hub" className="cl-input" required />
           </label>
           <label className="space-y-1 text-sm">
             <span className="font-medium">Category</span>
-            <input name="businessCategory" placeholder="Beauty products" className="w-full rounded border p-2" required />
+            <input name="businessCategory" placeholder="Beauty products" className="cl-input" required />
           </label>
         </div>
         <div className="grid gap-3 md:grid-cols-2">
           <label className="space-y-1 text-sm">
             <span className="font-medium">City</span>
-            <input name="city" placeholder="Lagos" className="w-full rounded border p-2" />
+            <input name="city" placeholder="Lagos" className="cl-input" />
           </label>
           <label className="space-y-1 text-sm">
             <span className="font-medium">State</span>
-            <input name="state" placeholder="Lagos State" className="w-full rounded border p-2" />
+            <input name="state" placeholder="Lagos State" className="cl-input" />
           </label>
         </div>
         <label className="space-y-1 text-sm">
@@ -125,7 +125,7 @@ export function ProjectForm() {
           <textarea
             name="businessDescription"
             placeholder="What you sell, who you help, and why customers choose you."
-            className="min-h-24 w-full rounded border p-2"
+            className="cl-textarea"
             required
           />
         </label>
@@ -137,7 +137,7 @@ export function ProjectForm() {
         </div>
         <label className="space-y-1 text-sm">
           <span className="font-medium">Target audience</span>
-          <input name="targetAudience" placeholder="Busy women in Lagos who want affordable beauty products" className="w-full rounded border p-2" required />
+          <input name="targetAudience" placeholder="Busy women in Lagos who want affordable beauty products" className="cl-input" required />
         </label>
       </section>
 
@@ -147,16 +147,16 @@ export function ProjectForm() {
         </div>
         <label className="space-y-1 text-sm">
           <span className="font-medium">Primary offer</span>
-          <input name="primaryOffer" placeholder="Weekend bundle: 3 products for ₦15,000" className="w-full rounded border p-2" required />
+          <input name="primaryOffer" placeholder="Weekend bundle: 3 products for ₦15,000" className="cl-input" required />
         </label>
         <div className="grid gap-3 md:grid-cols-2">
           <label className="space-y-1 text-sm">
             <span className="font-medium">Price range</span>
-            <input name="priceRange" placeholder="₦5,000 - ₦20,000" className="w-full rounded border p-2" />
+            <input name="priceRange" placeholder="₦5,000 - ₦20,000" className="cl-input" />
           </label>
           <label className="space-y-1 text-sm">
             <span className="font-medium">Call to action</span>
-            <input name="callToAction" placeholder="Send us a WhatsApp message now" className="w-full rounded border p-2" />
+            <input name="callToAction" placeholder="Send us a WhatsApp message now" className="cl-input" />
           </label>
         </div>
       </section>
@@ -168,15 +168,15 @@ export function ProjectForm() {
         <fieldset className="space-y-2 text-sm">
           <legend className="font-medium">Preferred channels</legend>
           <div className="grid gap-2 sm:grid-cols-3">
-            <label className="flex items-center gap-2 rounded border p-2">
+            <label className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white p-2.5">
               <input type="checkbox" name="preferredChannels" value="instagram" defaultChecked />
               Instagram
             </label>
-            <label className="flex items-center gap-2 rounded border p-2">
+            <label className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white p-2.5">
               <input type="checkbox" name="preferredChannels" value="tiktok" />
               TikTok
             </label>
-            <label className="flex items-center gap-2 rounded border p-2">
+            <label className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white p-2.5">
               <input type="checkbox" name="preferredChannels" value="whatsapp" />
               WhatsApp
             </label>
@@ -185,21 +185,21 @@ export function ProjectForm() {
         <div className="grid gap-3 md:grid-cols-2">
           <label className="space-y-1 text-sm">
             <span className="font-medium">Instagram handle</span>
-            <input name="instagramHandle" placeholder="@adabeautyhub" className="w-full rounded border p-2" />
+            <input name="instagramHandle" placeholder="@adabeautyhub" className="cl-input" />
           </label>
           <label className="space-y-1 text-sm">
             <span className="font-medium">WhatsApp number</span>
-            <input name="whatsappNumber" placeholder="+2348012345678" className="w-full rounded border p-2" />
+            <input name="whatsappNumber" placeholder="+2348012345678" className="cl-input" />
           </label>
         </div>
         <div className="grid gap-3 md:grid-cols-2">
           <label className="space-y-1 text-sm">
             <span className="font-medium">Website URL</span>
-            <input name="websiteUrl" placeholder="https://yourbusiness.com" className="w-full rounded border p-2" />
+            <input name="websiteUrl" placeholder="https://yourbusiness.com" className="cl-input" />
           </label>
           <label className="space-y-1 text-sm">
             <span className="font-medium">Primary destination URL</span>
-            <input name="ctaUrl" placeholder="https://wa.me/2348012345678" className="w-full rounded border p-2" required />
+            <input name="ctaUrl" placeholder="https://wa.me/2348012345678" className="cl-input" required />
           </label>
         </div>
       </section>
@@ -211,11 +211,11 @@ export function ProjectForm() {
         <div className="grid gap-3 md:grid-cols-2">
           <label className="space-y-1 text-sm">
             <span className="font-medium">Tone</span>
-            <input name="tone" placeholder="Friendly, confident, and urgent" className="w-full rounded border p-2" />
+            <input name="tone" placeholder="Friendly, confident, and urgent" className="cl-input" />
           </label>
           <label className="space-y-1 text-sm">
             <span className="font-medium">Language style</span>
-            <select name="languageStyle" className="w-full rounded border p-2" defaultValue="english">
+            <select name="languageStyle" className="cl-select" defaultValue="english">
               <option value="english">English</option>
               <option value="pidgin">Pidgin</option>
               <option value="mixed">Mixed</option>
