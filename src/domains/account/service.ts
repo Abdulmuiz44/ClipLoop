@@ -47,26 +47,41 @@ const NO_ACCESS_LIMITS: PlanLimits = {
   connectedChannels: 0,
 };
 
-const STARTER_LIMITS: PlanLimits = {
+const FREE_TRIAL_LIMITS: PlanLimits = {
   activeProjects: 1,
-  postsPerWeek: 5,
-  postsPerMonth: 20,
-  manualRegenerationsPerWeek: 3,
-  rendersPerMonth: 20,
-  publishesPerMonth: 20,
+  postsPerWeek: 3,
+  postsPerMonth: 12,
+  manualRegenerationsPerWeek: 2,
+  rendersPerMonth: 6,
+  publishesPerMonth: 6,
+  connectedChannels: 1,
+};
+
+const STARTER_LIMITS: PlanLimits = {
+  activeProjects: 5,
+  postsPerWeek: 20,
+  postsPerMonth: 80,
+  manualRegenerationsPerWeek: 10,
+  rendersPerMonth: 40,
+  publishesPerMonth: 40,
   connectedChannels: 1,
 };
 
 const PLAN_LIMITS: Record<PlanType, PlanLimits> = {
-  free: NO_ACCESS_LIMITS,
+  free: FREE_TRIAL_LIMITS,
   starter: STARTER_LIMITS,
   beta: STARTER_LIMITS,
 };
 
 export class ProductAccessError extends Error {
-  constructor(message = "ClipLoop is currently invite-only. Request beta access to continue.") {
+  constructor(message = "ClipLoop access is currently unavailable for this account.") {
     super(message);
   }
+}
+
+export function getDisplayPlanName(plan: PlanType) {
+  if (plan === "starter") return "pro";
+  return plan;
 }
 
 export async function getSubscriptionForUser(userId: string) {
@@ -84,11 +99,7 @@ export async function getUserPlanState(userId: string) {
   const effectivePlan: PlanType =
     hasStarterSubscription || hasManualStarterAccess ? "starter" : ((user.plan as PlanType) ?? "free");
   const billingStatus = subscription?.status ?? user.billingStatus ?? (effectivePlan === "starter" ? "active" : "none");
-  const access =
-    (env.MOCK_MODE && user.email === env.DEMO_USER_EMAIL) ||
-    !env.INVITE_ONLY_MODE ||
-    user.isBetaApproved ||
-    effectivePlan === "starter";
+  const access = true;
 
   return {
     user,

@@ -16,7 +16,7 @@ export async function POST(request: Request) {
     const resolvedEmail = currentUser?.email ?? body.email ?? null;
 
     if (!resolvedEmail) {
-      throw new Error("Email is required to start Starter checkout.");
+      throw new Error("Email is required to start Pro checkout.");
     }
 
     const result = await createStarterCheckout({

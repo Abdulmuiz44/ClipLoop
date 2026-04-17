@@ -16,10 +16,10 @@ type StarterCheckoutFormProps = {
 export function StarterCheckoutForm({
   email = "",
   name = "",
-  title = "Start Starter checkout",
-  description = "Use the email you want tied to your ClipLoop access. Paid Starter access is granted by webhook sync after Lemon Squeezy confirms the subscription.",
+  title = "Start Pro checkout",
+  description = "Use the email tied to your ClipLoop account. Pro access is granted by webhook sync after Lemon Squeezy confirms the subscription.",
   showFields = true,
-  submitLabel = "Start Starter checkout",
+  submitLabel = "Start Pro checkout",
   className = "",
 }: StarterCheckoutFormProps) {
   const [loading, setLoading] = useState(false);
