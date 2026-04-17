@@ -33,13 +33,13 @@ export function UsageSummary({
 }) {
   const rows = [
     {
-      label: "Posts generated this week",
+      label: "Generation credits used this week",
       used: usage.postsPerWeek,
       limit: limits.postsPerWeek,
       remaining: remaining?.postsPerWeek ?? Math.max(0, limits.postsPerWeek - usage.postsPerWeek),
     },
     {
-      label: "Posts generated this month",
+      label: "Generation credits used this month",
       used: usage.postsPerMonth,
       limit: limits.postsPerMonth,
       remaining: remaining?.postsPerMonth ?? Math.max(0, limits.postsPerMonth - usage.postsPerMonth),
@@ -53,7 +53,7 @@ export function UsageSummary({
         Math.max(0, limits.manualRegenerationsPerWeek - usage.manualRegenerationsPerWeek),
     },
     {
-      label: "Rendered videos this month",
+      label: "Render credits used this month",
       used: usage.rendersPerMonth,
       limit: limits.rendersPerMonth,
       remaining: remaining?.rendersPerMonth ?? Math.max(0, limits.rendersPerMonth - usage.rendersPerMonth),
@@ -87,7 +87,7 @@ export function UsageSummary({
 
       {!hasProductAccess ? (
         <p className="mt-3 text-sm text-slate-600">
-          Product access is currently blocked until beta approval or a starter subscription is active.
+          Product access is currently blocked. Upgrade to Pro or request access to continue.
         </p>
       ) : null}
 

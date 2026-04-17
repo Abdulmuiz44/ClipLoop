@@ -1,0 +1,326 @@
+"use client";
+
+import Link from "next/link";
+import { useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { ClipLoopLogo } from "@/components/ui/cliploop-logo";
+
+type Conversation = {
+  id: string;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+type Message = {
+  id: string;
+  role: "user" | "assistant" | "system";
+  kind: "text" | "status" | "result";
+  content: string;
+  metadataJson?: Record<string, unknown>;
+  createdAt: string;
+};
+
+type ChatMode = "chat" | "generate_copy" | "generate_video";
+
+function friendlyApiError(payload: Record<string, unknown>) {
+  const code = typeof payload.code === "string" ? payload.code : "";
+  if (code === "PROJECT_LIMIT_REACHED") {
+    return "You reached your project limit. Upgrade to Pro to create more projects.";
+  }
+  if (code.includes("POSTS_")) {
+    return "You are out of generation credits for this period. Upgrade to Pro for more.";
+  }
+  if (code.includes("RENDER_")) {
+    return "You are out of render credits for this period. Upgrade to Pro for more.";
+  }
+  if (code === "PRODUCT_ACCESS_DENIED") {
+    return "Access is currently limited for this account. Open pricing or request access to continue.";
+  }
+  return (typeof payload.error === "string" && payload.error) || "Request failed.";
+}
+
+export function ChatWorkspace(props: {
+  initialConversations: Conversation[];
+  initialConversationId: string | null;
+  initialMessages: Message[];
+  creditSummary: {
+    planLabel: string;
+    generationRemaining: number;
+    generationLimit: number;
+    renderRemaining: number;
+    renderLimit: number;
+  };
+}) {
+  const [conversations, setConversations] = useState<Conversation[]>(props.initialConversations);
+  const [activeConversationId, setActiveConversationId] = useState<string | null>(props.initialConversationId);
+  const [messages, setMessages] = useState<Message[]>(props.initialMessages);
+  const [input, setInput] = useState("");
+  const [sending, setSending] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [mode, setMode] = useState<ChatMode>("chat");
+
+  const activeConversation = useMemo(
+    () => conversations.find((conversation) => conversation.id === activeConversationId) ?? null,
+    [conversations, activeConversationId],
+  );
+
+  async function loadMessages(conversationId: string) {
+    const response = await fetch(`/api/chat/conversations/${conversationId}/messages`);
+    const json = await response.json();
+    if (response.ok) {
+      setMessages((json.messages ?? []).map((m: Message) => ({ ...m, metadataJson: m.metadataJson ?? {} })));
+    }
+  }
+
+  async function createConversation() {
+    const response = await fetch("/api/chat/conversations", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({}),
+    });
+    const json = await response.json().catch(() => ({}));
+    if (!response.ok || !json.conversation) return;
+    const next: Conversation = {
+      ...json.conversation,
+      createdAt: new Date(json.conversation.createdAt).toISOString(),
+      updatedAt: new Date(json.conversation.updatedAt).toISOString(),
+    };
+    setConversations((prev) => [next, ...prev]);
+    setActiveConversationId(next.id);
+    setMessages([]);
+    setSidebarOpen(false);
+  }
+
+  async function selectConversation(conversationId: string) {
+    setActiveConversationId(conversationId);
+    setSidebarOpen(false);
+    await loadMessages(conversationId);
+  }
+
+  async function sendMessage() {
+    if (!activeConversationId || !input.trim()) return;
+    const content = input.trim();
+    setInput("");
+    setSending(true);
+
+    const optimistic: Message = {
+      id: `local-${Date.now()}`,
+      role: "user",
+      kind: "text",
+      content,
+      createdAt: new Date().toISOString(),
+    };
+    setMessages((prev) => [...prev, optimistic]);
+
+    const response = await fetch(`/api/chat/conversations/${activeConversationId}/messages`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content, mode }),
+    });
+    const json = (await response.json().catch(() => ({}))) as Record<string, unknown>;
+    if (response.ok) {
+      await loadMessages(activeConversationId);
+      if (activeConversation?.title === "New chat") {
+        setConversations((prev) =>
+          prev.map((c) => (c.id === activeConversationId ? { ...c, title: content.slice(0, 70), updatedAt: new Date().toISOString() } : c)),
+        );
+      }
+    } else {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `err-${Date.now()}`,
+          role: "assistant",
+          kind: "text",
+          content: friendlyApiError(json),
+          createdAt: new Date().toISOString(),
+        },
+      ]);
+    }
+    setSending(false);
+  }
+
+  return (
+    <div className="relative -mx-4 flex min-h-[calc(100vh-5rem)] bg-slate-100 md:mx-0 md:overflow-hidden md:rounded-2xl md:border">
+      <aside
+        className={`absolute inset-y-0 left-0 z-30 w-[19rem] border-r bg-white p-3 transition-transform md:static md:translate-x-0 ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="flex items-center justify-between gap-2 border-b pb-3">
+          <ClipLoopLogo compact={false} />
+          <button className="rounded border px-2 py-1 text-xs md:hidden" onClick={() => setSidebarOpen(false)} type="button">
+            Close
+          </button>
+        </div>
+
+        <nav className="mt-3 space-y-1 text-sm">
+          <NavLink href="/app" label="Workspace" />
+          <NavLink href="/dashboard/settings" label="Settings" />
+          <NavLink href="/pricing" label="Pricing" />
+          <NavLink href="/dashboard/manual-queue" label="Manual queue" />
+          <NavLink href="/request-access" label="Request access" />
+        </nav>
+
+        <div className="mt-4 rounded-xl border bg-slate-50 p-3 text-xs">
+          <p className="font-semibold uppercase tracking-[0.14em] text-slate-500">{props.creditSummary.planLabel} plan</p>
+          <p className="mt-2 text-slate-700">Chat messages are free.</p>
+          <p className="mt-1 text-slate-700">
+            Generation credits: <strong>{props.creditSummary.generationRemaining}</strong> / {props.creditSummary.generationLimit}
+          </p>
+          <p className="mt-1 text-slate-700">
+            Render credits: <strong>{props.creditSummary.renderRemaining}</strong> / {props.creditSummary.renderLimit}
+          </p>
+        </div>
+
+        <div className="mt-4 flex items-center justify-between">
+          <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Chats</h2>
+          <Button type="button" className="h-8 px-2 text-xs" onClick={createConversation}>
+            New
+          </Button>
+        </div>
+        <div className="mt-2 space-y-2">
+          {conversations.map((conversation) => (
+            <button
+              key={conversation.id}
+              type="button"
+              className={`w-full rounded-xl border p-2.5 text-left text-sm ${
+                conversation.id === activeConversationId ? "border-slate-900 bg-slate-900 text-white" : "bg-white hover:bg-slate-50"
+              }`}
+              onClick={() => selectConversation(conversation.id)}
+            >
+              <p className="line-clamp-2 font-medium">{conversation.title}</p>
+            </button>
+          ))}
+        </div>
+      </aside>
+
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header className="flex items-center justify-between border-b bg-white px-3 py-3 md:px-6">
+          <button type="button" className="rounded-xl border px-2 py-1 text-sm md:hidden" onClick={() => setSidebarOpen(true)}>
+            Menu
+          </button>
+          <div className="min-w-0">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">ClipLoop Operator</p>
+            <h1 className="truncate text-base font-semibold">{activeConversation?.title ?? "Chat workspace"}</h1>
+          </div>
+          <Link href="/pricing" className="rounded-xl border px-3 py-1.5 text-xs font-medium hover:bg-slate-50">
+            Upgrade to Pro
+          </Link>
+        </header>
+
+        <main className="flex-1 overflow-y-auto px-3 py-4 pb-36 md:px-8">
+          <div className="mx-auto w-full max-w-3xl space-y-4">
+            {messages.length === 0 ? (
+              <div className="rounded-2xl border bg-white p-4 text-sm text-slate-600">
+                Ask anything for free, or switch mode below for paid actions. Example: <em>Generate a WhatsApp promo for weekend sale</em>.
+              </div>
+            ) : null}
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className={`rounded-2xl border p-3.5 text-sm shadow-sm ${
+                  message.role === "user" ? "ml-10 border-slate-900 bg-slate-900 text-white" : "mr-10 bg-white"
+                }`}
+              >
+                <p className={`mb-1 text-[11px] uppercase tracking-[0.14em] ${message.role === "user" ? "text-slate-300" : "text-slate-500"}`}>
+                  {message.role === "user" ? "You" : message.kind === "status" ? "Status" : "ClipLoop"}
+                </p>
+                <p className="leading-6">{message.content}</p>
+                {message.kind === "result" ? <ResultCard metadata={message.metadataJson ?? {}} /> : null}
+              </div>
+            ))}
+          </div>
+        </main>
+
+        <div className="fixed inset-x-0 bottom-0 z-20 border-t bg-white/95 p-3 backdrop-blur md:static md:border-t md:bg-white md:p-4">
+          <div className="mx-auto w-full max-w-3xl space-y-2">
+            <div className="flex flex-wrap gap-2">
+              <ModePill active={mode === "chat"} onClick={() => setMode("chat")} label="Ask (Free)" />
+              <ModePill active={mode === "generate_copy"} onClick={() => setMode("generate_copy")} label="Generate Copy (1 credit)" />
+              <ModePill active={mode === "generate_video"} onClick={() => setMode("generate_video")} label="Generate + Render (2 credits)" />
+            </div>
+            <div className="flex items-end gap-2">
+              <textarea
+                className="max-h-40 min-h-12 flex-1 rounded-2xl border p-3 text-sm shadow-sm focus:border-slate-900 focus:outline-none"
+                placeholder={
+                  mode === "chat"
+                    ? "Ask anything about your promo strategy..."
+                    : mode === "generate_copy"
+                      ? "Describe the promo copy you want..."
+                      : "Describe the promo video you want..."
+                }
+                value={input}
+                onChange={(event) => setInput(event.target.value)}
+              />
+              <Button type="button" onClick={sendMessage} disabled={sending || !activeConversationId}>
+                {sending ? "Working..." : "Send"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ModePill({ active, onClick, label }: { active: boolean; onClick: () => void; label: string }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`rounded-full border px-3 py-1 text-xs ${active ? "border-slate-900 bg-slate-900 text-white" : "bg-white text-slate-700 hover:bg-slate-50"}`}
+    >
+      {label}
+    </button>
+  );
+}
+
+function NavLink({ href, label }: { href: string; label: string }) {
+  return (
+    <a href={href} className="block rounded-lg px-3 py-2 hover:bg-slate-100">
+      {label}
+    </a>
+  );
+}
+
+function ResultCard({ metadata }: { metadata: Record<string, unknown> }) {
+  const videoUrl = typeof metadata.videoUrl === "string" ? metadata.videoUrl : null;
+  const caption = typeof metadata.caption === "string" ? metadata.caption : "";
+  const ctaText = typeof metadata.ctaText === "string" ? metadata.ctaText : "";
+  const targetChannel = typeof metadata.targetChannel === "string" ? metadata.targetChannel : "";
+  const downloadUrl = typeof metadata.downloadUrl === "string" ? metadata.downloadUrl : null;
+  const creditsConsumed = typeof metadata.creditsConsumed === "number" ? metadata.creditsConsumed : null;
+
+  return (
+    <div className="mt-3 space-y-2 rounded-xl border bg-slate-50 p-3 text-slate-800">
+      {videoUrl ? (
+        <video src={videoUrl} controls className="w-full rounded-lg border bg-black" />
+      ) : (
+        <div className="rounded-lg border bg-white p-2 text-xs text-slate-500">Copy generated. No render preview for this action.</div>
+      )}
+      <div className="grid gap-1 text-xs text-slate-700">
+        <p>
+          <strong>Channel:</strong> {targetChannel || "n/a"}
+        </p>
+        <p>
+          <strong>Caption:</strong> {caption || "n/a"}
+        </p>
+        <p>
+          <strong>CTA:</strong> {ctaText || "n/a"}
+        </p>
+        {creditsConsumed ? (
+          <p>
+            <strong>Credits used:</strong> {creditsConsumed}
+          </p>
+        ) : null}
+      </div>
+      {downloadUrl ? (
+        <a href={downloadUrl} className="inline-flex rounded-lg border bg-white px-2.5 py-1 text-xs font-medium hover:bg-slate-50">
+          Download video
+        </a>
+      ) : null}
+    </div>
+  );
+}

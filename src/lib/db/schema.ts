@@ -61,6 +61,9 @@ export const subscriptionStatusEnum = pgEnum("subscription_status", [
 ]);
 export const accessRequestStatusEnum = pgEnum("access_request_status", ["pending", "approved", "rejected"]);
 export const usagePeriodTypeEnum = pgEnum("usage_period_type", ["week", "month"]);
+export const conversationRoleEnum = pgEnum("conversation_role", ["user", "assistant", "system"]);
+export const conversationMessageKindEnum = pgEnum("conversation_message_kind", ["text", "status", "result"]);
+export const chatJobStatusEnum = pgEnum("chat_job_status", ["queued", "running", "completed", "failed"]);
 
 export const users = pgTable(
   "users",
@@ -116,6 +119,8 @@ export const projects = pgTable(
     preferredChannels: text("preferred_channels"),
     languageStyle: projectLanguageStyleEnum("language_style"),
     websiteUrl: text("website_url"),
+    contextNotes: text("context_notes"),
+    contextSettingsJson: jsonb("context_settings_json").notNull().default(sql`'{}'::jsonb`),
     ctaUrl: text("cta_url").notNull(),
     goalType: goalTypeEnum("goal_type").notNull(),
     voicePrefsJson: jsonb("voice_prefs_json"),
@@ -126,6 +131,90 @@ export const projects = pgTable(
   },
   (table) => ({
     userIdx: index("projects_user_id_idx").on(table.userId),
+  }),
+);
+
+export const projectContextDocuments = pgTable(
+  "project_context_documents",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    projectId: uuid("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    sourceUrl: text("source_url").notNull(),
+    title: text("title"),
+    contentText: text("content_text").notNull(),
+    contentHash: varchar("content_hash", { length: 64 }),
+    metadataJson: jsonb("metadata_json").notNull().default(sql`'{}'::jsonb`),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => ({
+    projectIdx: index("project_context_documents_project_id_idx").on(table.projectId),
+    sourceIdx: index("project_context_documents_source_url_idx").on(table.sourceUrl),
+    projectSourceUnique: uniqueIndex("project_context_documents_project_source_unique").on(table.projectId, table.sourceUrl),
+  }),
+);
+
+export const conversations = pgTable(
+  "conversations",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    projectId: uuid("project_id").references(() => projects.id, { onDelete: "set null" }),
+    title: text("title").notNull().default("New chat"),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => ({
+    userIdx: index("conversations_user_id_idx").on(table.userId),
+    projectIdx: index("conversations_project_id_idx").on(table.projectId),
+  }),
+);
+
+export const conversationMessages = pgTable(
+  "conversation_messages",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    conversationId: uuid("conversation_id")
+      .notNull()
+      .references(() => conversations.id, { onDelete: "cascade" }),
+    role: conversationRoleEnum("role").notNull(),
+    kind: conversationMessageKindEnum("kind").notNull().default("text"),
+    content: text("content").notNull(),
+    metadataJson: jsonb("metadata_json").notNull().default(sql`'{}'::jsonb`),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => ({
+    conversationIdx: index("conversation_messages_conversation_id_idx").on(table.conversationId),
+    conversationCreatedIdx: index("conversation_messages_conversation_created_at_idx").on(table.conversationId, table.createdAt),
+  }),
+);
+
+export const chatJobs = pgTable(
+  "chat_jobs",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    conversationId: uuid("conversation_id")
+      .notNull()
+      .references(() => conversations.id, { onDelete: "cascade" }),
+    userMessageId: uuid("user_message_id").references(() => conversationMessages.id, { onDelete: "set null" }),
+    assistantMessageId: uuid("assistant_message_id").references(() => conversationMessages.id, { onDelete: "set null" }),
+    projectId: uuid("project_id").references(() => projects.id, { onDelete: "set null" }),
+    contentItemId: uuid("content_item_id").references(() => contentItems.id, { onDelete: "set null" }),
+    targetChannel: projectChannelEnum("target_channel"),
+    status: chatJobStatusEnum("status").notNull().default("queued"),
+    requestText: text("request_text").notNull(),
+    errorText: text("error_text"),
+    metadataJson: jsonb("metadata_json").notNull().default(sql`'{}'::jsonb`),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => ({
+    conversationIdx: index("chat_jobs_conversation_id_idx").on(table.conversationId),
+    contentItemIdx: index("chat_jobs_content_item_id_idx").on(table.contentItemId),
+    statusIdx: index("chat_jobs_status_idx").on(table.status),
   }),
 );
 
@@ -489,6 +578,7 @@ export const iterationExperiments = pgTable(
 export const usersRelations = relations(users, ({ many }) => ({
   projects: many(projects),
   subscriptions: many(subscriptions),
+  conversations: many(conversations),
 }));
 
 export const projectsRelations = relations(projects, ({ one, many }) => ({
@@ -496,6 +586,8 @@ export const projectsRelations = relations(projects, ({ one, many }) => ({
   strategyCycles: many(strategyCycles),
   contentItems: many(contentItems),
   connectedChannels: many(connectedChannels),
+  contextDocuments: many(projectContextDocuments),
+  conversations: many(conversations),
 }));
 
 export const subscriptionsRelations = relations(subscriptions, ({ one }) => ({
@@ -511,6 +603,7 @@ export const contentItemsRelations = relations(contentItems, ({ one, many }) => 
   project: one(projects, { fields: [contentItems.projectId], references: [projects.id] }),
   strategyCycle: one(strategyCycles, { fields: [contentItems.strategyCycleId], references: [strategyCycles.id] }),
   assets: many(contentAssets),
+  chatJobs: many(chatJobs),
 }));
 
 export const contentAssetsRelations = relations(contentAssets, ({ one }) => ({
@@ -519,4 +612,25 @@ export const contentAssetsRelations = relations(contentAssets, ({ one }) => ({
 
 export const connectedChannelsRelations = relations(connectedChannels, ({ one }) => ({
   project: one(projects, { fields: [connectedChannels.projectId], references: [projects.id] }),
+}));
+
+export const projectContextDocumentsRelations = relations(projectContextDocuments, ({ one }) => ({
+  project: one(projects, { fields: [projectContextDocuments.projectId], references: [projects.id] }),
+}));
+
+export const conversationsRelations = relations(conversations, ({ one, many }) => ({
+  user: one(users, { fields: [conversations.userId], references: [users.id] }),
+  project: one(projects, { fields: [conversations.projectId], references: [projects.id] }),
+  messages: many(conversationMessages),
+  jobs: many(chatJobs),
+}));
+
+export const conversationMessagesRelations = relations(conversationMessages, ({ one }) => ({
+  conversation: one(conversations, { fields: [conversationMessages.conversationId], references: [conversations.id] }),
+}));
+
+export const chatJobsRelations = relations(chatJobs, ({ one }) => ({
+  conversation: one(conversations, { fields: [chatJobs.conversationId], references: [conversations.id] }),
+  contentItem: one(contentItems, { fields: [chatJobs.contentItemId], references: [contentItems.id] }),
+  project: one(projects, { fields: [chatJobs.projectId], references: [projects.id] }),
 }));

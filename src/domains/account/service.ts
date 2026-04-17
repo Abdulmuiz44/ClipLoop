@@ -49,21 +49,21 @@ const NO_ACCESS_LIMITS: PlanLimits = {
 
 const FREE_TRIAL_LIMITS: PlanLimits = {
   activeProjects: 1,
-  postsPerWeek: 5,
-  postsPerMonth: 20,
-  manualRegenerationsPerWeek: 3,
-  rendersPerMonth: 20,
-  publishesPerMonth: 20,
+  postsPerWeek: 3,
+  postsPerMonth: 12,
+  manualRegenerationsPerWeek: 2,
+  rendersPerMonth: 6,
+  publishesPerMonth: 6,
   connectedChannels: 1,
 };
 
 const STARTER_LIMITS: PlanLimits = {
   activeProjects: 5,
-  postsPerWeek: 5,
-  postsPerMonth: 20,
-  manualRegenerationsPerWeek: 3,
-  rendersPerMonth: 20,
-  publishesPerMonth: 20,
+  postsPerWeek: 20,
+  postsPerMonth: 80,
+  manualRegenerationsPerWeek: 10,
+  rendersPerMonth: 40,
+  publishesPerMonth: 40,
   connectedChannels: 1,
 };
 
@@ -74,9 +74,14 @@ const PLAN_LIMITS: Record<PlanType, PlanLimits> = {
 };
 
 export class ProductAccessError extends Error {
-  constructor(message = "ClipLoop is currently invite-only. Request beta access to continue.") {
+  constructor(message = "ClipLoop access is currently unavailable for this account.") {
     super(message);
   }
+}
+
+export function getDisplayPlanName(plan: PlanType) {
+  if (plan === "starter") return "pro";
+  return plan;
 }
 
 export async function getSubscriptionForUser(userId: string) {
