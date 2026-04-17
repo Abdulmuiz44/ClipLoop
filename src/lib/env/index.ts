@@ -1,9 +1,9 @@
 import { z } from "zod";
 
 const envSchema = z.object({
-  DATABASE_URL: z.string().min(1),
+  DATABASE_URL: z.string().min(1).default("postgres://postgres:postgres@localhost:5432/cliploop"),
   MOCK_MODE: z.coerce.boolean().default(true),
-  DEMO_USER_EMAIL: z.string().email().default("demo@cliploop.local"),
+  DEMO_USER_EMAIL: z.string().email().default("cliploopapp@gmail.com"),
   MOCK_LLM: z.coerce.boolean().default(true),
   INVITE_ONLY_MODE: z.coerce.boolean().default(true),
   LLM_PROVIDER: z.string().default("mock"),
@@ -24,7 +24,7 @@ const envSchema = z.object({
 export const env = envSchema.parse({
   DATABASE_URL: process.env.DATABASE_URL,
   MOCK_MODE: process.env.MOCK_MODE,
-  DEMO_USER_EMAIL: process.env.DEMO_USER_EMAIL,
+  DEMO_USER_EMAIL: "cliploopapp@gmail.com",
   MOCK_LLM: process.env.MOCK_LLM,
   INVITE_ONLY_MODE: process.env.INVITE_ONLY_MODE,
   LLM_PROVIDER: process.env.LLM_PROVIDER,

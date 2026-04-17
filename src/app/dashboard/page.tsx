@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
+import { env } from "@/lib/env";
 import { listProjectsForUser } from "@/domains/projects/service";
 import { AccessGate } from "@/components/dashboard/access-gate";
 import { UsageSummary } from "@/components/dashboard/usage-summary";
@@ -22,6 +23,24 @@ function StatCard({ label, value, tone = "default" }: { label: string; value: st
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
+  if (env.MOCK_MODE && user.id === "mock-local-user") {
+    return (
+      <div className="space-y-6">
+        <section className="rounded border border-amber-200 bg-amber-50 p-5">
+          <h1 className="text-2xl font-bold">Dashboard temporarily unavailable</h1>
+          <p className="mt-2 text-sm text-slate-700">
+            Mock auth is active with demo user <strong>{user.email}</strong>, but Postgres is not reachable yet. Start a local Postgres
+            server and run migrations, then refresh this page.
+          </p>
+          <div className="mt-3 rounded border border-amber-300 bg-white p-3 text-sm text-slate-700">
+            <p>Expected DB URL: <code>postgres://postgres:postgres@localhost:5432/cliploop</code></p>
+            <p className="mt-1">Then run: <code>npm run db:migrate</code></p>
+          </div>
+        </section>
+      </div>
+    );
+  }
+
   const state = await getUserPlanState(user.id);
   const access = await canAccessProduct(user.id);
 
