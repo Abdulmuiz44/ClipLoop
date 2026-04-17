@@ -153,8 +153,8 @@ export async function getCurrentUsageSummary(userId: string): Promise<CurrentUsa
         and(
           eq(schema.usageCounters.userId, userId),
           eq(schema.usageCounters.periodType, "week"),
-          eq(schema.usageCounters.periodStart, weekStart.toISOString().slice(0, 10)),
-          eq(schema.usageCounters.periodEnd, weekEnd.toISOString().slice(0, 10)),
+          eq(schema.usageCounters.periodStart, weekStart),
+          eq(schema.usageCounters.periodEnd, weekEnd),
         ),
       ),
     db
@@ -168,8 +168,8 @@ export async function getCurrentUsageSummary(userId: string): Promise<CurrentUsa
         and(
           eq(schema.usageCounters.userId, userId),
           eq(schema.usageCounters.periodType, "month"),
-          eq(schema.usageCounters.periodStart, monthStart.toISOString().slice(0, 10)),
-          eq(schema.usageCounters.periodEnd, monthEnd.toISOString().slice(0, 10)),
+          eq(schema.usageCounters.periodStart, monthStart),
+          eq(schema.usageCounters.periodEnd, monthEnd),
         ),
       ),
   ]);

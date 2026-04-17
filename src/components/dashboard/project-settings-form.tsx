@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { normalizeProjectChannels } from "@/lib/utils/channels";
 
 export function ProjectSettingsForm({
   project,
@@ -30,6 +31,7 @@ export function ProjectSettingsForm({
     whatsappNumber: string | null;
     websiteUrl: string | null;
     ctaUrl: string;
+    preferredChannelsJson: unknown;
     preferredChannels: string | null;
     languageStyle: "english" | "pidgin" | "mixed" | null;
     goalType: "clicks" | "signups" | "revenue";
@@ -39,12 +41,19 @@ export function ProjectSettingsForm({
 }) {
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const selectedChannels = normalizeProjectChannels(project.preferredChannelsJson, project.preferredChannels);
 
   async function onSubmit(formData: FormData) {
     setLoading(true);
     setMessage(null);
 
     const examplePostsRaw = String(formData.get("examplePosts") ?? "");
+    const preferredChannels = formData
+      .getAll("preferredChannels")
+      .map((value) => String(value).toLowerCase().trim())
+      .filter((value): value is "instagram" | "tiktok" | "whatsapp" =>
+        ["instagram", "tiktok", "whatsapp"].includes(value),
+      );
     const res = await fetch(`/api/projects/${project.id}/settings`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -71,7 +80,7 @@ export function ProjectSettingsForm({
         whatsappNumber: String(formData.get("whatsappNumber") ?? "") || null,
         websiteUrl: String(formData.get("websiteUrl") ?? "") || null,
         ctaUrl: String(formData.get("ctaUrl") ?? ""),
-        preferredChannels: String(formData.get("preferredChannels") ?? "") || null,
+        preferredChannels: preferredChannels.length > 0 ? preferredChannels : ["instagram"],
         languageStyle: String(formData.get("languageStyle") ?? "") || null,
         goalType: String(formData.get("goalType") ?? project.goalType),
         voiceStyleNotes: String(formData.get("voiceStyleNotes") ?? "") || null,
@@ -142,7 +151,23 @@ export function ProjectSettingsForm({
         <input className="w-full rounded border p-2" name="instagramHandle" defaultValue={project.instagramHandle ?? ""} placeholder="Instagram handle" />
         <input className="w-full rounded border p-2" name="whatsappNumber" defaultValue={project.whatsappNumber ?? ""} placeholder="WhatsApp number" />
       </div>
-      <input className="w-full rounded border p-2" name="preferredChannels" defaultValue={project.preferredChannels ?? ""} placeholder="Preferred channels" />
+      <fieldset className="space-y-2 text-sm">
+        <legend className="font-medium">Preferred channels</legend>
+        <div className="grid gap-2 sm:grid-cols-3">
+          <label className="flex items-center gap-2 rounded border p-2">
+            <input type="checkbox" name="preferredChannels" value="instagram" defaultChecked={selectedChannels.includes("instagram")} />
+            Instagram
+          </label>
+          <label className="flex items-center gap-2 rounded border p-2">
+            <input type="checkbox" name="preferredChannels" value="tiktok" defaultChecked={selectedChannels.includes("tiktok")} />
+            TikTok
+          </label>
+          <label className="flex items-center gap-2 rounded border p-2">
+            <input type="checkbox" name="preferredChannels" value="whatsapp" defaultChecked={selectedChannels.includes("whatsapp")} />
+            WhatsApp
+          </label>
+        </div>
+      </fieldset>
 
       <div className="grid gap-3 md:grid-cols-2">
         <input className="w-full rounded border p-2" name="websiteUrl" defaultValue={project.websiteUrl ?? ""} placeholder="Website URL" />

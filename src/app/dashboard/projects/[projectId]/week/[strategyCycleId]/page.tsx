@@ -5,6 +5,9 @@ import { ScheduleItemControl } from "@/components/dashboard/schedule-item-contro
 import { BulkScheduleControl } from "@/components/dashboard/bulk-schedule-control";
 import { RunJobsButton } from "@/components/dashboard/run-jobs-button";
 import { CopyButton } from "@/components/dashboard/copy-button";
+import { TargetChannelControl } from "@/components/dashboard/target-channel-control";
+import { PublishStrategyControl } from "@/components/dashboard/publish-strategy-control";
+import { ExportBundleButton } from "@/components/dashboard/export-bundle-button";
 import { getCurrentUser } from "@/lib/auth";
 import { canAccessProduct } from "@/domains/account/service";
 import { AccessGate } from "@/components/dashboard/access-gate";
@@ -15,6 +18,7 @@ import { getAssetsForContentItem } from "@/domains/rendering/service";
 import { getJobsForStrategyCycle } from "@/domains/publishing/service";
 import { getPerformanceForStrategyCycle } from "@/domains/performance/service";
 import { getIterationExperimentsForStrategyCycle, getNextStrategyCycle } from "@/domains/iteration/service";
+import { resolveContentItemTargetChannel } from "@/lib/utils/channels";
 
 function renderBadge(status: string) {
   if (status === "completed") return <span className="rounded bg-emerald-100 px-2 py-1 text-xs text-emerald-700">Rendered</span>;
@@ -117,6 +121,7 @@ export default async function WeekPage({
             </div>
             <div>
               <p className="mb-1 text-sm font-medium">Bulk schedule</p>
+              <p className="mb-2 text-xs text-slate-600">Bulk scheduling applies to Instagram-targeted items. TikTok/WhatsApp remain manual export-first.</p>
               <BulkScheduleControl endpoint={`/api/strategy-cycles/${cycle.id}/schedule`} />
             </div>
           </section>
@@ -206,6 +211,13 @@ export default async function WeekPage({
               const assets = assetsByPost[index];
               const perf = perfByContentId.get(post.id);
               const trackingLink = `/r/${post.trackingSlug}`;
+              const targetChannel = resolveContentItemTargetChannel(post.targetChannel, post.platform);
+              const channelCaptions = (post.channelCaptionsJson as Record<string, string> | null) ?? {};
+              const channelCtas = (post.channelCtaTextJson as Record<string, string> | null) ?? {};
+              const previewCaption = channelCaptions[targetChannel] ?? post.caption;
+              const previewCta = channelCtas[targetChannel] ?? post.ctaText;
+              const publishStrategy = (post.publishStrategy as "direct_instagram" | "manual_export" | null) ?? "manual_export";
+              const canDirectPublish = targetChannel === "instagram" && publishStrategy === "direct_instagram";
               const latestJob = latestJobByContentId.get(post.id);
               const publishMode =
                 latestJob?.payload.publishMode ??
@@ -238,14 +250,44 @@ export default async function WeekPage({
                     ))}
                   </ol>
                   <p className="mt-1 text-sm">
-                    <strong>Caption:</strong> {post.caption}
+                    <strong>Target channel:</strong> {targetChannel}
                   </p>
+                  <p className="mt-1 text-sm">
+                    <strong>Publish strategy:</strong> {publishStrategy}
+                  </p>
+                  <p className="mt-1 text-sm">
+                    <strong>Preview caption:</strong> {previewCaption}
+                  </p>
+                  {Object.keys((post.channelCaptionsJson as Record<string, string> | null) ?? {}).length > 0 ? (
+                    <div className="mt-1 text-sm">
+                      <strong>Per-channel captions:</strong>
+                      <ul className="ml-5 list-disc">
+                        {Object.entries((post.channelCaptionsJson as Record<string, string> | null) ?? {}).map(([channel, value]) => (
+                          <li key={`${post.id}-${channel}`}>
+                            <strong>{channel}:</strong> {value}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : null}
                   <p className="mt-1 text-sm">
                     <strong>Hashtags:</strong> {((post.hashtagsJson as string[]) ?? []).join(" ")}
                   </p>
                   <p className="mt-1 text-sm">
-                    <strong>CTA:</strong> {post.ctaText}
+                    <strong>Preview CTA:</strong> {previewCta}
                   </p>
+                  {Object.keys((post.channelCtaTextJson as Record<string, string> | null) ?? {}).length > 0 ? (
+                    <div className="mt-1 text-sm">
+                      <strong>Per-channel CTA:</strong>
+                      <ul className="ml-5 list-disc">
+                        {Object.entries((post.channelCtaTextJson as Record<string, string> | null) ?? {}).map(([channel, value]) => (
+                          <li key={`${post.id}-cta-${channel}`}>
+                            <strong>{channel}:</strong> {value}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : null}
                   <p className="mt-1 text-sm">
                     <strong>Tracking link:</strong> <a href={trackingLink}>{trackingLink}</a>
                     <span className="ml-2 inline-block"><CopyButton text={trackingLink} /></span>
@@ -272,15 +314,26 @@ export default async function WeekPage({
                   <p className="mt-1 text-sm">
                     <strong>Publish mode:</strong> {publishMode}
                   </p>
+                  {!canDirectPublish ? (
+                    <p className="mt-1 text-sm text-amber-700">
+                      This item uses manual export flow. Use render + export bundle with the preview caption/CTA.
+                    </p>
+                  ) : null}
                   <p className="mt-1 text-sm">
                     <strong>Publish error:</strong> {latestJob?.job.lastError ?? "None"}
                   </p>
 
                   <div className="mt-3 grid gap-3 md:grid-cols-2">
+                    <TargetChannelControl contentItemId={post.id} value={targetChannel} />
+                    <PublishStrategyControl contentItemId={post.id} targetChannel={targetChannel} value={publishStrategy} />
                     <ActionButton endpoint={`/api/content-items/${post.id}/regenerate`} label="Regenerate this post" />
-                    <RenderButton endpoint={`/api/content-items/${post.id}/render`} label="Render this post" />
+                    <RenderButton endpoint={`/api/content-items/${post.id}/render`} label="Render this post" initialTargetChannel={targetChannel} />
                     <ActionButton endpoint={`/api/content-items/${post.id}/approve`} label="Approve this post" />
-                    <ScheduleItemControl endpoint={`/api/content-items/${post.id}/schedule`} />
+                    {canDirectPublish ? (
+                      <ScheduleItemControl endpoint={`/api/content-items/${post.id}/schedule`} />
+                    ) : (
+                      <ExportBundleButton contentItemId={post.id} disabled={!assets.video} />
+                    )}
                   </div>
 
                   {assets.thumbnail ? (

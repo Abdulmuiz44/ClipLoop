@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
 import { generateStructuredObject } from "@/lib/llm";
 import { iterationAnalysisPrompt, iterationNextPackPrompt } from "@/lib/prompts/templates";
@@ -7,6 +7,28 @@ import { iterationAnalysisSchema } from "@/lib/validation/iteration";
 import { postBatchOutputSchema } from "@/lib/validation/content";
 import { getPerformanceForStrategyCycle, rollupPerformanceForStrategyCycle } from "@/domains/performance/service";
 import { buildTrackingSlug } from "@/lib/utils/slugs";
+import {
+  defaultPublishStrategyForChannel,
+  normalizeProjectChannels,
+  pickDeterministicChannel,
+  resolveContentItemTargetChannel,
+  type ProjectChannel,
+} from "@/lib/utils/channels";
+
+function buildIterationChannelCaptions(input: {
+  channels: ProjectChannel[];
+  name: string;
+  offer: string;
+  cta: string;
+}): Partial<Record<ProjectChannel, string>> {
+  const variants: Partial<Record<ProjectChannel, string>> = {};
+  for (const channel of input.channels) {
+    if (channel === "instagram") variants[channel] = `${input.name}: ${input.offer}. ${input.cta}`;
+    if (channel === "tiktok") variants[channel] = `${input.offer}. ${input.cta}`;
+    if (channel === "whatsapp") variants[channel] = `${input.offer} - ${input.cta}`;
+  }
+  return variants;
+}
 
 function addDays(date: Date, days: number) {
   const next = new Date(date);
@@ -218,6 +240,15 @@ export async function generateNextContentPackFromIteration(
 
   const project = await db.query.projects.findFirst({ where: eq(schema.projects.id, cycle.projectId) });
   if (!project) throw new Error("Project not found");
+  const preferredChannels = normalizeProjectChannels(project.preferredChannelsJson, project.preferredChannels);
+  const winnerIds = analysis.winners.map((winner) => winner.content_item_id);
+  const sourceCycleItems =
+    winnerIds.length > 0
+      ? await db.query.contentItems.findMany({
+          where: inArray(schema.contentItems.id, winnerIds),
+        })
+      : [];
+  const sourceItemById = new Map(sourceCycleItems.map((row) => [row.id, row]));
 
   const payload = await generateStructuredObject({
     schema: postBatchOutputSchema,
@@ -229,7 +260,7 @@ export async function generateNextContentPackFromIteration(
       primaryOffer: project.primaryOffer ?? project.offer,
       tone: project.tone,
       callToAction: project.callToAction,
-      preferredChannels: project.preferredChannels,
+      preferredChannels,
       languageStyle: project.languageStyle,
     }),
     mockFactory: () => ({
@@ -243,14 +274,36 @@ export async function generateNextContentPackFromIteration(
           `CTA: ${project.callToAction ?? project.ctaUrl}`,
         ],
         caption: `Next-cycle variant informed by winners for ${project.businessName ?? project.productName}.`,
+        channel_captions: buildIterationChannelCaptions({
+          channels: preferredChannels,
+          name: project.businessName ?? project.productName,
+          offer: project.primaryOffer ?? project.offer,
+          cta: project.callToAction ?? "Try this offer now",
+        }),
         cta_text: project.callToAction ?? "Try this offer now",
+        channel_cta_text: buildIterationChannelCaptions({
+          channels: preferredChannels,
+          name: project.businessName ?? project.productName,
+          offer: project.primaryOffer ?? project.offer,
+          cta: project.callToAction ?? "Try this offer now",
+        }),
         hashtags: ["#nigeriabusiness", "#shortform", "#iteration"],
         why_it_should_work: "Derived from winner patterns with clearer local offer and CTA.",
       })),
     }),
   });
 
-  const newContentItems: typeof schema.contentItems.$inferInsert[] = payload.posts.map((post, idx) => ({
+  const newContentItems: typeof schema.contentItems.$inferInsert[] = payload.posts.map((post, idx) => {
+    const targetChannel = (() => {
+      const winnerId = analysis.winners[idx % Math.max(analysis.winners.length, 1)]?.content_item_id;
+      if (!winnerId) return pickDeterministicChannel(preferredChannels, idx);
+      const source = sourceItemById.get(winnerId);
+      if (!source) return pickDeterministicChannel(preferredChannels, idx);
+      return resolveContentItemTargetChannel(source.targetChannel, source.platform);
+    })();
+    return {
+    targetChannel,
+    publishStrategy: defaultPublishStrategyForChannel(targetChannel),
     projectId: project.id,
     strategyCycleId: nextStrategyCycleId,
     parentContentItemId: analysis.winners[idx % Math.max(analysis.winners.length, 1)]?.content_item_id ?? null,
@@ -261,14 +314,17 @@ export async function generateNextContentPackFromIteration(
     hook: post.hook,
     slidesJson: post.slides,
     caption: post.caption,
+    channelCaptionsJson: post.channel_captions ?? {},
     hashtagsJson: post.hashtags,
     ctaText: post.cta_text,
+    channelCtaTextJson: post.channel_cta_text ?? {},
     destinationUrl: project.ctaUrl,
     trackingSlug: buildTrackingSlug(project.productName, `iter-${nextStrategyCycleId}-${idx + 1}`),
     templateId: "clean_dark",
     renderStatus: "pending",
     publishStatus: "draft",
-  }));
+    };
+  });
 
   const inserted = await db
     .insert(schema.contentItems)

@@ -7,6 +7,7 @@ ClipLoop is a lean AI-powered localized short-form content engine for businesses
 - Business profile layer on projects (business/creator/app + localized profile context)
 - Week 1 generation loop (project → strategy → 5 drafts → single regeneration)
 - Rendering loop (render one or all posts to local MP4 + thumbnail)
+- Optional HyperFrames render backend (adapter-based, template-driven promo composition)
 - Approval + scheduling + DB-backed publish queue (mock publisher)
 - Tracked links + click logging + conversion/revenue ingestion + performance rollups
 - Manual iteration engine (analyze winners/losers → generate next cycle)
@@ -57,6 +58,34 @@ Open `http://localhost:3000`.
 - Windows (winget): `winget install Gyan.FFmpeg`
 
 If FFmpeg is missing, render APIs return a clear error.
+
+## HyperFrames renderer (optional backend)
+
+ClipLoop remains the workflow/product layer. HyperFrames is integrated as an optional composition/render engine behind the existing render flow.
+
+What this path does:
+- adds renderer adapter routing: `legacy` or `hyperframes`
+- builds a server-side composition package from content item data
+- uses one initial HyperFrames template (`hf_promo_v1`) for short promo clips
+- uses channel-aware caption/CTA variants and target-channel context
+- writes output video + thumbnail back into existing `content_assets` flow
+
+Current HyperFrames use case:
+- short promo clip from:
+  - hook
+  - channel caption
+  - channel CTA
+  - business name
+  - optional `logo_url` and `background_asset_url` from `voice_prefs_json`
+  - target channel (`instagram` / `tiktok` / `whatsapp`)
+
+Environment setup:
+- `HYPERFRAMES_ENABLED=true` to allow HyperFrames backend
+- `HYPERFRAMES_BIN=hyperframes` (or custom CLI path)
+
+Failure behavior:
+- if HyperFrames is disabled or CLI is missing, render fails with explicit error codes
+- no fake success path is used
 
 ## Publish workflow (real Instagram + mock fallback)
 
@@ -212,6 +241,9 @@ Rendered outputs are stored locally under:
 
 - Only Instagram real publishing is supported today.
 - TikTok publishing is not implemented yet.
+- TikTok and WhatsApp remain manual render/export-first for posting.
+- HyperFrames integration is server-side template composition only; no in-app visual editor yet.
+- HyperFrames preview UI is not exposed yet (adapter is structured to support it later).
 - No cron or distributed workers yet.
 - Attribution is intentionally simple.
 - No advanced analytics dashboards/charts.
@@ -252,7 +284,7 @@ Projects now include a business profile that feeds strategy and post generation:
 - city/state and target audience
 - primary offer, price range, tone, and CTA
 - Instagram/WhatsApp/web context
-- preferred channels and language style (`english`, `pidgin`, `mixed`)
+- normalized preferred channels (`instagram`, `tiktok`, `whatsapp`) and language style (`english`, `pidgin`, `mixed`)
 
 Generation behavior is now biased toward:
 - short promo content
@@ -261,6 +293,87 @@ Generation behavior is now biased toward:
 - social-proof style angles
 - local business friendliness
 - English/Pidgin output based on project language style
+
+## Channel-aware generation
+
+ClipLoop now stores preferred channels as structured data and uses them directly in generation.
+
+Channel behavior in this pass:
+- Instagram: cleaner promo captions, polished CTAs, stronger visual promo framing.
+- TikTok: sharper opening hooks, faster short-form pacing, creator-native phrasing.
+- WhatsApp: shorter status-friendly copy, direct sales tone, less generic marketing language.
+
+Generated posts now support lightweight per-channel output fields:
+- `channel_captions` variants
+- `channel_cta_text` variants
+
+Each content item now persists `targetChannel` (`instagram`, `tiktok`, `whatsapp`) as explicit workflow state.
+
+`targetChannel` effects:
+- generation assigns deterministic defaults from project preferred channels
+- iteration preserves or sensibly assigns channel intent on next-cycle posts
+- dashboard exposes and allows per-item channel switching
+- preview caption/CTA and render defaults follow persisted channel
+- each item also persists `publishStrategy` (`direct_instagram` or `manual_export`)
+- direct scheduling/publishing remains Instagram-only; TikTok/WhatsApp are manual/export-first
+
+## Manual export bundles
+
+Manual-export items now support first-class downloadable packaging.
+
+Bundle contents:
+- rendered video (`assets/video.mp4`) when available
+- thumbnail (`assets/thumbnail.jpg`) when available
+- `caption.txt` (channel-aware caption)
+- `cta.txt` (channel-aware CTA)
+- `manifest.json` (item/project/channel/asset metadata)
+- `README.txt` (human-readable publishing notes)
+
+This workflow is intentionally local/open-source-first:
+- ZIP packaging is server-side using open-source Node tooling (`archiver`)
+- no paid export SaaS
+- no API-key-based packaging dependency
+
+Core workflows are unchanged:
+- render, approval, scheduling, publish, tracking, and iteration continue to run on the same pipeline.
+
+## Manual Publish Queue
+
+ClipLoop now includes a dedicated dashboard queue for manual posting operations:
+- `/dashboard/manual-queue`
+
+Queue scope:
+- only items with `publishStrategy=manual_export`
+- direct Instagram items stay in the existing direct publish path
+
+Manual statuses:
+- `ready_for_export`: item is in manual flow and awaiting bundle export/posting
+- `exported`: operator exported the ZIP bundle
+- `posted`: operator confirmed platform posting manually
+
+Queue actions:
+- filter by target channel (`instagram`, `tiktok`, `whatsapp`)
+- filter by manual status
+- sort newest/oldest
+- render-for-export when render is still pending
+- export bundle using existing ZIP packaging flow
+- mark item as posted (operator-confirmed, not API-verified)
+
+Publish guardrails:
+- direct scheduling/publishing remains Instagram-only for `direct_instagram` items
+- TikTok and WhatsApp remain manual/export-first in this pass
+
+## Open-source-first infrastructure direction
+
+ClipLoop is designed as a paid product using open-source/self-hostable building blocks wherever practical.
+
+Current local/open-source-first subsystems:
+- FFmpeg legacy renderer
+- HyperFrames renderer adapter (local CLI path)
+- HTML template-based composition
+- server-side composition generation
+- server-side manual export ZIP packaging
+- Next.js + Postgres + Drizzle stack
 
 ## Invite-only beta + billing-ready MVP slice
 

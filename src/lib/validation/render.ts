@@ -1,12 +1,19 @@
 import { z } from "zod";
 import { renderTemplateIdSchema } from "@/lib/render/templates";
 
+export const renderBackendSchema = z.enum(["legacy", "hyperframes"]);
+export const renderTargetChannelSchema = z.enum(["instagram", "tiktok", "whatsapp"]);
+
 export const renderContentItemBodySchema = z.object({
   templateId: renderTemplateIdSchema.optional(),
+  renderer: renderBackendSchema.optional().default("legacy"),
+  targetChannel: renderTargetChannelSchema.optional(),
 });
 
 export const renderStrategyCycleBodySchema = z.object({
   templateId: renderTemplateIdSchema.optional(),
+  renderer: renderBackendSchema.optional().default("legacy"),
+  targetChannel: renderTargetChannelSchema.optional(),
 });
 
 export const contentAssetSchema = z.object({

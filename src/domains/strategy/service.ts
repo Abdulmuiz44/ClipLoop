@@ -5,6 +5,7 @@ import { weeklyStrategyPrompt } from "@/lib/prompts/templates";
 import { PROMPT_VERSIONS } from "@/lib/prompts/versions";
 import { weeklyStrategyOutputSchema } from "@/lib/validation/strategy";
 import { getWeekEnd, getWeekStart } from "@/lib/utils/dates";
+import { normalizeProjectChannels } from "@/lib/utils/channels";
 
 export async function getStrategyCycleById(strategyCycleId: string) {
   return db.query.strategyCycles.findFirst({ where: eq(schema.strategyCycles.id, strategyCycleId) });
@@ -18,6 +19,7 @@ export async function getLatestStrategyCycleForProject(projectId: string) {
 }
 
 export async function generateWeeklyStrategyForProject(project: typeof schema.projects.$inferSelect) {
+  const preferredChannels = normalizeProjectChannels(project.preferredChannelsJson, project.preferredChannels);
   const weekStartDate = getWeekStart(new Date());
 
   const existing = await db.query.strategyCycles.findFirst({
@@ -53,7 +55,7 @@ export async function generateWeeklyStrategyForProject(project: typeof schema.pr
       whatsappNumber: project.whatsappNumber,
       websiteUrl: project.websiteUrl,
       ctaUrl: project.ctaUrl,
-      preferredChannels: project.preferredChannels,
+      preferredChannels,
       languageStyle: project.languageStyle,
       goalType: project.goalType,
       voiceStyleNotes: (project.voicePrefsJson as { style_notes?: string } | null)?.style_notes,

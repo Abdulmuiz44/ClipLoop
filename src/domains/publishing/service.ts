@@ -6,6 +6,7 @@ import { bulkScheduleBodySchema } from "@/lib/validation/publishing";
 import { assertPublishAllowed, incrementUsageCounter } from "@/domains/usage/service";
 import { env } from "@/lib/env";
 import { getChannelHealth, getProjectChannel } from "@/domains/channels/service";
+import { resolveContentItemTargetChannel } from "@/lib/utils/channels";
 
 type PublishJobPayload = { contentItemId: string };
 
@@ -101,6 +102,11 @@ export async function scheduleContentItem(contentItemId: string, scheduledFor: D
 
   if (item.renderStatus !== "completed") {
     throw new Error("Content item must be rendered before scheduling");
+  }
+
+  const targetChannel = resolveContentItemTargetChannel(item.targetChannel, item.platform);
+  if (item.publishStrategy !== "direct_instagram" || targetChannel !== "instagram") {
+    throw new Error(`This item is set to manual export flow. Direct scheduling/publishing is only supported for Instagram direct items.`);
   }
 
   const { job, mode } = await enqueuePublishJob(contentItemId, scheduledFor);
@@ -240,17 +246,24 @@ export async function processJob(jobId: string) {
       .set({ publishStatus: "publishing", updatedAt: new Date() })
       .where(eq(schema.contentItems.id, item.id));
 
+    const targetChannel = resolveContentItemTargetChannel(item.targetChannel, item.platform);
+    if (item.publishStrategy !== "direct_instagram" || targetChannel !== "instagram") {
+      throw new Error(`Item is manual export or non-Instagram channel. Direct publish is blocked.`);
+    }
+
     const channel = await getProjectChannel(project.id, "instagram");
-    const channelHealth = getChannelHealth(channel ?? null);
+    const normalizedChannel = channel ?? null;
+    const channelHealth = getChannelHealth(normalizedChannel);
     const shouldUseMock = env.MOCK_MODE && (!channel || channelHealth.status !== "active");
 
     if (!shouldUseMock && channelHealth.status !== "active") {
       throw new Error(`Real publishing blocked: ${channelHealth.reason}`);
     }
 
-    const publisher = getPublisher(shouldUseMock ? null : channel);
-    await publisher.validateContentItemReady(item, shouldUseMock ? null : channel);
-    const publishResult = await publisher.publishContentItem(item, shouldUseMock ? null : channel);
+    const activeChannel = shouldUseMock ? null : normalizedChannel;
+    const publisher = getPublisher(activeChannel);
+    await publisher.validateContentItemReady(item, activeChannel);
+    const publishResult = await publisher.publishContentItem(item, activeChannel);
 
     await db
       .update(schema.contentItems)

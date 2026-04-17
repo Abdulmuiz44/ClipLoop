@@ -9,6 +9,8 @@ import { listContentItemsForStrategyCycle } from "@/domains/content-items/servic
 import { getProjectPerformanceTotals } from "@/domains/performance/service";
 import { getProductReadinessSummary } from "@/domains/onboarding/service";
 
+export const dynamic = "force-dynamic";
+
 function StatCard({ label, value, tone = "default" }: { label: string; value: string | number; tone?: "default" | "good" }) {
   return (
     <div className={`rounded border p-4 text-sm ${tone === "good" ? "border-emerald-200 bg-emerald-50" : "bg-white"}`}>
@@ -106,6 +108,9 @@ export default async function DashboardPage() {
                 ) : null}
                 <Link href="/dashboard/settings" className="inline-flex rounded border bg-white px-3 py-2 text-sm">
                   Review account limits
+                </Link>
+                <Link href="/dashboard/manual-queue" className="inline-flex rounded border bg-white px-3 py-2 text-sm">
+                  Open manual queue
                 </Link>
               </div>
             </div>

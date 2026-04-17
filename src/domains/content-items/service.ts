@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq, inArray } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
 import { generateStructuredObject } from "@/lib/llm";
 import { postGenerationPrompt, regeneratePostPrompt } from "@/lib/prompts/templates";
@@ -6,6 +6,46 @@ import { PROMPT_VERSIONS } from "@/lib/prompts/versions";
 import { postBatchOutputSchema, singlePostOutputSchema } from "@/lib/validation/content";
 import { buildTrackingSlug } from "@/lib/utils/slugs";
 import { assertManualRegenerationAllowed, assertPostGenerationAllowed, incrementUsageCounter } from "@/domains/usage/service";
+import {
+  defaultPublishStrategyForChannel,
+  normalizeProjectChannels,
+  pickDeterministicChannel,
+  resolveContentItemTargetChannel,
+  type ProjectChannel,
+  type PublishStrategy,
+} from "@/lib/utils/channels";
+
+function buildMockChannelCaptions(input: {
+  channels: ProjectChannel[];
+  businessName: string;
+  audience: string;
+  offer: string;
+  cta: string;
+}): Partial<Record<ProjectChannel, string>> {
+  const variants: Partial<Record<ProjectChannel, string>> = {};
+  for (const channel of input.channels) {
+    if (channel === "instagram") {
+      variants[channel] = `${input.businessName} for ${input.audience}. ${input.offer}. ${input.cta}`;
+    }
+    if (channel === "tiktok") {
+      variants[channel] = `Quick gist: ${input.offer}. ${input.businessName} for ${input.audience}. ${input.cta}`;
+    }
+    if (channel === "whatsapp") {
+      variants[channel] = `${input.offer}. ${input.cta}`;
+    }
+  }
+  return variants;
+}
+
+function buildMockChannelCtas(input: { channels: ProjectChannel[]; cta: string }): Partial<Record<ProjectChannel, string>> {
+  const variants: Partial<Record<ProjectChannel, string>> = {};
+  for (const channel of input.channels) {
+    if (channel === "instagram") variants[channel] = input.cta;
+    if (channel === "tiktok") variants[channel] = `Watch am finish, then ${input.cta.toLowerCase()}`;
+    if (channel === "whatsapp") variants[channel] = `Tap to order now`;
+  }
+  return variants;
+}
 
 export async function listContentItemsForStrategyCycle(strategyCycleId: string) {
   const rows = await db.query.contentItems.findMany({
@@ -24,6 +64,129 @@ export async function listContentItemsForStrategyCycle(strategyCycleId: string) 
   return Array.from(latestByRoot.values()).sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 }
 
+export async function updateContentItemTargetChannel(contentItemId: string, targetChannel: ProjectChannel) {
+  const item = await db.query.contentItems.findFirst({ where: eq(schema.contentItems.id, contentItemId) });
+  if (!item) throw new Error("Content item not found");
+
+  const channelCaptions = (item.channelCaptionsJson as Partial<Record<ProjectChannel, string>> | null) ?? {};
+  const channelCtas = (item.channelCtaTextJson as Partial<Record<ProjectChannel, string>> | null) ?? {};
+
+  const [updated] = await db
+    .update(schema.contentItems)
+    .set({
+      targetChannel,
+      publishStrategy: defaultPublishStrategyForChannel(targetChannel),
+      caption: channelCaptions[targetChannel] ?? item.caption,
+      ctaText: channelCtas[targetChannel] ?? item.ctaText,
+      updatedAt: new Date(),
+    })
+    .where(eq(schema.contentItems.id, contentItemId))
+    .returning();
+
+  return updated;
+}
+
+export async function updateContentItemPublishStrategy(contentItemId: string, publishStrategy: PublishStrategy) {
+  const item = await db.query.contentItems.findFirst({ where: eq(schema.contentItems.id, contentItemId) });
+  if (!item) throw new Error("Content item not found");
+
+  const targetChannel = resolveContentItemTargetChannel(item.targetChannel, item.platform);
+  if (targetChannel !== "instagram" && publishStrategy === "direct_instagram") {
+    throw new Error(`direct_instagram strategy is only allowed for instagram target channel.`);
+  }
+
+  const [updated] = await db
+    .update(schema.contentItems)
+    .set({
+      publishStrategy,
+      manualPublishStatus: publishStrategy === "manual_export" ? "ready_for_export" : item.manualPublishStatus,
+      updatedAt: new Date(),
+    })
+    .where(eq(schema.contentItems.id, contentItemId))
+    .returning();
+
+  return updated;
+}
+
+export async function markContentItemExported(contentItemId: string) {
+  const item = await db.query.contentItems.findFirst({ where: eq(schema.contentItems.id, contentItemId) });
+  if (!item) throw new Error("Content item not found");
+  if (item.publishStrategy !== "manual_export") return item;
+  if (item.manualPublishStatus === "posted") return item;
+
+  const [updated] = await db
+    .update(schema.contentItems)
+    .set({
+      manualPublishStatus: "exported",
+      updatedAt: new Date(),
+    })
+    .where(eq(schema.contentItems.id, contentItemId))
+    .returning();
+
+  return updated;
+}
+
+export async function markContentItemManualPosted(contentItemId: string) {
+  const item = await db.query.contentItems.findFirst({ where: eq(schema.contentItems.id, contentItemId) });
+  if (!item) throw new Error("Content item not found");
+  if (item.publishStrategy !== "manual_export") {
+    throw new Error("Only manual_export items can be marked as posted.");
+  }
+
+  const [updated] = await db
+    .update(schema.contentItems)
+    .set({
+      manualPublishStatus: "posted",
+      publishStatus: "published",
+      publishedAt: item.publishedAt ?? new Date(),
+      updatedAt: new Date(),
+    })
+    .where(eq(schema.contentItems.id, contentItemId))
+    .returning();
+
+  return updated;
+}
+
+export async function listManualQueueItemsForUser(
+  userId: string,
+  input?: {
+    targetChannel?: "instagram" | "tiktok" | "whatsapp" | "all";
+    manualStatus?: "ready_for_export" | "exported" | "posted" | "all";
+    sort?: "newest" | "oldest";
+  },
+) {
+  const projects = await db.query.projects.findMany({
+    where: eq(schema.projects.userId, userId),
+    columns: { id: true, name: true, productName: true },
+  });
+  const projectIds = projects.map((project) => project.id);
+  if (projectIds.length === 0) return [];
+
+  const rows = await db.query.contentItems.findMany({
+    where: and(eq(schema.contentItems.publishStrategy, "manual_export"), inArray(schema.contentItems.projectId, projectIds)),
+    orderBy: [desc(schema.contentItems.createdAt)],
+  });
+
+  const byProject = new Map(projects.map((project) => [project.id, project]));
+  let filtered = rows;
+
+  if (input?.targetChannel && input.targetChannel !== "all") {
+    filtered = filtered.filter((row) => row.targetChannel === input.targetChannel);
+  }
+  if (input?.manualStatus && input.manualStatus !== "all") {
+    filtered = filtered.filter((row) => row.manualPublishStatus === input.manualStatus);
+  }
+  if (input?.sort === "oldest") {
+    filtered = [...filtered].sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+  }
+
+  return filtered.map((row) => ({
+    ...row,
+    project: byProject.get(row.projectId) ?? null,
+    isRendered: row.renderStatus === "completed",
+  }));
+}
+
 export async function generatePostsForStrategyCycle(strategyCycleId: string) {
   const strategyCycle = await db.query.strategyCycles.findFirst({ where: eq(schema.strategyCycles.id, strategyCycleId) });
   if (!strategyCycle) throw new Error("Strategy cycle not found");
@@ -36,6 +199,7 @@ export async function generatePostsForStrategyCycle(strategyCycleId: string) {
   const project = await db.query.projects.findFirst({ where: eq(schema.projects.id, strategyCycle.projectId) });
   if (!project) throw new Error("Project not found");
   await assertPostGenerationAllowed(project.userId, 5);
+  const preferredChannels = normalizeProjectChannels(project.preferredChannelsJson, project.preferredChannels);
 
   const structured = await generateStructuredObject({
     schema: postBatchOutputSchema,
@@ -63,7 +227,7 @@ export async function generatePostsForStrategyCycle(strategyCycleId: string) {
         whatsappNumber: project.whatsappNumber,
         websiteUrl: project.websiteUrl,
         ctaUrl: project.ctaUrl,
-        preferredChannels: project.preferredChannels,
+        preferredChannels,
         languageStyle: project.languageStyle,
         goalType: project.goalType,
         voiceStyleNotes: (project.voicePrefsJson as { style_notes?: string } | null)?.style_notes,
@@ -91,14 +255,29 @@ export async function generatePostsForStrategyCycle(strategyCycleId: string) {
           project.languageStyle === "pidgin"
             ? `${project.businessName ?? project.productName} dey help ${project.targetAudience ?? project.audience}. ${project.callToAction ?? "Send DM make we start."}`
             : `${project.businessName ?? project.productName} helps ${project.targetAudience ?? project.audience}. ${project.callToAction ?? "Send us a DM to get started."}`,
+        channel_captions: buildMockChannelCaptions({
+          channels: preferredChannels,
+          businessName: project.businessName ?? project.productName,
+          audience: project.targetAudience ?? project.audience,
+          offer: project.primaryOffer ?? project.offer,
+          cta: project.callToAction ?? "Send us a DM now",
+        }),
         cta_text: project.callToAction ?? "Send us a DM now",
+        channel_cta_text: buildMockChannelCtas({
+          channels: preferredChannels,
+          cta: project.callToAction ?? "Send us a DM now",
+        }),
         hashtags: ["#nigeriabusiness", "#smallbusiness", "#promo"],
         why_it_should_work: "Offer-led local hook with direct CTA, urgency, and social-proof framing.",
       })),
     }),
   });
 
-  const newContentItems: typeof schema.contentItems.$inferInsert[] = structured.posts.map((post, idx) => ({
+  const newContentItems: typeof schema.contentItems.$inferInsert[] = structured.posts.map((post, idx) => {
+    const targetChannel = pickDeterministicChannel(preferredChannels, idx);
+    return {
+      targetChannel,
+      publishStrategy: defaultPublishStrategyForChannel(targetChannel),
     projectId: project.id,
     strategyCycleId,
     platform: "instagram",
@@ -108,14 +287,17 @@ export async function generatePostsForStrategyCycle(strategyCycleId: string) {
     hook: post.hook,
     slidesJson: post.slides,
     caption: post.caption,
+    channelCaptionsJson: post.channel_captions ?? {},
     hashtagsJson: post.hashtags,
     ctaText: post.cta_text,
+    channelCtaTextJson: post.channel_cta_text ?? {},
     destinationUrl: project.ctaUrl,
     trackingSlug: buildTrackingSlug(project.productName, `${strategyCycleId}-${idx + 1}`),
     templateId: "clean_dark",
     renderStatus: "pending",
     publishStatus: "draft",
-  }));
+    };
+  });
 
   const inserted = await db
     .insert(schema.contentItems)
@@ -150,7 +332,9 @@ export async function regenerateSingleContentItem(contentItemId: string) {
         hook: item.hook,
         slides: (item.slidesJson as string[]) ?? [],
         caption: item.caption,
+        channel_captions: ((item.channelCaptionsJson as Record<string, string> | null) ?? {}) as any,
         cta_text: item.ctaText,
+        channel_cta_text: ((item.channelCtaTextJson as Record<string, string> | null) ?? {}) as any,
         hashtags: (item.hashtagsJson as string[]) ?? [],
         why_it_should_work: "",
       },
@@ -167,7 +351,9 @@ export async function regenerateSingleContentItem(contentItemId: string) {
           "CTA: generate your pack now",
         ],
         caption: `${project.productName} now with a refreshed hook and clearer proof line.`,
+        channel_captions: (item.channelCaptionsJson as Record<string, string> | null) ?? {},
         cta_text: item.ctaText,
+        channel_cta_text: (item.channelCtaTextJson as Record<string, string> | null) ?? {},
         hashtags: ["#saas", "#contentstrategy", "#marketing"],
         why_it_should_work: "Sharper hook and cleaner value prop",
       },
@@ -181,14 +367,19 @@ export async function regenerateSingleContentItem(contentItemId: string) {
       strategyCycleId: item.strategyCycleId,
       parentContentItemId: item.parentContentItemId ?? item.id,
       platform: item.platform,
+      targetChannel: resolveContentItemTargetChannel(item.targetChannel, item.platform),
+      publishStrategy: (item.publishStrategy as PublishStrategy | null) ?? defaultPublishStrategyForChannel(resolveContentItemTargetChannel(item.targetChannel, item.platform)),
+      manualPublishStatus: item.manualPublishStatus,
       contentType: item.contentType,
       internalTitle: structured.post.internal_title,
       angle: item.angle,
       hook: structured.post.hook,
       slidesJson: structured.post.slides,
       caption: structured.post.caption,
+      channelCaptionsJson: structured.post.channel_captions ?? ((item.channelCaptionsJson as Record<string, string> | null) ?? {}),
       hashtagsJson: structured.post.hashtags,
       ctaText: structured.post.cta_text,
+      channelCtaTextJson: structured.post.channel_cta_text ?? ((item.channelCtaTextJson as Record<string, string> | null) ?? {}),
       destinationUrl: item.destinationUrl,
       trackingSlug: buildTrackingSlug(project.productName, `regen-${item.id}`),
       templateId: "clean_dark",

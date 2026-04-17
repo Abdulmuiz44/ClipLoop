@@ -7,10 +7,12 @@ import {
   type UpdateProjectSettingsInput,
 } from "@/lib/validation/projects";
 import { assertProjectCreationAllowed } from "@/domains/usage/service";
+import { normalizeProjectChannels } from "@/lib/utils/channels";
 
 export async function createProject(userId: string, rawInput: unknown) {
   const input = createProjectInputSchema.parse(rawInput);
   await assertProjectCreationAllowed(userId);
+  const normalizedChannels = normalizeProjectChannels(input.preferredChannels);
 
   const [project] = await db
     .insert(schema.projects)
@@ -36,7 +38,8 @@ export async function createProject(userId: string, rawInput: unknown) {
       callToAction: input.callToAction ?? null,
       instagramHandle: input.instagramHandle ?? null,
       whatsappNumber: input.whatsappNumber ?? null,
-      preferredChannels: input.preferredChannels ?? null,
+      preferredChannelsJson: normalizedChannels,
+      preferredChannels: normalizedChannels.join(","),
       languageStyle: input.languageStyle ?? null,
       websiteUrl: input.websiteUrl ?? null,
       ctaUrl: input.ctaUrl,
@@ -66,6 +69,9 @@ export async function updateProjectSettings(projectId: string, userId: string, r
   const input = updateProjectSettingsInputSchema.parse(rawInput);
   const project = await getProjectById(projectId, userId);
   if (!project) throw new Error("Project not found");
+  const normalizedChannels = input.preferredChannels
+    ? normalizeProjectChannels(input.preferredChannels)
+    : normalizeProjectChannels(project.preferredChannelsJson, project.preferredChannels);
 
   const [updated] = await db
     .update(schema.projects)
@@ -90,7 +96,8 @@ export async function updateProjectSettings(projectId: string, userId: string, r
       callToAction: input.callToAction !== undefined ? input.callToAction : project.callToAction,
       instagramHandle: input.instagramHandle !== undefined ? input.instagramHandle : project.instagramHandle,
       whatsappNumber: input.whatsappNumber !== undefined ? input.whatsappNumber : project.whatsappNumber,
-      preferredChannels: input.preferredChannels !== undefined ? input.preferredChannels : project.preferredChannels,
+      preferredChannelsJson: input.preferredChannels !== undefined ? normalizedChannels : project.preferredChannelsJson,
+      preferredChannels: input.preferredChannels !== undefined ? normalizedChannels.join(",") : project.preferredChannels,
       languageStyle: input.languageStyle !== undefined ? input.languageStyle : project.languageStyle,
       websiteUrl: input.websiteUrl ?? project.websiteUrl,
       ctaUrl: input.ctaUrl ?? project.ctaUrl,

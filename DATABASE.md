@@ -177,6 +177,7 @@ Stores the product and content context for one customer project.
 - `instagram_handle` text nullable
 - `whatsapp_number` text nullable
 - `preferred_channels` text nullable
+- `preferred_channels_json` jsonb not null default `[]` (normalized channels: `instagram`, `tiktok`, `whatsapp`)
 - `language_style` enum(`english`,`pidgin`,`mixed`) nullable
 - `website_url` text nullable
 - `cta_url` text not null
@@ -197,6 +198,17 @@ Stores the product and content context for one customer project.
   "tone": "direct",
   "style_notes": "simple, punchy, no jargon"
 }
+```
+
+### `content_items` channel-aware additions
+- `target_channel` enum(`instagram`,`tiktok`,`whatsapp`) not null default `instagram`
+- `publish_strategy` enum(`direct_instagram`,`manual_export`) not null default `direct_instagram`
+- `manual_publish_status` enum(`ready_for_export`,`exported`,`posted`) not null default `ready_for_export`
+- `channel_captions_json` jsonb nullable
+- `channel_cta_text_json` jsonb nullable
+
+These fields hold explicit channel intent and per-channel variants used for channel-native output while preserving the existing render/publish/tracking pipeline.
+`manual_publish_status` tracks operator-confirmed state for manual workflows (TikTok/WhatsApp and optional Instagram manual export).
 
 ---
 

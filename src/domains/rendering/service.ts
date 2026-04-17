@@ -1,10 +1,15 @@
 import { and, desc, eq } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
-import { assertFfmpegAvailable, FfmpegUnavailableError, generateThumbnail, renderSlidesToVideo } from "@/lib/render/ffmpeg";
-import { getRenderTemplate, type RenderTemplateId } from "@/lib/render/templates";
+import { FfmpegUnavailableError } from "@/lib/render/ffmpeg";
+import { renderTemplateIdSchema, type RenderTemplateId } from "@/lib/render/templates";
 import { prepareRenderOutput } from "@/lib/render/storage";
 import { listContentItemsForStrategyCycle } from "@/domains/content-items/service";
 import { assertRenderAllowed, incrementUsageCounter } from "@/domains/usage/service";
+import { legacyRenderAdapter } from "@/lib/render/adapters/legacy";
+import { HyperframesDisabledError, hyperframesRenderAdapter } from "@/lib/render/adapters/hyperframes";
+import type { RenderBackend } from "@/lib/render/adapters/types";
+import { normalizeProjectChannels, resolveContentItemTargetChannel, type ProjectChannel } from "@/lib/utils/channels";
+import { HyperframesUnavailableError } from "@/lib/render/hyperframes/cli";
 
 function buildSlidesForRender(item: typeof schema.contentItems.$inferSelect) {
   const middleSlides = ((item.slidesJson as string[]) ?? []).filter(Boolean);
@@ -15,6 +20,43 @@ function buildSlidesForRender(item: typeof schema.contentItems.$inferSelect) {
   }
 
   return [item.hook, ...coreMiddle, `CTA: ${item.ctaText}`].slice(0, 7);
+}
+
+function resolveTargetChannel(params: {
+  requested?: ProjectChannel;
+  item: typeof schema.contentItems.$inferSelect;
+  project: typeof schema.projects.$inferSelect;
+}): ProjectChannel {
+  if (params.requested) return params.requested;
+  if (params.item.targetChannel) return resolveContentItemTargetChannel(params.item.targetChannel, params.item.platform);
+  if (params.item.platform === "instagram" || params.item.platform === "tiktok") return params.item.platform;
+  const preferred = normalizeProjectChannels(params.project.preferredChannelsJson, params.project.preferredChannels);
+  return preferred[0] ?? "instagram";
+}
+
+function pickChannelText(
+  item: typeof schema.contentItems.$inferSelect,
+  targetChannel: ProjectChannel,
+): { caption: string; ctaText: string } {
+  const channelCaptions = (item.channelCaptionsJson as Partial<Record<ProjectChannel, string>> | null) ?? {};
+  const channelCtas = (item.channelCtaTextJson as Partial<Record<ProjectChannel, string>> | null) ?? {};
+  return {
+    caption: channelCaptions[targetChannel] ?? item.caption,
+    ctaText: channelCtas[targetChannel] ?? item.ctaText,
+  };
+}
+
+function pickOptionalVisualAssets(project: typeof schema.projects.$inferSelect): { logoUrl?: string | null; backgroundUrl?: string | null } {
+  const voice = (project.voicePrefsJson as Record<string, unknown> | null) ?? {};
+  const logoUrl = typeof voice.logo_url === "string" ? voice.logo_url : null;
+  const backgroundUrl = typeof voice.background_asset_url === "string" ? voice.background_asset_url : null;
+  return { logoUrl, backgroundUrl };
+}
+
+function resolveTemplateId(requested: RenderTemplateId | undefined, current: string): RenderTemplateId | undefined {
+  if (requested) return requested;
+  const parsed = renderTemplateIdSchema.safeParse(current);
+  return parsed.success ? parsed.data : undefined;
 }
 
 async function upsertAsset(params: {
@@ -85,60 +127,82 @@ export async function getAssetsForContentItem(contentItemId: string) {
   };
 }
 
-export async function renderContentItem(contentItemId: string, templateId?: RenderTemplateId) {
+export async function renderContentItem(
+  contentItemId: string,
+  options?: { templateId?: RenderTemplateId; renderer?: RenderBackend; targetChannel?: ProjectChannel },
+) {
   const item = await db.query.contentItems.findFirst({ where: eq(schema.contentItems.id, contentItemId) });
   if (!item) throw new Error("Content item not found");
   const project = await db.query.projects.findFirst({ where: eq(schema.projects.id, item.projectId) });
   if (!project) throw new Error("Project not found");
   await assertRenderAllowed(project.userId, 1);
-
-  const template = getRenderTemplate(templateId ?? item.templateId);
+  const renderer: RenderBackend = options?.renderer ?? "legacy";
+  const targetChannel = resolveTargetChannel({ requested: options?.targetChannel, item, project });
+  const resolvedTemplateId = resolveTemplateId(options?.templateId, item.templateId);
   const slides = buildSlidesForRender(item);
+  const channelCopy = pickChannelText(item, targetChannel);
+  const visualAssets = pickOptionalVisualAssets(project);
 
   await db
     .update(schema.contentItems)
     .set({
       renderStatus: "rendering",
-      templateId: template.id,
+      templateId: resolvedTemplateId ?? item.templateId,
       updatedAt: new Date(),
     })
     .where(eq(schema.contentItems.id, contentItemId));
 
   try {
-    assertFfmpegAvailable();
     const output = await prepareRenderOutput(contentItemId);
-
-    await renderSlidesToVideo({
+    const adapter = renderer === "legacy" ? legacyRenderAdapter : hyperframesRenderAdapter;
+    const result = await adapter.render({
+      contentItemId,
+      templateId: resolvedTemplateId,
+      targetChannel,
+      hook: item.hook,
       slides,
-      footerText: `${template.displayName} • ${item.ctaText}`,
-      template,
-      workDir: output.runDir,
-      outputVideoPath: output.videoPath,
+      caption: channelCopy.caption,
+      ctaText: channelCopy.ctaText,
+      businessName: project.businessName ?? project.productName,
+      logoUrl: visualAssets.logoUrl,
+      backgroundUrl: visualAssets.backgroundUrl,
+      output: {
+        runDir: output.runDir,
+        videoPath: output.videoPath,
+        thumbnailPath: output.thumbnailPath,
+        videoUrl: output.videoUrl,
+        thumbnailUrl: output.thumbnailUrl,
+      },
     });
-
-    await generateThumbnail(output.videoPath, output.thumbnailPath);
-
-    const duration = Math.round(slides.length * template.slideDurationSec);
 
     const videoAsset = await upsertAsset({
       contentItemId,
       assetType: "video",
-      storagePath: output.videoPath,
-      storageUrl: output.videoUrl,
-      durationSec: duration,
-      width: template.width,
-      height: template.height,
-      metadataJson: { templateId: template.id, slideCount: slides.length },
+      storagePath: result.videoPath,
+      storageUrl: result.videoUrl,
+      durationSec: result.durationSec,
+      width: result.width,
+      height: result.height,
+      metadataJson: {
+        templateId: result.templateId,
+        renderer: result.renderer,
+        targetChannel,
+        ...(result.metadataJson ?? {}),
+      },
     });
 
     const thumbnailAsset = await upsertAsset({
       contentItemId,
       assetType: "thumbnail",
-      storagePath: output.thumbnailPath,
-      storageUrl: output.thumbnailUrl,
-      width: template.width,
-      height: template.height,
-      metadataJson: { templateId: template.id },
+      storagePath: result.thumbnailPath,
+      storageUrl: result.thumbnailUrl,
+      width: result.width,
+      height: result.height,
+      metadataJson: {
+        templateId: result.templateId,
+        renderer: result.renderer,
+        targetChannel,
+      },
     });
 
     await db
@@ -157,7 +221,7 @@ export async function renderContentItem(contentItemId: string, templateId?: Rend
       amount: 1,
     });
 
-    return { contentItem: item, videoAsset, thumbnailAsset, templateId: template.id };
+    return { contentItem: item, videoAsset, thumbnailAsset, templateId: result.templateId, renderer: result.renderer, targetChannel };
   } catch (error) {
     await db
       .update(schema.contentItems)
@@ -167,7 +231,7 @@ export async function renderContentItem(contentItemId: string, templateId?: Rend
       })
       .where(eq(schema.contentItems.id, contentItemId));
 
-    if (error instanceof FfmpegUnavailableError) {
+    if (error instanceof FfmpegUnavailableError || error instanceof HyperframesUnavailableError || error instanceof HyperframesDisabledError) {
       throw error;
     }
 
@@ -175,7 +239,10 @@ export async function renderContentItem(contentItemId: string, templateId?: Rend
   }
 }
 
-export async function renderStrategyCycleContent(strategyCycleId: string, templateId?: RenderTemplateId) {
+export async function renderStrategyCycleContent(
+  strategyCycleId: string,
+  options?: { templateId?: RenderTemplateId; renderer?: RenderBackend; targetChannel?: ProjectChannel },
+) {
   const strategyCycle = await db.query.strategyCycles.findFirst({ where: eq(schema.strategyCycles.id, strategyCycleId) });
   if (!strategyCycle) throw new Error("Strategy cycle not found");
 
@@ -185,7 +252,7 @@ export async function renderStrategyCycleContent(strategyCycleId: string, templa
 
   for (const post of posts) {
     try {
-      const rendered = await renderContentItem(post.id, templateId);
+      const rendered = await renderContentItem(post.id, options);
       results.push(rendered);
     } catch (error) {
       errors.push({

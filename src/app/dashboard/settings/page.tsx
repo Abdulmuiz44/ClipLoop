@@ -4,6 +4,8 @@ import { UsageSummary } from "@/components/dashboard/usage-summary";
 import { ManageBillingButton } from "@/components/dashboard/manage-billing-button";
 import { StarterCheckoutForm } from "@/components/marketing/starter-checkout-form";
 
+export const dynamic = "force-dynamic";
+
 export default async function SettingsPage() {
   const user = await getCurrentUser();
   const state = await getUserPlanState(user.id);

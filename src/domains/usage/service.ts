@@ -4,7 +4,7 @@ import { getPlanLimitsForUser } from "@/domains/account/service";
 
 type CounterKey = "postsGenerated" | "manualRegenerations" | "videosRendered" | "postsPublished";
 type PeriodType = "week" | "month";
-type Period = { periodType: PeriodType; periodStart: string; periodEnd: string };
+type Period = { periodType: PeriodType; periodStart: Date; periodEnd: Date };
 
 function getWeekPeriod(date = new Date()): Period {
   const day = date.getUTCDay();
@@ -13,13 +13,13 @@ function getWeekPeriod(date = new Date()): Period {
   start.setUTCHours(0, 0, 0, 0);
   const end = new Date(start);
   end.setUTCDate(start.getUTCDate() + 6);
-  return { periodType: "week", periodStart: start.toISOString().slice(0, 10), periodEnd: end.toISOString().slice(0, 10) };
+  return { periodType: "week", periodStart: start, periodEnd: end };
 }
 
 function getMonthPeriod(date = new Date()): Period {
   const start = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1));
   const end = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 0));
-  return { periodType: "month", periodStart: start.toISOString().slice(0, 10), periodEnd: end.toISOString().slice(0, 10) };
+  return { periodType: "month", periodStart: start, periodEnd: end };
 }
 
 export class UsageLimitError extends Error {
