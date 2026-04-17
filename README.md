@@ -1,9 +1,10 @@
 # ClipLoop
 
-ClipLoop is a lean AI-powered growth automation tool for indie apps and small SaaS products.
+ClipLoop is a lean AI-powered localized short-form content engine for businesses, creators, and apps.
 
 ## MVP slices currently implemented
 
+- Business profile layer on projects (business/creator/app + localized profile context)
 - Week 1 generation loop (project → strategy → 5 drafts → single regeneration)
 - Rendering loop (render one or all posts to local MP4 + thumbnail)
 - Approval + scheduling + DB-backed publish queue (mock publisher)
@@ -226,22 +227,40 @@ Public routes:
 - `/request-access`
 
 Public positioning:
-- short-form growth automation for indie apps
+- localized short-form growth automation for Nigerian businesses, creators, and apps
 - one weekly generated promo pack
 - render, approve, schedule, publish, track, learn, repeat
 - invite-only beta
 - cheap, opinionated, intentionally narrow
 
 Good fit:
-- indie apps
-- solo founders
-- small SaaS products
-- builders who want one weekly loop instead of a broad social suite
+- Nigerian small businesses
+- local creators
+- app teams with local distribution goals
+- operators who want one weekly loop instead of a broad social suite
 
 Not a fit:
-- agencies managing many brands
+- agencies managing many brands at full enterprise scale
 - large social teams
 - users expecting unlimited generation or fully polished multi-channel automation today
+
+## Business-aware generation
+
+Projects now include a business profile that feeds strategy and post generation:
+- project type (`business`, `creator`, `app`)
+- business identity and category
+- city/state and target audience
+- primary offer, price range, tone, and CTA
+- Instagram/WhatsApp/web context
+- preferred channels and language style (`english`, `pidgin`, `mixed`)
+
+Generation behavior is now biased toward:
+- short promo content
+- offer-led hooks
+- urgency/scarcity framing when appropriate
+- social-proof style angles
+- local business friendliness
+- English/Pidgin output based on project language style
 
 ## Invite-only beta + billing-ready MVP slice
 

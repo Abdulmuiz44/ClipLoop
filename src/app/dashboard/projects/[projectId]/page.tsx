@@ -71,10 +71,55 @@ export default async function ProjectPage({ params }: { params: Promise<{ projec
           </div>
           <div className="flex flex-wrap gap-2 text-xs">
             <span className="rounded-full bg-slate-100 px-3 py-1">Goal: {project.goalType}</span>
+            {project.projectType ? <span className="rounded-full bg-slate-100 px-3 py-1">Type: {project.projectType}</span> : null}
+            {project.languageStyle ? <span className="rounded-full bg-slate-100 px-3 py-1">Language: {project.languageStyle}</span> : null}
             <span className="rounded-full bg-slate-100 px-3 py-1">Readiness: {readiness.score}</span>
             {latestCycle ? <span className="rounded-full bg-slate-100 px-3 py-1">Current cycle: {latestCycle.weekStart.toISOString().slice(0, 10)}</span> : null}
           </div>
         </div>
+      </section>
+
+      <section className="rounded border bg-white p-4">
+        <h2 className="font-semibold">Business profile</h2>
+        <div className="mt-3 grid gap-3 text-sm md:grid-cols-2">
+          <p>
+            <strong>Name:</strong> {project.businessName ?? project.productName}
+          </p>
+          <p>
+            <strong>Category:</strong> {project.businessCategory ?? project.niche}
+          </p>
+          <p>
+            <strong>Location:</strong> {[project.city, project.state].filter(Boolean).join(", ") || "Not set"}
+          </p>
+          <p>
+            <strong>Target audience:</strong> {project.targetAudience ?? project.audience}
+          </p>
+          <p>
+            <strong>Primary offer:</strong> {project.primaryOffer ?? project.offer}
+          </p>
+          <p>
+            <strong>Price range:</strong> {project.priceRange ?? "Not set"}
+          </p>
+          <p>
+            <strong>Tone:</strong> {project.tone ?? "Not set"}
+          </p>
+          <p>
+            <strong>Call to action:</strong> {project.callToAction ?? "Use default CTA URL"}
+          </p>
+          <p>
+            <strong>Preferred channels:</strong> {project.preferredChannels ?? "Instagram"}
+          </p>
+          <p>
+            <strong>Instagram:</strong> {project.instagramHandle ?? "Not set"}
+          </p>
+          <p>
+            <strong>WhatsApp:</strong> {project.whatsappNumber ?? "Not set"}
+          </p>
+          <p>
+            <strong>Website:</strong> {project.websiteUrl ?? "Not set"}
+          </p>
+        </div>
+        {project.businessDescription ? <p className="mt-3 text-sm text-slate-700">{project.businessDescription}</p> : null}
       </section>
 
       <section className="grid gap-4 md:grid-cols-[0.9fr_1.1fr]">
