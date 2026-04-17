@@ -52,5 +52,4 @@ CREATE INDEX IF NOT EXISTS "credit_ledger_entries_user_id_idx" ON "credit_ledger
 CREATE INDEX IF NOT EXISTS "credit_ledger_entries_credit_account_id_idx" ON "credit_ledger_entries" USING btree ("credit_account_id");
 CREATE INDEX IF NOT EXISTS "credit_ledger_entries_user_created_at_idx" ON "credit_ledger_entries" USING btree ("user_id", "created_at");
 CREATE UNIQUE INDEX IF NOT EXISTS "credit_ledger_entries_user_reference_unique"
-  ON "credit_ledger_entries" USING btree ("user_id", "reference_type", "reference_id")
-  WHERE "reference_type" is not null and "reference_id" is not null;
+  ON "credit_ledger_entries" USING btree ("user_id", "reference_type", "reference_id");

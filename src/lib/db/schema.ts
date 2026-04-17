@@ -404,9 +404,11 @@ export const creditLedgerEntries = pgTable(
     userIdx: index("credit_ledger_entries_user_id_idx").on(table.userId),
     accountIdx: index("credit_ledger_entries_credit_account_id_idx").on(table.creditAccountId),
     userCreatedIdx: index("credit_ledger_entries_user_created_at_idx").on(table.userId, table.createdAt),
-    userReferenceUnique: uniqueIndex("credit_ledger_entries_user_reference_unique")
-      .on(table.userId, table.referenceType, table.referenceId)
-      .where(sql`${table.referenceType} is not null and ${table.referenceId} is not null`),
+    userReferenceUnique: uniqueIndex("credit_ledger_entries_user_reference_unique").on(
+      table.userId,
+      table.referenceType,
+      table.referenceId,
+    ),
   }),
 );
 
