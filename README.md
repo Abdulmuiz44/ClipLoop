@@ -1,16 +1,27 @@
 # ClipLoop
 
-ClipLoop is a lean AI-powered localized short-form content engine for businesses, creators, and apps.
+ClipLoop is a chat-first AI promo video operator for businesses, creators, and apps.
 
 ## MVP slices currently implemented
 
-- Business profile layer on projects (business/creator/app + localized profile context)
-- Week 1 generation loop (project → strategy → 5 drafts → single regeneration)
-- Rendering loop (render one or all posts to local MP4 + thumbnail)
-- Optional HyperFrames render backend (adapter-based, template-driven promo composition)
-- Approval + scheduling + DB-backed publish queue (mock publisher)
-- Tracked links + click logging + conversion/revenue ingestion + performance rollups
-- Manual iteration engine (analyze winners/losers → generate next cycle)
+- Chat-first workspace at `/app` with:
+  - conversation sidebar
+  - mobile-first thread UX
+  - fixed bottom input bar on small screens
+- Guided onboarding that captures business profile + preferred channels
+- Website ingestion pipeline (code-first crawl + text extraction, no scraping SaaS)
+- Business context storage:
+  - structured profile fields on projects
+  - persisted website context documents
+- Conversation/message/chat-job persistence
+- Server-side chat orchestration:
+  - loads business context
+  - interprets channel intent
+  - generates promo draft
+  - triggers existing render infrastructure
+  - returns results in-thread with preview + download link
+- Provider-agnostic LLM layer with Mistral support and mock fallback
+- Existing generation/render/schedule/publish/tracking/iteration systems kept behind the scenes
 
 ## Tech stack
 - Next.js App Router + TypeScript
@@ -19,6 +30,55 @@ ClipLoop is a lean AI-powered localized short-form content engine for businesses
 - Drizzle ORM
 - Zod validation
 - FFmpeg (system dependency for rendering)
+- Optional Mistral chat provider via REST API
+
+## Product direction (chat-first)
+
+Primary authenticated experience:
+- `/app`: chat workspace (default destination from `/dashboard`)
+- onboarding-first flow for users without a project context
+- conversations and results handled inside chat thread
+
+Secondary surfaces still available:
+- settings, manual queue, legacy workflow pages
+- existing backend loops remain operational and reusable by chat orchestration
+
+## Credit model and plan naming
+
+ClipLoop monetization now follows:
+- Chat is free (normal conversation does not consume credits)
+- Paid value actions consume credits:
+  - promo copy generation consumes generation credits
+  - video rendering consumes render credits
+
+User-facing plan names:
+- `Free`: chat access + capped monthly credits
+- `Pro`: higher generation/render credit limits and multi-project usage
+
+Compatibility note:
+- Some internal billing/domain identifiers still use `starter` for Lemon Squeezy/webhook compatibility.
+- UI copy and product messaging use **Pro**.
+
+## Authenticated shell direction
+
+The authenticated UX is now focused on a cleaner mobile-first app shell:
+- primary workspace at `/app`
+- sidebar/drawer navigation for secondary surfaces
+- integrated ClipLoop branding
+- clearer in-chat action modes and limit messaging
+
+## Chat orchestration flow
+
+For a request like:
+- "Generate a WhatsApp promo video for our weekend sale"
+
+ClipLoop now:
+1. Loads the user’s primary business context (structured + ingested website text)
+2. Infers target channel intent
+3. Generates promo script/caption/CTA
+4. Creates a backend content item and triggers render (legacy/HyperFrames adapter)
+5. Persists chat job + messages
+6. Returns result card in-thread with video preview, caption, CTA, channel, download link
 
 ## Local setup
 
@@ -86,6 +146,19 @@ Environment setup:
 Failure behavior:
 - if HyperFrames is disabled or CLI is missing, render fails with explicit error codes
 - no fake success path is used
+
+## LLM provider abstraction
+
+ClipLoop now routes model calls through an internal provider interface:
+- `mock` provider for deterministic local/dev behavior
+- `mistral` provider for real chat generation
+
+Environment:
+- `LLM_PROVIDER=mock|mistral`
+- `MISTRAL_API_KEY=...` (required when `LLM_PROVIDER=mistral`)
+- `MISTRAL_MODEL=mistral-small-latest` (override as needed)
+
+Business logic stays provider-agnostic so future self-hosted/open-weight backends can be swapped in without rewriting orchestration logic.
 
 ## Publish workflow (real Instagram + mock fallback)
 

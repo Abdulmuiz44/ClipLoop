@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Starter Checkout Submitted | ClipLoop",
-  description: "Your ClipLoop Starter checkout finished. We are waiting for Lemon Squeezy webhook confirmation to sync access.",
+  title: "Pro Checkout Submitted | ClipLoop",
+  description: "Your ClipLoop Pro checkout finished. We are waiting for Lemon Squeezy webhook confirmation to sync access.",
   alternates: { canonical: "/billing/success" },
 };
 
@@ -11,22 +11,22 @@ export default function BillingSuccessPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <section className="rounded-3xl border border-emerald-200 bg-white p-8 shadow-sm">
-        <p className="text-sm font-medium uppercase tracking-[0.22em] text-emerald-700">Starter checkout complete</p>
-        <h1 className="mt-3 text-4xl font-bold tracking-tight text-slate-950">Payment received. Starter access should sync in a moment.</h1>
+        <p className="text-sm font-medium uppercase tracking-[0.22em] text-emerald-700">Pro checkout complete</p>
+        <h1 className="mt-3 text-4xl font-bold tracking-tight text-slate-950">Payment received. Pro access should sync in a moment.</h1>
         <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600">
           Lemon Squeezy webhooks are the source of truth for billing in ClipLoop. Once the subscription event lands, your account moves into
-          Starter access automatically.
+          Pro access automatically.
         </p>
       </section>
 
       <div className="grid gap-4 md:grid-cols-3">
         <div className="rounded-2xl border border-slate-200 bg-white p-4 text-sm shadow-sm">
           <p className="font-medium text-slate-950">What changed</p>
-          <p className="mt-2 leading-6 text-slate-600">Paid Starter access grants the existing weekly workflow without requiring beta approval.</p>
+          <p className="mt-2 leading-6 text-slate-600">Paid Pro access unlocks higher generation/render credits and more projects.</p>
         </div>
         <div className="rounded-2xl border border-slate-200 bg-white p-4 text-sm shadow-sm">
-          <p className="font-medium text-slate-950">Starter limits</p>
-          <p className="mt-2 leading-6 text-slate-600">One active project, five posts per week, twenty posts per month, and the current hard render/publish caps.</p>
+          <p className="font-medium text-slate-950">Pro credit envelope</p>
+          <p className="mt-2 leading-6 text-slate-600">Up to five active projects, 80 generation credits/month, and 40 render credits/month.</p>
         </div>
         <div className="rounded-2xl border border-slate-200 bg-white p-4 text-sm shadow-sm">
           <p className="font-medium text-slate-950">Best next step</p>

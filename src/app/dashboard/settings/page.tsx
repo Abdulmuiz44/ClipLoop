@@ -1,5 +1,5 @@
 import { getCurrentUser } from "@/lib/auth";
-import { getCurrentUsageSummary, getUserPlanState } from "@/domains/account/service";
+import { getCurrentUsageSummary, getDisplayPlanName, getUserPlanState } from "@/domains/account/service";
 import { UsageSummary } from "@/components/dashboard/usage-summary";
 import { ManageBillingButton } from "@/components/dashboard/manage-billing-button";
 import { StarterCheckoutForm } from "@/components/marketing/starter-checkout-form";
@@ -16,7 +16,7 @@ export default async function SettingsPage() {
       <div className="space-y-2">
         <p className="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">Account and billing</p>
         <h1 className="text-3xl font-bold">Billing and access state</h1>
-        <p className="text-sm text-slate-600">ClipLoop keeps billing intentionally narrow: one Starter plan, invite-only beta access, and Lemon Squeezy as the source of truth for paid subscriptions.</p>
+        <p className="text-sm text-slate-600">ClipLoop keeps billing intentionally narrow: free chat + capped credits, with Pro unlocking higher generation and render capacity.</p>
       </div>
 
       <section className="grid gap-4 md:grid-cols-2">
@@ -29,7 +29,7 @@ export default async function SettingsPage() {
             </div>
             <div className="flex items-center justify-between gap-4">
               <dt className="text-slate-500">Effective plan</dt>
-              <dd>{state.effectivePlan}</dd>
+              <dd>{getDisplayPlanName(state.effectivePlan)}</dd>
             </div>
             <div className="flex items-center justify-between gap-4">
               <dt className="text-slate-500">Billing status</dt>
@@ -86,7 +86,7 @@ export default async function SettingsPage() {
 
               <p className="text-slate-600">
                 {state.effectivePlan === "starter"
-                  ? "Starter access is active through Lemon Squeezy. Use the management link below to update payment details or cancel."
+                  ? "Pro access is active through Lemon Squeezy. Use the management link below to update payment details or cancel."
                   : "A subscription record exists, but ClipLoop currently resolves your effective plan from the synced status above."}
               </p>
 
@@ -97,9 +97,9 @@ export default async function SettingsPage() {
               email={user.email}
               name={user.fullName ?? ""}
               showFields={false}
-              title="Upgrade to Starter"
-              description="Paid Starter access unlocks the same weekly ClipLoop workflow without needing manual beta approval."
-              submitLabel="Start Starter checkout"
+              title="Upgrade to Pro"
+              description="Pro increases your generation/render credits while chat remains free."
+              submitLabel="Start Pro checkout"
               className="mt-3"
             />
           )}
@@ -109,9 +109,9 @@ export default async function SettingsPage() {
       <section className="rounded border bg-white p-5 text-sm">
         <h2 className="font-semibold">How access is decided</h2>
         <ul className="mt-3 space-y-2 text-slate-600">
-          <li>Paid Starter access comes from the synced Lemon Squeezy subscription state.</li>
-          <li>Beta-approved users keep beta access even if they never start paid Starter.</li>
-          <li>If a paid subscription fully expires, ClipLoop falls back to beta access when approval exists, otherwise to gated free access.</li>
+          <li>All users can start on the free plan with one active project.</li>
+          <li>Paid Pro access comes from the synced Lemon Squeezy subscription state.</li>
+          <li>Upgrade to Pro for more projects and higher generation/render credits.</li>
         </ul>
       </section>
 
@@ -119,7 +119,7 @@ export default async function SettingsPage() {
         usage={usage.usage}
         limits={usage.limits}
         remaining={usage.remaining}
-        title="Starter usage envelope"
+        title="Credit usage envelope"
         subtitle={`Week window ${usage.periods.week.start} to ${usage.periods.week.end}. Month window ${usage.periods.month.start} to ${usage.periods.month.end}.`}
       />
     </div>

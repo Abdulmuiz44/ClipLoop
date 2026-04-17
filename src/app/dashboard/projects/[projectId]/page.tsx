@@ -171,7 +171,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ projec
         usage={usage.usage}
         limits={usage.limits}
         remaining={usage.remaining}
-        subtitle="These are account-level hard caps for the starter and beta MVP."
+        subtitle="These are account-level hard caps for the free and Pro plans."
       />
 
       <section className="grid gap-3 md:grid-cols-4">

@@ -50,7 +50,7 @@ export default function HomePage() {
           <div className="grid gap-3 md:grid-cols-3">
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm">
               <p className="font-medium text-slate-950">Cheap and narrow</p>
-              <p className="mt-2 leading-6 text-slate-600">$5 starter intent, one project, hard caps, one clear weekly loop.</p>
+              <p className="mt-2 leading-6 text-slate-600">Free chat + paid credits, one clear weekly promo loop.</p>
             </div>
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm">
               <p className="font-medium text-slate-950">Grounded in the real product</p>
@@ -123,7 +123,7 @@ export default function HomePage() {
           <p className="text-sm font-medium uppercase tracking-[0.22em] text-slate-500">Why ClipLoop</p>
           <ul className="mt-5 space-y-3 text-sm leading-6 text-slate-700">
             <li>It is opinionated on purpose. One project, one weekly pack, one simple loop.</li>
-            <li>It is cheap by design. Starter is positioned around a $5 monthly workflow, not a giant platform tax.</li>
+            <li>It is cheap by design. Pro is positioned around a $5 monthly workflow, not a giant platform tax.</li>
             <li>It focuses on outcomes. Generate, ship, track, learn, repeat.</li>
             <li>It is not pretending to be a bloated social media suite or creative studio.</li>
           </ul>
@@ -152,10 +152,10 @@ export default function HomePage() {
 
       <section className="grid gap-6 rounded-3xl border border-slate-200 bg-slate-950 p-8 text-white shadow-sm md:grid-cols-[0.8fr_1.2fr]">
         <div>
-          <p className="text-sm font-medium uppercase tracking-[0.22em] text-slate-400">Starter pricing</p>
+          <p className="text-sm font-medium uppercase tracking-[0.22em] text-slate-400">Pro pricing</p>
           <h2 className="mt-3 text-3xl font-bold tracking-tight">$5/month, intentionally capped</h2>
           <p className="mt-4 text-sm leading-7 text-slate-300">
-            One active project. Five posts per week. Hard monthly limits. Paid Starter checkout is live, and invite-only beta still exists for approval-first users.
+            Free chat is live for everyone. Pro unlocks higher generation and render credits for real production throughput.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
             <Link href="/pricing" className="inline-flex rounded-xl bg-white px-4 py-2.5 text-sm text-slate-950 hover:bg-slate-200">

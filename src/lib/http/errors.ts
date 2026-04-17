@@ -22,9 +22,18 @@ export function toErrorResponse(error: unknown) {
   }
 
   if (error instanceof UsageLimitError) {
+    const suggestion =
+      error.code.includes("PROJECT_")
+        ? "Upgrade to Pro to create more projects."
+        : error.code.includes("RENDER_")
+          ? "Upgrade to Pro for more render credits."
+          : error.code.includes("POSTS_")
+            ? "Upgrade to Pro for more generation credits."
+            : "Upgrade to Pro for higher limits.";
     return NextResponse.json(
       {
         error: error.message,
+        suggestion,
         code: error.code,
         limit: error.limit,
         used: error.used,

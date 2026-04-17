@@ -234,3 +234,45 @@ These fields hold explicit channel intent and per-channel variants used for chan
   - render completion (monthly)
   - publish completion (monthly)
 - limit checks are applied server-side before mutating workflows.
+
+---
+
+## Chat-first additions
+
+The product now uses a chat-first primary UX. New DB structures:
+
+### `projects` additions
+- `context_notes` text nullable
+- `context_settings_json` jsonb not null default `{}`
+
+### `project_context_documents`
+- stores ingested website/page context as normalized text per project
+- key fields:
+  - `project_id`
+  - `source_url`
+  - `title`
+  - `content_text`
+  - `content_hash`
+  - `metadata_json`
+
+### `conversations`
+- user-owned chat threads
+- optional `project_id` link for business-context scope
+
+### `conversation_messages`
+- append-only chat messages per conversation
+- role enum: `user | assistant | system`
+- kind enum: `text | status | result`
+- `metadata_json` stores result payload details (caption/CTA/video URLs/etc.)
+
+### `chat_jobs`
+- durable orchestration records for chat-triggered generation/render operations
+- links request message, status, target channel, and resulting content item when available
+- status enum: `queued | running | completed | failed`
+
+### Credit accounting note
+- this pass reuses existing `usage_counters` for credit accounting:
+  - generation credits map to `posts_generated`
+  - render credits map to `videos_rendered`
+- free chat messages do not increment usage counters
+- no additional billing tables were introduced in this pass

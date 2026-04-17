@@ -21,12 +21,12 @@ export function AccessGate({ email }: { email: string }) {
           <p className="mt-1 text-slate-600">Strategy generation, 5 weekly post drafts, rendering, scheduling, tracking, and manual iteration.</p>
         </div>
         <div className="rounded border border-slate-200 bg-slate-50 p-3 text-sm">
-          <p className="font-medium">Starter target</p>
+          <p className="font-medium">Pro target</p>
           <p className="mt-1 text-slate-600">$5/month for one active project and hard-capped MVP usage.</p>
         </div>
         <div className="rounded border border-slate-200 bg-slate-50 p-3 text-sm">
           <p className="font-medium">Approval flow</p>
-          <p className="mt-1 text-slate-600">Request access below. Approved beta users and paid starter users unlock the product workflow.</p>
+          <p className="mt-1 text-slate-600">Request access below. Free chat is available now, and Pro unlocks higher paid-action credits.</p>
         </div>
       </div>
 
@@ -34,7 +34,7 @@ export function AccessGate({ email }: { email: string }) {
         email={email}
         showFields={false}
         title="Need paid access instead?"
-        description="Starter access no longer needs manual beta approval. Start the real Lemon Squeezy checkout path with the account email already shown here."
+        description="Pro access no longer needs manual beta approval. Start the real Lemon Squeezy checkout path with the account email already shown here."
       />
 
       <AccessRequestForm email={email} showBackHome />

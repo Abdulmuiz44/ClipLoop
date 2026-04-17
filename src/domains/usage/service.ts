@@ -107,6 +107,14 @@ export async function assertProjectCreationAllowed(userId: string) {
     and(eq(schema.projects.userId, userId), eq(schema.projects.status, "active")),
   );
   if (count >= limits.activeProjects) {
+    if (limits.activeProjects <= 1) {
+      throw new UsageLimitError(
+        "You can create 1 project on the free plan. Upgrade to create more projects.",
+        "PROJECT_LIMIT_REACHED",
+        limits.activeProjects,
+        count,
+      );
+    }
     throw new UsageLimitError("Project limit reached for your current plan.", "PROJECT_LIMIT_REACHED", limits.activeProjects, count);
   }
 }
