@@ -11,7 +11,7 @@ type GenerateStructuredInput<TSchema extends ZodTypeAny> = {
 export async function generateStructuredObject<TSchema extends ZodTypeAny>(
   input: GenerateStructuredInput<TSchema>,
 ): Promise<z.infer<TSchema>> {
-  if (env.MOCK_LLM || env.LLM_PROVIDER === "mock") {
+  if (env.LLM_PROVIDER === "mock" || (env.MOCK_LLM && env.LLM_PROVIDER !== "mistral")) {
     return input.schema.parse(input.mockFactory());
   }
 
@@ -35,7 +35,7 @@ export async function generateStructuredObject<TSchema extends ZodTypeAny>(
 }
 
 export async function generateText(prompt: string, mockText = "Mock text output") {
-  if (env.MOCK_LLM || env.LLM_PROVIDER === "mock") {
+  if (env.LLM_PROVIDER === "mock" || (env.MOCK_LLM && env.LLM_PROVIDER !== "mistral")) {
     return `${mockText}\n\n[Deterministic mock for prompt hash: ${prompt.length}]`;
   }
   const provider = getChatProvider();

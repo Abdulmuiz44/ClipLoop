@@ -271,8 +271,12 @@ The product now uses a chat-first primary UX. New DB structures:
 - status enum: `queued | running | completed | failed`
 
 ### Credit accounting note
-- this pass reuses existing `usage_counters` for credit accounting:
-  - generation credits map to `posts_generated`
-  - render credits map to `videos_rendered`
-- free chat messages do not increment usage counters
-- no additional billing tables were introduced in this pass
+- dedicated ledger-backed accounting is now used:
+  - `credit_accounts` = current per-user balances (`generation_balance`, `render_balance`)
+  - `credit_ledger_entries` = immutable transaction history (`credit/debit`, reason, amount delta, balance snapshot)
+  - monthly plan grants are recorded as ledger credit entries (`credit_reason = monthly_grant`)
+  - paid actions record debits with per-action reference metadata for receipts/audit
+- free chat messages do not consume credits
+- compatibility transition:
+  - `usage_counters` are still incremented for existing limits/reporting logic
+  - ledger balances are the billing source of truth for charge/block decisions

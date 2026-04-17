@@ -20,16 +20,16 @@ function Feature({ children }: { children: React.ReactNode }) {
 export default function PricingPage() {
   return (
     <div className="space-y-8">
-      <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+      <section className="cl-card p-8">
         <p className="text-sm font-medium uppercase tracking-[0.22em] text-slate-500">Pricing</p>
-        <h1 className="mt-3 text-4xl font-bold tracking-tight text-slate-950">Free chat. Pay for generation and render capacity.</h1>
+        <h1 className="mt-3 text-4xl font-semibold tracking-tight text-slate-950">Free chat. Pay for generation and render capacity.</h1>
         <p className="mt-3 max-w-3xl text-base leading-7 text-slate-600">
           ClipLoop chat stays free. Credits are consumed when you run promo copy generation and video rendering operations.
         </p>
       </section>
 
       <section className="grid gap-5 md:grid-cols-2">
-        <article className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <article className="cl-card p-6">
           <p className="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">Free</p>
           <h2 className="mt-2 text-3xl font-bold text-slate-950">
             $0<span className="text-base font-medium text-slate-500">/month</span>
@@ -43,13 +43,13 @@ export default function PricingPage() {
             <Feature>Manual queue and export workflow included</Feature>
           </ul>
           <div className="mt-6">
-            <Link href="/app" className="inline-flex rounded-xl border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
+            <Link href="/app" className="inline-flex rounded-xl border border-slate-200 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
               Start in workspace
             </Link>
           </div>
         </article>
 
-        <article className="rounded-3xl border-2 border-slate-900 bg-white p-6 shadow-sm">
+        <article className="rounded-3xl border-2 border-slate-900 bg-white p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">Pro</p>
@@ -57,7 +57,7 @@ export default function PricingPage() {
                 $5<span className="text-base font-medium text-slate-500">/month</span>
               </h2>
             </div>
-            <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-800">Best value</span>
+            <span className="rounded-full border border-slate-900 bg-slate-900 px-3 py-1 text-xs font-medium text-white">Best value</span>
           </div>
 
           <p className="mt-4 text-sm text-slate-600">For operators who need higher generation/render throughput and multiple active projects.</p>

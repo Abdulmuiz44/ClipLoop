@@ -4,20 +4,61 @@
 
 :root {
   color-scheme: light;
+  --cl-bg: #f7f7f6;
+  --cl-surface: #ffffff;
+  --cl-text: #0f1720;
+  --cl-muted: #5f6773;
+  --cl-border: #e5e7eb;
 }
 
 body {
-  background:
-    radial-gradient(circle at top left, rgba(241, 245, 249, 0.95), transparent 32%),
-    radial-gradient(circle at top right, rgba(226, 232, 240, 0.9), transparent 24%),
-    linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
-  @apply min-h-screen text-slate-900 antialiased;
+  background: var(--cl-bg);
+  color: var(--cl-text);
+  @apply min-h-screen antialiased;
 }
 
 a {
-  @apply text-blue-600 hover:text-blue-700;
+  @apply text-slate-800 hover:text-slate-950;
 }
 
 ::selection {
   @apply bg-slate-900 text-white;
+}
+
+@layer components {
+  .cl-card {
+    @apply rounded-2xl border border-slate-200 bg-white;
+  }
+
+  .cl-card-soft {
+    @apply rounded-2xl border border-slate-200 bg-slate-50/60;
+  }
+
+  .cl-title {
+    @apply text-2xl font-semibold tracking-tight text-slate-950;
+  }
+
+  .cl-subtitle {
+    @apply text-sm leading-6 text-slate-600;
+  }
+
+  .cl-input {
+    @apply w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-slate-400;
+  }
+
+  .cl-textarea {
+    @apply min-h-24 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-slate-400;
+  }
+
+  .cl-select {
+    @apply w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-slate-400;
+  }
+
+  .cl-label {
+    @apply mb-1.5 block text-sm font-medium text-slate-700;
+  }
+
+  .cl-badge {
+    @apply inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-medium text-slate-700;
+  }
 }

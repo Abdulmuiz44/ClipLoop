@@ -3,24 +3,25 @@ import { getCurrentUsageSummary, getDisplayPlanName, getUserPlanState } from "@/
 import { UsageSummary } from "@/components/dashboard/usage-summary";
 import { ManageBillingButton } from "@/components/dashboard/manage-billing-button";
 import { StarterCheckoutForm } from "@/components/marketing/starter-checkout-form";
+import { formatCreditReason, getCreditWalletWithRecentTransactions } from "@/domains/credits/service";
 
 export const dynamic = "force-dynamic";
 
 export default async function SettingsPage() {
   const user = await getCurrentUser();
   const state = await getUserPlanState(user.id);
-  const usage = await getCurrentUsageSummary(user.id);
+  const [usage, ledger] = await Promise.all([getCurrentUsageSummary(user.id), getCreditWalletWithRecentTransactions(user.id)]);
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
       <div className="space-y-2">
         <p className="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">Account and billing</p>
-        <h1 className="text-3xl font-bold">Billing and access state</h1>
-        <p className="text-sm text-slate-600">ClipLoop keeps billing intentionally narrow: free chat + capped credits, with Pro unlocking higher generation and render capacity.</p>
+        <h1 className="text-3xl font-semibold tracking-tight">Billing and access state</h1>
+        <p className="text-sm leading-6 text-slate-600">ClipLoop keeps billing intentionally narrow: free chat + capped credits, with Pro unlocking higher generation and render capacity.</p>
       </div>
 
       <section className="grid gap-4 md:grid-cols-2">
-        <div className="rounded border bg-white p-4 text-sm">
+        <div className="cl-card p-5 text-sm">
           <h2 className="font-semibold">Account status</h2>
           <dl className="mt-3 space-y-2">
             <div className="flex items-center justify-between gap-4">
@@ -50,7 +51,7 @@ export default async function SettingsPage() {
           </dl>
         </div>
 
-        <div className="rounded border bg-white p-4 text-sm">
+        <div className="cl-card p-5 text-sm">
           <h2 className="font-semibold">Subscription record</h2>
           {state.subscription ? (
             <div className="mt-3 space-y-4">
@@ -106,7 +107,7 @@ export default async function SettingsPage() {
         </div>
       </section>
 
-      <section className="rounded border bg-white p-5 text-sm">
+      <section className="cl-card p-5 text-sm">
         <h2 className="font-semibold">How access is decided</h2>
         <ul className="mt-3 space-y-2 text-slate-600">
           <li>All users can start on the free plan with one active project.</li>
@@ -122,6 +123,55 @@ export default async function SettingsPage() {
         title="Credit usage envelope"
         subtitle={`Week window ${usage.periods.week.start} to ${usage.periods.week.end}. Month window ${usage.periods.month.start} to ${usage.periods.month.end}.`}
       />
+
+      <section className="cl-card p-5 text-sm">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 className="font-semibold">Credit ledger</h2>
+            <p className="mt-1 text-slate-600">
+              Durable credit accounting source of truth. Monthly grant period: <strong>{ledger.wallet.periodKey}</strong>.
+            </p>
+          </div>
+          <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700">
+            <p>
+              Generation balance: <strong>{ledger.wallet.generationBalance}</strong>
+            </p>
+            <p>
+              Render balance: <strong>{ledger.wallet.renderBalance}</strong>
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-4 overflow-x-auto">
+          <table className="min-w-full text-left text-xs">
+            <thead className="text-slate-500">
+              <tr className="border-b">
+                <th className="py-2 pr-3">Time</th>
+                <th className="py-2 pr-3">Type</th>
+                <th className="py-2 pr-3">Bucket</th>
+                <th className="py-2 pr-3">Amount</th>
+                <th className="py-2 pr-3">Balance after</th>
+              </tr>
+            </thead>
+            <tbody>
+              {ledger.transactions.map((entry) => (
+                <tr key={entry.id} className="border-b last:border-0">
+                  <td className="py-2 pr-3 text-slate-600">{entry.createdAt.toISOString().replace("T", " ").slice(0, 16)} UTC</td>
+                  <td className="py-2 pr-3">{formatCreditReason(entry.reason)}</td>
+                  <td className="py-2 pr-3 capitalize">{entry.bucket}</td>
+                  <td className={`py-2 pr-3 font-medium ${entry.amountDelta < 0 ? "text-rose-600" : "text-emerald-700"}`}>
+                    {entry.amountDelta > 0 ? `+${entry.amountDelta}` : entry.amountDelta}
+                  </td>
+                  <td className="py-2 pr-3">{entry.balanceAfter}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {ledger.transactions.length === 0 ? (
+            <p className="pt-3 text-xs text-slate-500">No transactions yet. Paid generation/render actions will appear here.</p>
+          ) : null}
+        </div>
+      </section>
     </div>
   );
 }

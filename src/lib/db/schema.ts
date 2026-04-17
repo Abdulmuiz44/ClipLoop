@@ -64,6 +64,15 @@ export const usagePeriodTypeEnum = pgEnum("usage_period_type", ["week", "month"]
 export const conversationRoleEnum = pgEnum("conversation_role", ["user", "assistant", "system"]);
 export const conversationMessageKindEnum = pgEnum("conversation_message_kind", ["text", "status", "result"]);
 export const chatJobStatusEnum = pgEnum("chat_job_status", ["queued", "running", "completed", "failed"]);
+export const creditBucketEnum = pgEnum("credit_bucket", ["generation", "render"]);
+export const creditDirectionEnum = pgEnum("credit_direction", ["credit", "debit"]);
+export const creditReasonEnum = pgEnum("credit_reason", [
+  "monthly_grant",
+  "action_generate_copy",
+  "action_generate_video_generation",
+  "action_generate_video_render",
+  "manual_adjustment",
+]);
 
 export const users = pgTable(
   "users",
@@ -354,6 +363,53 @@ export const subscriptions = pgTable(
   }),
 );
 
+export const creditAccounts = pgTable(
+  "credit_accounts",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    generationBalance: integer("generation_balance").notNull().default(0),
+    renderBalance: integer("render_balance").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => ({
+    userUnique: uniqueIndex("credit_accounts_user_id_unique").on(table.userId),
+  }),
+);
+
+export const creditLedgerEntries = pgTable(
+  "credit_ledger_entries",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    creditAccountId: uuid("credit_account_id")
+      .notNull()
+      .references(() => creditAccounts.id, { onDelete: "cascade" }),
+    bucket: creditBucketEnum("bucket").notNull(),
+    direction: creditDirectionEnum("direction").notNull(),
+    reason: creditReasonEnum("reason").notNull(),
+    amountDelta: integer("amount_delta").notNull(),
+    balanceAfter: integer("balance_after").notNull(),
+    referenceType: text("reference_type"),
+    referenceId: text("reference_id"),
+    metadataJson: jsonb("metadata_json").notNull().default(sql`'{}'::jsonb`),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => ({
+    userIdx: index("credit_ledger_entries_user_id_idx").on(table.userId),
+    accountIdx: index("credit_ledger_entries_credit_account_id_idx").on(table.creditAccountId),
+    userCreatedIdx: index("credit_ledger_entries_user_created_at_idx").on(table.userId, table.createdAt),
+    userReferenceUnique: uniqueIndex("credit_ledger_entries_user_reference_unique")
+      .on(table.userId, table.referenceType, table.referenceId)
+      .where(sql`${table.referenceType} is not null and ${table.referenceId} is not null`),
+  }),
+);
+
 export const accessRequests = pgTable(
   "access_requests",
   {
@@ -579,6 +635,8 @@ export const usersRelations = relations(users, ({ many }) => ({
   projects: many(projects),
   subscriptions: many(subscriptions),
   conversations: many(conversations),
+  creditAccounts: many(creditAccounts),
+  creditLedgerEntries: many(creditLedgerEntries),
 }));
 
 export const projectsRelations = relations(projects, ({ one, many }) => ({
@@ -592,6 +650,16 @@ export const projectsRelations = relations(projects, ({ one, many }) => ({
 
 export const subscriptionsRelations = relations(subscriptions, ({ one }) => ({
   user: one(users, { fields: [subscriptions.userId], references: [users.id] }),
+}));
+
+export const creditAccountsRelations = relations(creditAccounts, ({ one, many }) => ({
+  user: one(users, { fields: [creditAccounts.userId], references: [users.id] }),
+  entries: many(creditLedgerEntries),
+}));
+
+export const creditLedgerEntriesRelations = relations(creditLedgerEntries, ({ one }) => ({
+  user: one(users, { fields: [creditLedgerEntries.userId], references: [users.id] }),
+  account: one(creditAccounts, { fields: [creditLedgerEntries.creditAccountId], references: [creditAccounts.id] }),
 }));
 
 export const strategyCyclesRelations = relations(strategyCycles, ({ one, many }) => ({

@@ -69,18 +69,18 @@ export function UsageSummary({
   const hasProductAccess = rows.some((row) => row.limit > 0);
 
   return (
-    <section className="rounded border bg-white p-4">
+    <section className="cl-card p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="font-semibold">{title}</h2>
+          <h2 className="font-semibold tracking-tight">{title}</h2>
           {subtitle ? <p className="mt-1 text-sm text-slate-600">{subtitle}</p> : null}
         </div>
         <div className="flex flex-wrap gap-2 text-xs">
           {typeof limits.activeProjects === "number" ? (
-            <span className="rounded-full bg-slate-100 px-2 py-1">Active projects: {limits.activeProjects}</span>
+            <span className="cl-badge">Active projects: {limits.activeProjects}</span>
           ) : null}
           {typeof limits.connectedChannels === "number" ? (
-            <span className="rounded-full bg-slate-100 px-2 py-1">Channels: {limits.connectedChannels}</span>
+            <span className="cl-badge">Channels: {limits.connectedChannels}</span>
           ) : null}
         </div>
       </div>
@@ -93,7 +93,7 @@ export function UsageSummary({
 
       <ul className="mt-3 space-y-2 text-sm">
         {rows.map((row) => (
-          <li key={row.label} className="rounded border border-slate-200 px-3 py-2">
+          <li key={row.label} className="rounded-xl border border-slate-200 bg-slate-50/40 px-3 py-2.5">
             <div className="flex items-center justify-between gap-3">
               <span>{row.label}</span>
               <span className={row.limit > 0 && row.used >= row.limit ? "font-semibold text-red-600" : "text-slate-700"}>
