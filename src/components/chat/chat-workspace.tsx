@@ -355,6 +355,32 @@ function ResultCard({ metadata }: { metadata: Record<string, unknown> }) {
   const downloadUrl = typeof metadata.downloadUrl === "string" ? metadata.downloadUrl : null;
   const creditsConsumed = typeof metadata.creditsConsumed === "number" ? metadata.creditsConsumed : null;
   const receipts = Array.isArray(metadata.creditReceipts) ? metadata.creditReceipts : [];
+  const parsedReceipts = receipts
+    .map((receipt) => {
+      if (!receipt || typeof receipt !== "object") return null;
+      const row = receipt as Record<string, unknown>;
+      const transactionId = typeof row.transactionId === "string" ? row.transactionId : null;
+      const bucket = typeof row.bucket === "string" ? row.bucket : null;
+      const amount = typeof row.amount === "number" ? row.amount : null;
+      const reason = typeof row.reason === "string" ? row.reason : null;
+      const createdAtRaw = typeof row.createdAt === "string" ? row.createdAt : null;
+      if (!transactionId || !bucket || !amount || !reason || !createdAtRaw) return null;
+      const createdAt = new Date(createdAtRaw);
+      return {
+        transactionId,
+        bucket,
+        amount,
+        reason,
+        time: Number.isNaN(createdAt.getTime()) ? createdAtRaw : `${createdAt.toISOString().replace("T", " ").slice(0, 16)} UTC`,
+      };
+    })
+    .filter(Boolean) as Array<{
+    transactionId: string;
+    bucket: string;
+    amount: number;
+    reason: string;
+    time: string;
+  }>;
 
   return (
     <div className="mt-3 space-y-2 rounded-xl border p-3 text-slate-800 cl-divider" style={{ background: "var(--cl-soft)" }}>
@@ -378,18 +404,17 @@ function ResultCard({ metadata }: { metadata: Record<string, unknown> }) {
             <strong>Credits used:</strong> {creditsConsumed}
           </p>
         ) : null}
-        {receipts.length > 0 ? (
-          <p>
-            <strong>Receipt IDs:</strong>{" "}
-            {receipts
-              .map((receipt) => {
-                if (!receipt || typeof receipt !== "object") return null;
-                const transactionId = (receipt as Record<string, unknown>).transactionId;
-                return typeof transactionId === "string" ? transactionId.slice(0, 8) : null;
-              })
-              .filter(Boolean)
-              .join(", ")}
-          </p>
+        {parsedReceipts.length > 0 ? (
+          <div>
+            <p>
+              <strong>Charge receipts:</strong>
+            </p>
+            {parsedReceipts.map((receipt) => (
+              <p key={receipt.transactionId} className="mt-0.5 text-slate-700">
+                {receipt.amount} {receipt.bucket} credit{receipt.amount === 1 ? "" : "s"} at {receipt.time} ({receipt.reason})
+              </p>
+            ))}
+          </div>
         ) : null}
       </div>
       {downloadUrl ? (

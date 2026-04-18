@@ -5,7 +5,9 @@ import { postGenerationPrompt, regeneratePostPrompt } from "@/lib/prompts/templa
 import { PROMPT_VERSIONS } from "@/lib/prompts/versions";
 import { postBatchOutputSchema, singlePostOutputSchema } from "@/lib/validation/content";
 import { buildTrackingSlug } from "@/lib/utils/slugs";
-import { assertManualRegenerationAllowed, assertPostGenerationAllowed, incrementUsageCounter } from "@/domains/usage/service";
+import { incrementUsageCounter } from "@/domains/usage/service";
+import { assertCanAffordAction, chargeCredits } from "@/domains/credits/service";
+import { getBillingPolicy } from "@/domains/credits/policy";
 import {
   defaultPublishStrategyForChannel,
   normalizeProjectChannels,
@@ -198,7 +200,11 @@ export async function generatePostsForStrategyCycle(strategyCycleId: string) {
 
   const project = await db.query.projects.findFirst({ where: eq(schema.projects.id, strategyCycle.projectId) });
   if (!project) throw new Error("Project not found");
-  await assertPostGenerationAllowed(project.userId, 5);
+  const generatePostsPolicy = getBillingPolicy("strategy_cycle_generate_posts");
+  if (!generatePostsPolicy.billable) {
+    throw new Error("Billing policy mismatch for strategy cycle post generation.");
+  }
+  await assertCanAffordAction(project.userId, [{ bucket: generatePostsPolicy.bucket, amount: generatePostsPolicy.amount }]);
   const preferredChannels = normalizeProjectChannels(project.preferredChannelsJson, project.preferredChannels);
 
   const structured = await generateStructuredObject({
@@ -304,6 +310,21 @@ export async function generatePostsForStrategyCycle(strategyCycleId: string) {
     .values(newContentItems)
     .returning();
 
+  await chargeCredits({
+    userId: project.userId,
+    bucket: generatePostsPolicy.bucket,
+    amount: generatePostsPolicy.amount,
+    reason: generatePostsPolicy.reason,
+    referenceType: "strategy_cycle_generate_posts",
+    referenceId: strategyCycleId,
+    metadata: {
+      strategyCycleId,
+      projectId: project.id,
+      generatedCount: inserted.length,
+      source: "non_chat_generate_posts",
+    },
+  });
+
   await incrementUsageCounter({ userId: project.userId, projectId: project.id, period: "week", field: "postsGenerated", amount: inserted.length });
   await incrementUsageCounter({
     userId: project.userId,
@@ -322,7 +343,29 @@ export async function regenerateSingleContentItem(contentItemId: string) {
 
   const project = await db.query.projects.findFirst({ where: eq(schema.projects.id, item.projectId) });
   if (!project) throw new Error("Project not found");
-  await assertManualRegenerationAllowed(project.userId);
+  const regeneratePolicy = getBillingPolicy("content_item_regenerate");
+  if (!regeneratePolicy.billable) {
+    throw new Error("Billing policy mismatch for content item regenerate.");
+  }
+
+  const existingCharge = await db.query.creditLedgerEntries.findFirst({
+    where: and(
+      eq(schema.creditLedgerEntries.userId, project.userId),
+      eq(schema.creditLedgerEntries.referenceType, "content_item_regenerate"),
+      eq(schema.creditLedgerEntries.referenceId, item.id),
+    ),
+  });
+  if (existingCharge) {
+    const existingRegenerated = await db.query.contentItems.findFirst({
+      where: and(eq(schema.contentItems.parentContentItemId, item.id), eq(schema.contentItems.projectId, project.id)),
+      orderBy: [desc(schema.contentItems.createdAt)],
+    });
+    if (existingRegenerated) {
+      return existingRegenerated;
+    }
+  } else {
+    await assertCanAffordAction(project.userId, [{ bucket: regeneratePolicy.bucket, amount: regeneratePolicy.amount }]);
+  }
 
   const structured = await generateStructuredObject({
     schema: singlePostOutputSchema,
@@ -387,6 +430,21 @@ export async function regenerateSingleContentItem(contentItemId: string) {
       publishStatus: "draft",
     })
     .returning();
+
+  await chargeCredits({
+    userId: project.userId,
+    bucket: regeneratePolicy.bucket,
+    amount: regeneratePolicy.amount,
+    reason: regeneratePolicy.reason,
+    referenceType: "content_item_regenerate",
+    referenceId: item.id,
+    metadata: {
+      projectId: project.id,
+      contentItemId: item.id,
+      regeneratedContentItemId: regenerated.id,
+      source: "non_chat_regenerate",
+    },
+  });
 
   await incrementUsageCounter({ userId: project.userId, projectId: project.id, period: "week", field: "manualRegenerations", amount: 1 });
   return regenerated;

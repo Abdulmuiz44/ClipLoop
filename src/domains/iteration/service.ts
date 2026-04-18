@@ -7,6 +7,9 @@ import { iterationAnalysisSchema } from "@/lib/validation/iteration";
 import { postBatchOutputSchema } from "@/lib/validation/content";
 import { getPerformanceForStrategyCycle, rollupPerformanceForStrategyCycle } from "@/domains/performance/service";
 import { buildTrackingSlug } from "@/lib/utils/slugs";
+import { assertCanAffordAction, chargeCredits } from "@/domains/credits/service";
+import { getBillingPolicy } from "@/domains/credits/policy";
+import { incrementUsageCounter } from "@/domains/usage/service";
 import {
   defaultPublishStrategyForChannel,
   normalizeProjectChannels,
@@ -240,6 +243,11 @@ export async function generateNextContentPackFromIteration(
 
   const project = await db.query.projects.findFirst({ where: eq(schema.projects.id, cycle.projectId) });
   if (!project) throw new Error("Project not found");
+  const nextPackPolicy = getBillingPolicy("strategy_cycle_generate_next_pack");
+  if (!nextPackPolicy.billable) {
+    throw new Error("Billing policy mismatch for strategy cycle next-pack generation.");
+  }
+  await assertCanAffordAction(project.userId, [{ bucket: nextPackPolicy.bucket, amount: nextPackPolicy.amount }]);
   const preferredChannels = normalizeProjectChannels(project.preferredChannelsJson, project.preferredChannels);
   const winnerIds = analysis.winners.map((winner) => winner.content_item_id);
   const sourceCycleItems =
@@ -330,6 +338,36 @@ export async function generateNextContentPackFromIteration(
     .insert(schema.contentItems)
     .values(newContentItems)
     .returning();
+
+  await chargeCredits({
+    userId: project.userId,
+    bucket: nextPackPolicy.bucket,
+    amount: nextPackPolicy.amount,
+    reason: nextPackPolicy.reason,
+    referenceType: "strategy_cycle_generate_next_pack",
+    referenceId: nextStrategyCycleId,
+    metadata: {
+      strategyCycleId: nextStrategyCycleId,
+      projectId: project.id,
+      generatedCount: inserted.length,
+      source: "iteration_generate_next_pack",
+    },
+  });
+
+  await incrementUsageCounter({
+    userId: project.userId,
+    projectId: project.id,
+    period: "week",
+    field: "postsGenerated",
+    amount: inserted.length,
+  });
+  await incrementUsageCounter({
+    userId: project.userId,
+    projectId: project.id,
+    period: "month",
+    field: "postsGenerated",
+    amount: inserted.length,
+  });
 
   return inserted;
 }

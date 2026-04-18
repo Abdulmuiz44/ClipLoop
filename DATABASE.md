@@ -259,6 +259,49 @@ The product now uses a chat-first primary UX. New DB structures:
 - user-owned chat threads
 - optional `project_id` link for business-context scope
 
+---
+
+## Credit ledger additions
+
+ClipLoop billing-grade credit accounting is ledger-backed.
+
+### `credit_accounts`
+- one row per user
+- running balances:
+  - `generation_balance`
+  - `render_balance`
+- this table is the balance source of truth shown in product surfaces
+
+### `credit_ledger_entries`
+- immutable credit transactions (credit/debit)
+- key fields:
+  - `user_id`
+  - `credit_account_id`
+  - `bucket` (`generation` or `render`)
+  - `direction` (`credit` or `debit`)
+  - `reason` (monthly grant or billable action reason)
+  - `amount_delta`
+  - `balance_after`
+  - optional `reference_type` + `reference_id` for idempotency and traceability
+  - `metadata_json` for action linkage (chat job/content item)
+  - `created_at`
+
+### Idempotency behavior
+- Paid action debits use unique references (for example `chat_job` keys)
+- Retries return existing ledger entries instead of creating duplicate charges
+
+### Compatibility behavior
+- `usage_counters` remain in place for compatibility/reporting
+- charging and available-balance decisions are made from ledger state, not counters
+- chat paid actions (`generate_copy`, `generate_video`) are ledger-gated and ledger-charged
+- non-chat billable generation/render flows are also ledger-gated and ledger-charged
+- usage counters continue to update after successful operations for reporting/analytics compatibility
+- billing action definitions are centralized in `src/domains/credits/policy.ts` (billable vs non-billable, bucket, amount, reason)
+
+### Operational vs billing limits
+- billing decisions for paid generation/render are ledger-first
+- remaining usage-limit assertions are restricted to non-billing operational limits (for example project creation caps and publish scheduling caps)
+
 ### `conversation_messages`
 - append-only chat messages per conversation
 - role enum: `user | assistant | system`

@@ -1,6 +1,7 @@
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
 import { getPlanLimitsForUser } from "@/domains/account/service";
+import { getBillingPolicy } from "@/domains/credits/policy";
 
 type CreditBucket = "generation" | "render";
 type CreditReason =
@@ -158,6 +159,20 @@ export async function assertCanAffordAction(
 export async function chargeCredits(input: ChargeInput) {
   if (input.amount <= 0) throw new Error("Charge amount must be positive.");
 
+  const hasReference = Boolean(input.referenceType && input.referenceId);
+  if (hasReference) {
+    const existing = await db.query.creditLedgerEntries.findFirst({
+      where: and(
+        eq(schema.creditLedgerEntries.userId, input.userId),
+        eq(schema.creditLedgerEntries.referenceType, input.referenceType!),
+        eq(schema.creditLedgerEntries.referenceId, input.referenceId!),
+      ),
+    });
+    if (existing) {
+      return existing;
+    }
+  }
+
   await applyMonthlyGrantIfNeeded(input.userId);
   const account = await getOrCreateCreditAccount(input.userId);
 
@@ -178,7 +193,7 @@ export async function chargeCredits(input: ChargeInput) {
     }
 
     const nextBalance = currentBalance - input.amount;
-    const [entry] = await tx
+    const [inserted] = await tx
       .insert(schema.creditLedgerEntries)
       .values({
         userId: input.userId,
@@ -192,14 +207,37 @@ export async function chargeCredits(input: ChargeInput) {
         referenceId: input.referenceId ?? null,
         metadataJson: input.metadata ?? {},
       })
+      .onConflictDoNothing({
+        target: [schema.creditLedgerEntries.userId, schema.creditLedgerEntries.referenceType, schema.creditLedgerEntries.referenceId],
+      })
       .returning();
 
-    if (input.bucket === "generation") {
+    const [existingEntry] =
+      !inserted && hasReference
+        ? await tx
+            .select()
+            .from(schema.creditLedgerEntries)
+            .where(
+              and(
+                eq(schema.creditLedgerEntries.userId, input.userId),
+                eq(schema.creditLedgerEntries.referenceType, input.referenceType!),
+                eq(schema.creditLedgerEntries.referenceId, input.referenceId!),
+              ),
+            )
+            .limit(1)
+        : [];
+    const entry = inserted ?? existingEntry;
+
+    if (!entry) {
+      throw new Error("Could not persist credit ledger entry.");
+    }
+
+    if (inserted && input.bucket === "generation") {
       await tx
         .update(schema.creditAccounts)
         .set({ generationBalance: nextBalance, updatedAt: new Date() })
         .where(eq(schema.creditAccounts.id, current.id));
-    } else {
+    } else if (inserted) {
       await tx
         .update(schema.creditAccounts)
         .set({ renderBalance: nextBalance, updatedAt: new Date() })
@@ -210,16 +248,30 @@ export async function chargeCredits(input: ChargeInput) {
   });
 }
 
+export async function getCreditEntryByReference(input: { userId: string; referenceType: string; referenceId: string }) {
+  return db.query.creditLedgerEntries.findFirst({
+    where: and(
+      eq(schema.creditLedgerEntries.userId, input.userId),
+      eq(schema.creditLedgerEntries.referenceType, input.referenceType),
+      eq(schema.creditLedgerEntries.referenceId, input.referenceId),
+    ),
+  });
+}
+
 export async function chargeGenerateCopyCredits(input: {
   userId: string;
   chatJobId?: string;
   contentItemId?: string;
 }) {
+  const policy = getBillingPolicy("chat_generate_copy");
+  if (!policy.billable) {
+    throw new Error("Billing policy mismatch for chat_generate_copy.");
+  }
   return chargeCredits({
     userId: input.userId,
-    bucket: "generation",
-    amount: 1,
-    reason: "action_generate_copy",
+    bucket: policy.bucket,
+    amount: policy.amount,
+    reason: policy.reason,
     referenceType: "chat_job",
     referenceId: input.chatJobId ? `${input.chatJobId}:copy` : undefined,
     metadata: { chatJobId: input.chatJobId, contentItemId: input.contentItemId, action: "generate_copy" },
@@ -231,6 +283,30 @@ export async function chargeGenerateVideoCredits(input: {
   chatJobId?: string;
   contentItemId?: string;
 }) {
+  const generationPolicy = getBillingPolicy("chat_generate_video_generation");
+  const renderPolicy = getBillingPolicy("chat_generate_video_render");
+  if (!generationPolicy.billable || !renderPolicy.billable) {
+    throw new Error("Billing policy mismatch for chat_generate_video actions.");
+  }
+  const generationReferenceId = input.chatJobId ? `${input.chatJobId}:video:generation` : null;
+  const renderReferenceId = input.chatJobId ? `${input.chatJobId}:video:render` : null;
+
+  if (generationReferenceId && renderReferenceId) {
+    const existing = await db.query.creditLedgerEntries.findMany({
+      where: and(
+        eq(schema.creditLedgerEntries.userId, input.userId),
+        eq(schema.creditLedgerEntries.referenceType, "chat_job"),
+      ),
+      limit: 50,
+      orderBy: [desc(schema.creditLedgerEntries.createdAt)],
+    });
+    const generation = existing.find((entry) => entry.referenceId === generationReferenceId);
+    const render = existing.find((entry) => entry.referenceId === renderReferenceId);
+    if (generation && render) {
+      return { generation, render };
+    }
+  }
+
   await applyMonthlyGrantIfNeeded(input.userId);
   const account = await getOrCreateCreditAccount(input.userId);
 
@@ -239,57 +315,112 @@ export async function chargeGenerateVideoCredits(input: {
       where: eq(schema.creditAccounts.id, account.id),
     });
     if (!current) throw new Error("Credit account not found.");
-    if (current.generationBalance < 1) {
-      throw new InsufficientCreditsError("Generation credits are insufficient for this action.", "generation", 1, current.generationBalance);
+    if (current.generationBalance < generationPolicy.amount) {
+      throw new InsufficientCreditsError(
+        "Generation credits are insufficient for this action.",
+        generationPolicy.bucket,
+        generationPolicy.amount,
+        current.generationBalance,
+      );
     }
-    if (current.renderBalance < 1) {
-      throw new InsufficientCreditsError("Render credits are insufficient for this action.", "render", 1, current.renderBalance);
+    if (current.renderBalance < renderPolicy.amount) {
+      throw new InsufficientCreditsError(
+        "Render credits are insufficient for this action.",
+        renderPolicy.bucket,
+        renderPolicy.amount,
+        current.renderBalance,
+      );
     }
 
-    const nextGeneration = current.generationBalance - 1;
-    const nextRender = current.renderBalance - 1;
+    const nextGeneration = current.generationBalance - generationPolicy.amount;
+    const nextRender = current.renderBalance - renderPolicy.amount;
     const metadata = { chatJobId: input.chatJobId, contentItemId: input.contentItemId, action: "generate_video" };
 
-    const [generation] = await tx
+    const [insertedGeneration] = await tx
       .insert(schema.creditLedgerEntries)
       .values({
         userId: input.userId,
         creditAccountId: current.id,
-        bucket: "generation",
+        bucket: generationPolicy.bucket,
         direction: "debit",
-        reason: "action_generate_video_generation",
-        amountDelta: -1,
+        reason: generationPolicy.reason,
+        amountDelta: -generationPolicy.amount,
         balanceAfter: nextGeneration,
         referenceType: "chat_job",
-        referenceId: input.chatJobId ? `${input.chatJobId}:video:generation` : null,
+        referenceId: generationReferenceId,
         metadataJson: metadata,
+      })
+      .onConflictDoNothing({
+        target: [schema.creditLedgerEntries.userId, schema.creditLedgerEntries.referenceType, schema.creditLedgerEntries.referenceId],
       })
       .returning();
 
-    const [render] = await tx
+    const [insertedRender] = await tx
       .insert(schema.creditLedgerEntries)
       .values({
         userId: input.userId,
         creditAccountId: current.id,
-        bucket: "render",
+        bucket: renderPolicy.bucket,
         direction: "debit",
-        reason: "action_generate_video_render",
-        amountDelta: -1,
+        reason: renderPolicy.reason,
+        amountDelta: -renderPolicy.amount,
         balanceAfter: nextRender,
         referenceType: "chat_job",
-        referenceId: input.chatJobId ? `${input.chatJobId}:video:render` : null,
+        referenceId: renderReferenceId,
         metadataJson: metadata,
+      })
+      .onConflictDoNothing({
+        target: [schema.creditLedgerEntries.userId, schema.creditLedgerEntries.referenceType, schema.creditLedgerEntries.referenceId],
       })
       .returning();
 
-    await tx
-      .update(schema.creditAccounts)
-      .set({
-        generationBalance: nextGeneration,
-        renderBalance: nextRender,
-        updatedAt: new Date(),
-      })
-      .where(eq(schema.creditAccounts.id, current.id));
+    const [existingGeneration] =
+      !insertedGeneration && generationReferenceId
+        ? await tx
+            .select()
+            .from(schema.creditLedgerEntries)
+            .where(
+              and(
+                eq(schema.creditLedgerEntries.userId, input.userId),
+                eq(schema.creditLedgerEntries.referenceType, "chat_job"),
+                eq(schema.creditLedgerEntries.referenceId, generationReferenceId),
+              ),
+            )
+            .limit(1)
+        : [];
+    const [existingRender] =
+      !insertedRender && renderReferenceId
+        ? await tx
+            .select()
+            .from(schema.creditLedgerEntries)
+            .where(
+              and(
+                eq(schema.creditLedgerEntries.userId, input.userId),
+                eq(schema.creditLedgerEntries.referenceType, "chat_job"),
+                eq(schema.creditLedgerEntries.referenceId, renderReferenceId),
+              ),
+            )
+            .limit(1)
+        : [];
+    const generation = insertedGeneration ?? existingGeneration;
+    const render = insertedRender ?? existingRender;
+
+    if (!generation || !render) {
+      throw new Error("Could not persist video charge ledger entries.");
+    }
+
+    if (insertedGeneration && insertedRender) {
+      await tx
+        .update(schema.creditAccounts)
+        .set({
+          generationBalance: nextGeneration,
+          renderBalance: nextRender,
+          updatedAt: new Date(),
+        })
+        .where(eq(schema.creditAccounts.id, current.id));
+    } else if (insertedGeneration || insertedRender) {
+      throw new Error("Detected partial video charge state. Please retry the request.");
+    }
 
     return { generation, render };
   });

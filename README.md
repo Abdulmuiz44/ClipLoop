@@ -68,6 +68,14 @@ Credit accounting is now ledger-backed:
 - monthly plan grants are applied as ledger credits per month window
 - chat result cards include receipt metadata for paid actions
 - settings now includes recent transaction history
+- paid action charging is idempotent by `chat_job` reference keys to avoid duplicate debits on retries
+- chat paid actions (`generate_copy`, `generate_video`) use ledger affordability as the charging gate
+- non-chat paid actions also use ledger affordability/charging gates:
+  - `generate-posts` (strategy cycle pack)
+  - `regenerate` (single post)
+  - `render` (single and cycle render paths)
+  - `generate-next` iteration pack generation
+- billing policy is centralized in `src/domains/credits/policy.ts` to avoid cost/rule drift
 
 User-facing plan names:
 - `Free`: chat access + capped monthly credits
@@ -76,7 +84,31 @@ User-facing plan names:
 Compatibility note:
 - Some internal billing/domain identifiers still use `starter` for Lemon Squeezy/webhook compatibility.
 - UI copy and product messaging use **Pro**.
-- Existing `usage_counters` are still updated for compatibility/reporting during transition, while balances and paid-action charging use the new ledger.
+- Existing `usage_counters` are still updated for compatibility/reporting during transition.
+- Charging decisions and displayed balances are ledger-driven (`credit_accounts` + `credit_ledger_entries`), not counter-driven.
+- Non-billable operational workflows may still use existing usage counters during transition.
+- `usage_counters` no longer block billable generation/render decisions.
+- Scheduling/publishing limits remain non-billing operational limits in this pass.
+
+Active policy coverage:
+- Billable:
+  - chat `generate_copy` (generation 1)
+  - chat `generate_video` generation step (generation 1)
+  - chat `generate_video` render step (render 1)
+  - strategy cycle post generation (generation 5)
+  - content item regenerate (generation 1)
+  - iteration next-pack generation (generation 5)
+  - content item render (render 1)
+- Non-billable:
+  - plain chat
+  - export bundle
+  - direct Instagram publish
+  - manual mark-posted / queue operations
+
+Billing hardening tests:
+- `npm run test:billing`
+- The suite runs DB-backed integration tests for idempotent charging across generate-posts, regenerate, render, and generate-next.
+- If Postgres or required migrated tables are unavailable, tests are reported as skipped.
 
 ## Authenticated shell direction
 
