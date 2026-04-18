@@ -4,11 +4,13 @@
 
 :root {
   color-scheme: light;
-  --cl-bg: #f7f7f6;
+  --cl-bg: #f6f6f5;
   --cl-surface: #ffffff;
-  --cl-text: #0f1720;
-  --cl-muted: #5f6773;
-  --cl-border: #e5e7eb;
+  --cl-text: #101114;
+  --cl-muted: #5a626f;
+  --cl-border: #e3e5e8;
+  --cl-border-strong: #d5d9df;
+  --cl-soft: #f2f3f5;
 }
 
 body {
@@ -27,11 +29,50 @@ a {
 
 @layer components {
   .cl-card {
-    @apply rounded-2xl border border-slate-200 bg-white;
+    @apply rounded-2xl border bg-white;
+    border-color: var(--cl-border);
   }
 
   .cl-card-soft {
-    @apply rounded-2xl border border-slate-200 bg-slate-50/60;
+    @apply rounded-2xl border;
+    border-color: var(--cl-border);
+    background: var(--cl-soft);
+  }
+
+  .cl-shell {
+    @apply rounded-3xl border bg-white;
+    border-color: var(--cl-border);
+  }
+
+  .cl-kicker {
+    @apply text-[11px] font-medium uppercase tracking-[0.18em] text-slate-500;
+  }
+
+  .cl-section-title {
+    @apply text-3xl font-semibold tracking-tight text-slate-950;
+  }
+
+  .cl-divider {
+    border-color: var(--cl-border);
+  }
+
+  .cl-nav-item {
+    @apply block rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-100 hover:text-slate-900;
+  }
+
+  .cl-nav-item-active {
+    @apply bg-slate-900 text-white hover:bg-slate-900 hover:text-white;
+  }
+
+  .cl-chip {
+    @apply inline-flex items-center rounded-full border bg-white px-2.5 py-1 text-xs font-medium text-slate-700;
+    border-color: var(--cl-border);
+  }
+
+  .cl-muted-box {
+    @apply rounded-2xl border p-4;
+    border-color: var(--cl-border);
+    background: var(--cl-soft);
   }
 
   .cl-title {
@@ -43,15 +84,18 @@ a {
   }
 
   .cl-input {
-    @apply w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-slate-400;
+    @apply w-full rounded-xl border bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-slate-500;
+    border-color: var(--cl-border);
   }
 
   .cl-textarea {
-    @apply min-h-24 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-slate-400;
+    @apply min-h-24 w-full rounded-xl border bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-slate-500;
+    border-color: var(--cl-border);
   }
 
   .cl-select {
-    @apply w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-slate-400;
+    @apply w-full rounded-xl border bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-slate-500;
+    border-color: var(--cl-border);
   }
 
   .cl-label {
@@ -59,6 +103,7 @@ a {
   }
 
   .cl-badge {
-    @apply inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-medium text-slate-700;
+    @apply inline-flex items-center rounded-full border bg-slate-50 px-2.5 py-1 text-xs font-medium text-slate-700;
+    border-color: var(--cl-border);
   }
 }

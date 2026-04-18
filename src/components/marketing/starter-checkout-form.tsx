@@ -50,7 +50,7 @@ export function StarterCheckoutForm({
   }
 
   return (
-    <form action={onSubmit} className={`cl-card space-y-4 p-5 ${className}`}>
+    <form action={onSubmit} className={`cl-card space-y-4 p-5 md:p-6 ${className}`}>
       <div>
         <h2 className="text-xl font-semibold text-slate-950">{title}</h2>
         <p className="mt-2 text-sm leading-6 text-slate-600">{description}</p>
@@ -76,7 +76,7 @@ export function StarterCheckoutForm({
         </div>
       ) : null}
 
-      {message ? <p className="rounded-xl bg-rose-50 px-3 py-3 text-sm text-rose-700">{message}</p> : null}
+      {message ? <p className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-3 text-sm text-rose-700">{message}</p> : null}
 
       <Button disabled={loading} type="submit">
         {loading ? "Opening checkout..." : submitLabel}

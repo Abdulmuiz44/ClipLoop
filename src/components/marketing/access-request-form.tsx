@@ -53,7 +53,7 @@ export function AccessRequestForm({
   }
 
   return (
-    <form action={onSubmit} className={`cl-card space-y-4 p-5 ${className}`}>
+    <form action={onSubmit} className={`cl-card space-y-4 p-5 md:p-6 ${className}`}>
       <div>
         <h2 className="text-xl font-semibold text-slate-950">{title}</h2>
         <p className="mt-2 text-sm leading-6 text-slate-600">{description}</p>
@@ -97,14 +97,14 @@ export function AccessRequestForm({
         />
       </label>
 
-      {message ? <p className="rounded-xl bg-slate-50 px-3 py-3 text-sm leading-6 text-slate-700">{message}</p> : null}
+      {message ? <p className="rounded-xl border bg-slate-50 px-3 py-3 text-sm leading-6 text-slate-700 cl-divider">{message}</p> : null}
 
       <div className="flex flex-wrap gap-3">
         <Button disabled={loading} type="submit">
           {loading ? "Submitting..." : "Request beta access"}
         </Button>
         {showBackHome ? (
-          <Link href="/" className="inline-flex items-center rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-700">
+          <Link href="/" className="inline-flex items-center rounded-xl border px-3 py-2 text-sm text-slate-700 transition cl-divider hover:bg-slate-50">
             Back to home
           </Link>
         ) : null}

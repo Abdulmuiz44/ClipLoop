@@ -69,10 +69,10 @@ export function UsageSummary({
   const hasProductAccess = rows.some((row) => row.limit > 0);
 
   return (
-    <section className="cl-card p-5">
+    <section className="cl-card p-5 md:p-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="font-semibold tracking-tight">{title}</h2>
+          <h2 className="text-lg font-semibold tracking-tight">{title}</h2>
           {subtitle ? <p className="mt-1 text-sm text-slate-600">{subtitle}</p> : null}
         </div>
         <div className="flex flex-wrap gap-2 text-xs">
@@ -91,9 +91,9 @@ export function UsageSummary({
         </p>
       ) : null}
 
-      <ul className="mt-3 space-y-2 text-sm">
+      <ul className="mt-4 space-y-2.5 text-sm">
         {rows.map((row) => (
-          <li key={row.label} className="rounded-xl border border-slate-200 bg-slate-50/40 px-3 py-2.5">
+          <li key={row.label} className="rounded-xl border px-3 py-2.5 cl-divider" style={{ background: "var(--cl-soft)" }}>
             <div className="flex items-center justify-between gap-3">
               <span>{row.label}</span>
               <span className={row.limit > 0 && row.used >= row.limit ? "font-semibold text-red-600" : "text-slate-700"}>

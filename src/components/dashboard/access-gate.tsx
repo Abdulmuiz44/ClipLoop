@@ -5,9 +5,9 @@ import { StarterCheckoutForm } from "@/components/marketing/starter-checkout-for
 
 export function AccessGate({ email }: { email: string }) {
   return (
-    <div className="cl-card mx-auto max-w-3xl space-y-6 p-6">
+    <div className="cl-card mx-auto max-w-3xl space-y-6 p-6 md:p-7">
       <div className="space-y-2">
-        <p className="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">Invite-only beta</p>
+        <p className="cl-kicker">Invite-only beta</p>
         <h1 className="text-3xl font-semibold tracking-tight">ClipLoop is onboarding a small cohort</h1>
         <p className="max-w-2xl text-sm leading-6 text-slate-600">
           ClipLoop is intentionally narrow right now: one product, one channel, one weekly growth loop. We are keeping access tight while we
@@ -16,15 +16,15 @@ export function AccessGate({ email }: { email: string }) {
       </div>
 
       <div className="grid gap-3 md:grid-cols-3">
-        <div className="cl-card-soft p-3 text-sm">
+        <div className="cl-card-soft p-3.5 text-sm">
           <p className="font-medium">What you get</p>
           <p className="mt-1 text-slate-600">Strategy generation, 5 weekly post drafts, rendering, scheduling, tracking, and manual iteration.</p>
         </div>
-        <div className="cl-card-soft p-3 text-sm">
+        <div className="cl-card-soft p-3.5 text-sm">
           <p className="font-medium">Pro target</p>
           <p className="mt-1 text-slate-600">$5/month for one active project and hard-capped MVP usage.</p>
         </div>
-        <div className="cl-card-soft p-3 text-sm">
+        <div className="cl-card-soft p-3.5 text-sm">
           <p className="font-medium">Approval flow</p>
           <p className="mt-1 text-slate-600">Request access below. Free chat is available now, and Pro unlocks higher paid-action credits.</p>
         </div>

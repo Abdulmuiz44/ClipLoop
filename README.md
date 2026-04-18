@@ -51,6 +51,8 @@ The authenticated product shell now follows a restrained, premium visual languag
 - soft borders and generous spacing
 - minimal decoration and calmer hierarchy
 - mobile-first chat layout with fixed composer and clean drawer navigation
+- shared primitives for cards/inputs/badges/nav states to keep every page visually consistent
+- quiet status/error/success blocks with readable contrast and no loud visual noise
 
 ## Credit model and plan naming
 
@@ -83,6 +85,8 @@ The authenticated UX is now focused on a cleaner mobile-first app shell:
 - sidebar/drawer navigation for secondary surfaces
 - integrated ClipLoop branding
 - clearer in-chat action modes and limit messaging
+- calmer top navigation, tighter spacing rhythm, and cleaner message/composer hierarchy
+- same black/white enterprise-style surface language across pricing, settings, manual queue, and billing outcome views
 
 ## Chat orchestration flow
 

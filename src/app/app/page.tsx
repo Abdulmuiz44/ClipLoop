@@ -17,7 +17,7 @@ export default async function ChatAppPage() {
     return (
       <div className="mx-auto max-w-3xl space-y-4">
         <div className="cl-card p-6">
-          <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Welcome to ClipLoop</p>
+          <p className="cl-kicker">Welcome to ClipLoop</p>
           <h1 className="mt-1 text-2xl font-semibold tracking-tight">Chat-first promo operator</h1>
           <p className="mt-2 text-sm leading-6 text-slate-600">Complete onboarding once. Then ask for promo videos directly in chat.</p>
         </div>

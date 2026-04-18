@@ -45,8 +45,9 @@ export default async function ManualQueuePage({ searchParams }: { searchParams: 
 
   return (
     <div className="space-y-6">
-      <section className="cl-card p-5">
-        <h1 className="text-2xl font-semibold tracking-tight">Manual Publish Queue</h1>
+      <section className="cl-card p-5 md:p-6">
+        <p className="cl-kicker">Manual operations</p>
+        <h1 className="mt-1 text-2xl font-semibold tracking-tight">Manual Publish Queue</h1>
         <p className="mt-1 text-sm leading-6 text-slate-600">
           Operational queue for manual-export items. Export bundles quickly and mark posted after platform upload.
         </p>
@@ -67,7 +68,7 @@ export default async function ManualQueuePage({ searchParams }: { searchParams: 
             <option value="newest">Newest first</option>
             <option value="oldest">Oldest first</option>
           </select>
-          <button className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+          <button className="rounded-xl border bg-white px-3 py-2 text-sm font-medium text-slate-700 transition cl-divider hover:bg-slate-50">
             Apply filters
           </button>
         </form>
@@ -78,7 +79,7 @@ export default async function ManualQueuePage({ searchParams }: { searchParams: 
           <div className="cl-card p-4 text-sm text-slate-600">No manual-export items for current filters.</div>
         ) : (
           items.map((item) => (
-            <article key={item.id} className="cl-card p-5">
+            <article key={item.id} className="cl-card p-5 md:p-6">
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div>
                   <p className="font-semibold tracking-tight">{item.internalTitle}</p>
@@ -88,7 +89,7 @@ export default async function ManualQueuePage({ searchParams }: { searchParams: 
                   <span className="cl-badge">channel: {item.targetChannel}</span>
                   <span className="cl-badge">strategy: {item.publishStrategy}</span>
                   <span className="cl-badge">manual: {item.manualPublishStatus}</span>
-                  <span className={`rounded-full border px-2 py-1 ${item.isRendered ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-amber-200 bg-amber-50 text-amber-700"}`}>
+                  <span className={`rounded-full border px-2 py-1 ${item.isRendered ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-slate-300 bg-slate-100 text-slate-700"}`}>
                     {item.isRendered ? "rendered" : "needs render"}
                   </span>
                 </div>
@@ -114,7 +115,7 @@ export default async function ManualQueuePage({ searchParams }: { searchParams: 
                 ) : (
                   <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">Posted confirmed</div>
                 )}
-                <a className="inline-flex items-center justify-center rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50" href={`/dashboard/projects/${item.projectId}`}>
+                <a className="inline-flex items-center justify-center rounded-xl border px-3 py-2 text-sm text-slate-700 transition cl-divider hover:bg-slate-50" href={`/dashboard/projects/${item.projectId}`}>
                   Open project
                 </a>
               </div>
