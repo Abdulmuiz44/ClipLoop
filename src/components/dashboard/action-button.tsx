@@ -23,7 +23,8 @@ export function ActionButton({
       const json = await response.json().catch(() => ({}));
       const limitDetail =
         typeof json.used === "number" && typeof json.limit === "number" ? ` (${json.used}/${json.limit} used)` : "";
-      setError(`${json.error ?? "Action failed"}${limitDetail}`);
+      const suggestion = typeof json.suggestion === "string" ? ` ${json.suggestion}` : "";
+      setError(`${json.error ?? "Action failed"}${limitDetail}${suggestion}`);
       setLoading(false);
       return;
     }

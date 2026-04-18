@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
 import { env } from "@/lib/env";
 
-const OFFLINE_DEMO_USER_ID = "mock-local-user";
+export const OFFLINE_DEMO_USER_ID = "00000000-0000-0000-0000-000000000001";
 
 function isDatabaseUnavailableError(error: unknown) {
   const message = error instanceof Error ? error.message : String(error);

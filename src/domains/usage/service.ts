@@ -78,13 +78,10 @@ export async function incrementUsageCounter(params: {
     .where(eq(schema.usageCounters.id, counter.id));
 }
 
-async function getAggregate(userId: string, period: "week" | "month") {
-  const target = period === "week" ? getWeekPeriod() : getMonthPeriod();
+async function getAggregatePublished(userId: string) {
+  const target = getMonthPeriod();
   const rows = await db
     .select({
-      postsGenerated: sql<number>`coalesce(sum(${schema.usageCounters.postsGenerated}), 0)`,
-      manualRegenerations: sql<number>`coalesce(sum(${schema.usageCounters.manualRegenerations}), 0)`,
-      videosRendered: sql<number>`coalesce(sum(${schema.usageCounters.videosRendered}), 0)`,
       postsPublished: sql<number>`coalesce(sum(${schema.usageCounters.postsPublished}), 0)`,
     })
     .from(schema.usageCounters)
@@ -97,7 +94,7 @@ async function getAggregate(userId: string, period: "week" | "month") {
       ),
     );
 
-  return rows[0] ?? { postsGenerated: 0, manualRegenerations: 0, videosRendered: 0, postsPublished: 0 };
+  return rows[0] ?? { postsPublished: 0 };
 }
 
 export async function assertProjectCreationAllowed(userId: string) {
@@ -119,59 +116,9 @@ export async function assertProjectCreationAllowed(userId: string) {
   }
 }
 
-export async function assertPostGenerationAllowed(userId: string, count: number) {
-  const limits = await getPlanLimitsForUser(userId);
-  const weekly = await getAggregate(userId, "week");
-  const monthly = await getAggregate(userId, "month");
-
-  if (weekly.postsGenerated + count > limits.postsPerWeek) {
-    throw new UsageLimitError(
-      "Weekly post generation limit reached.",
-      "POSTS_WEEKLY_LIMIT_REACHED",
-      limits.postsPerWeek,
-      weekly.postsGenerated,
-    );
-  }
-
-  if (monthly.postsGenerated + count > limits.postsPerMonth) {
-    throw new UsageLimitError(
-      "Monthly post generation limit reached.",
-      "POSTS_MONTHLY_LIMIT_REACHED",
-      limits.postsPerMonth,
-      monthly.postsGenerated,
-    );
-  }
-}
-
-export async function assertManualRegenerationAllowed(userId: string) {
-  const limits = await getPlanLimitsForUser(userId);
-  const weekly = await getAggregate(userId, "week");
-  if (weekly.manualRegenerations + 1 > limits.manualRegenerationsPerWeek) {
-    throw new UsageLimitError(
-      "Weekly manual regeneration limit reached.",
-      "REGEN_WEEKLY_LIMIT_REACHED",
-      limits.manualRegenerationsPerWeek,
-      weekly.manualRegenerations,
-    );
-  }
-}
-
-export async function assertRenderAllowed(userId: string, count: number) {
-  const limits = await getPlanLimitsForUser(userId);
-  const monthly = await getAggregate(userId, "month");
-  if (monthly.videosRendered + count > limits.rendersPerMonth) {
-    throw new UsageLimitError(
-      "Monthly render limit reached.",
-      "RENDER_MONTHLY_LIMIT_REACHED",
-      limits.rendersPerMonth,
-      monthly.videosRendered,
-    );
-  }
-}
-
 export async function assertPublishAllowed(userId: string, count: number) {
   const limits = await getPlanLimitsForUser(userId);
-  const monthly = await getAggregate(userId, "month");
+  const monthly = await getAggregatePublished(userId);
   if (monthly.postsPublished + count > limits.publishesPerMonth) {
     throw new UsageLimitError(
       "Monthly publish limit reached.",

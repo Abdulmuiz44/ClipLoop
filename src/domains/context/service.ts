@@ -3,12 +3,26 @@ import { db, schema } from "@/lib/db";
 import { createProject } from "@/domains/projects/service";
 import { crawlWebsiteContext, hashContent } from "@/domains/context/ingestion";
 import type { OnboardingInput } from "@/lib/validation/chat";
+import { env } from "@/lib/env";
+import { OFFLINE_DEMO_USER_ID } from "@/lib/auth";
+
+function isDatabaseUnavailableError(error: unknown) {
+  const message = error instanceof Error ? error.message : String(error);
+  return message.includes("ECONNREFUSED") || message.includes("Failed query:");
+}
 
 export async function listProjectsForContext(userId: string) {
-  return db.query.projects.findMany({
-    where: and(eq(schema.projects.userId, userId), eq(schema.projects.status, "active")),
-    orderBy: [desc(schema.projects.updatedAt)],
-  });
+  try {
+    return await db.query.projects.findMany({
+      where: and(eq(schema.projects.userId, userId), eq(schema.projects.status, "active")),
+      orderBy: [desc(schema.projects.updatedAt)],
+    });
+  } catch (error) {
+    if (env.MOCK_MODE && userId === OFFLINE_DEMO_USER_ID && isDatabaseUnavailableError(error)) {
+      return [];
+    }
+    throw error;
+  }
 }
 
 export async function getPrimaryProjectForUser(userId: string) {

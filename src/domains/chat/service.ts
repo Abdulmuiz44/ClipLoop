@@ -13,7 +13,7 @@ import {
   type ProjectChannel,
 } from "@/lib/utils/channels";
 import { env } from "@/lib/env";
-import { assertPostGenerationAllowed, assertRenderAllowed, incrementUsageCounter, UsageLimitError } from "@/domains/usage/service";
+import { incrementUsageCounter, UsageLimitError } from "@/domains/usage/service";
 import {
   assertCanAffordAction,
   chargeGenerateCopyCredits,
@@ -21,6 +21,7 @@ import {
   getCreditWalletSummary,
   InsufficientCreditsError,
 } from "@/domains/credits/service";
+import { getBillingPolicy } from "@/domains/credits/policy";
 
 const chatPromoOutputSchema = z.object({
   internal_title: z.string().min(6),
@@ -187,15 +188,15 @@ type ChatActionMode = "chat" | "generate_copy" | "generate_video";
 
 function formatChatFailureMessage(error: unknown) {
   if (error instanceof InsufficientCreditsError) {
-    return `You are low on ${error.bucket} credits (${error.available} available, ${error.required} needed). Chat is still free. Upgrade to Pro for more credits.`;
+    return `You are low on ${error.bucket} credits (${error.available} available, ${error.required} needed). Chat is still free. Upgrade to Pro from the Pricing page for more credits.`;
   }
 
   if (error instanceof UsageLimitError) {
     if (error.code.includes("POSTS_")) {
-      return `You are out of generation credits for this period (${error.used}/${error.limit}). Chat is still free. Upgrade to Pro for more generation credits.`;
+      return `You are out of generation credits for this period (${error.used}/${error.limit}). Chat is still free. Upgrade to Pro from the Pricing page for more generation credits.`;
     }
     if (error.code.includes("RENDER_")) {
-      return `You are out of render credits for this period (${error.used}/${error.limit}). Upgrade to Pro for more video renders.`;
+      return `You are out of render credits for this period (${error.used}/${error.limit}). Upgrade to Pro from the Pricing page for more video renders.`;
     }
     if (error.code.includes("PROJECT_")) {
       return `You have reached your project limit (${error.used}/${error.limit}). Upgrade to Pro to add more projects.`;
@@ -318,18 +319,27 @@ export async function sendChatMessageAndGenerate(params: {
       return { userMessage, statusMessage, resultMessage: assistantText };
     }
 
-    await assertPostGenerationAllowed(project.userId, 1);
-    if (mode === "generate_video") {
-      await assertRenderAllowed(project.userId, 1);
-    }
     await assertCanAffordAction(
       project.userId,
       mode === "generate_video"
-        ? [
-            { bucket: "generation", amount: 1 },
-            { bucket: "render", amount: 1 },
-          ]
-        : [{ bucket: "generation", amount: 1 }],
+        ? (() => {
+            const generationPolicy = getBillingPolicy("chat_generate_video_generation");
+            const renderPolicy = getBillingPolicy("chat_generate_video_render");
+            if (!generationPolicy.billable || !renderPolicy.billable) {
+              throw new Error("Billing policy mismatch for chat generate video.");
+            }
+            return [
+              { bucket: generationPolicy.bucket, amount: generationPolicy.amount },
+              { bucket: renderPolicy.bucket, amount: renderPolicy.amount },
+            ];
+          })()
+        : (() => {
+            const copyPolicy = getBillingPolicy("chat_generate_copy");
+            if (!copyPolicy.billable) {
+              throw new Error("Billing policy mismatch for chat generate copy.");
+            }
+            return [{ bucket: copyPolicy.bucket, amount: copyPolicy.amount }];
+          })(),
     );
 
     const targetChannel = inferTargetChannel(params.content, context.preferredChannels);
@@ -347,6 +357,7 @@ export async function sendChatMessageAndGenerate(params: {
       rendered = await renderContentItem(contentItem.id, {
         targetChannel,
         renderer: env.HYPERFRAMES_ENABLED ? "hyperframes" : "legacy",
+        chargeCredits: false,
       });
     }
 

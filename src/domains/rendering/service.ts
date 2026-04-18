@@ -4,12 +4,14 @@ import { FfmpegUnavailableError } from "@/lib/render/ffmpeg";
 import { renderTemplateIdSchema, type RenderTemplateId } from "@/lib/render/templates";
 import { prepareRenderOutput } from "@/lib/render/storage";
 import { listContentItemsForStrategyCycle } from "@/domains/content-items/service";
-import { assertRenderAllowed, incrementUsageCounter } from "@/domains/usage/service";
+import { incrementUsageCounter } from "@/domains/usage/service";
 import { legacyRenderAdapter } from "@/lib/render/adapters/legacy";
 import { HyperframesDisabledError, hyperframesRenderAdapter } from "@/lib/render/adapters/hyperframes";
 import type { RenderBackend } from "@/lib/render/adapters/types";
 import { normalizeProjectChannels, resolveContentItemTargetChannel, type ProjectChannel } from "@/lib/utils/channels";
 import { HyperframesUnavailableError } from "@/lib/render/hyperframes/cli";
+import { assertCanAffordAction, chargeCredits, getCreditEntryByReference } from "@/domains/credits/service";
+import { getBillingPolicy } from "@/domains/credits/policy";
 
 function buildSlidesForRender(item: typeof schema.contentItems.$inferSelect) {
   const middleSlides = ((item.slidesJson as string[]) ?? []).filter(Boolean);
@@ -129,13 +131,29 @@ export async function getAssetsForContentItem(contentItemId: string) {
 
 export async function renderContentItem(
   contentItemId: string,
-  options?: { templateId?: RenderTemplateId; renderer?: RenderBackend; targetChannel?: ProjectChannel },
+  options?: { templateId?: RenderTemplateId; renderer?: RenderBackend; targetChannel?: ProjectChannel; chargeCredits?: boolean },
 ) {
   const item = await db.query.contentItems.findFirst({ where: eq(schema.contentItems.id, contentItemId) });
   if (!item) throw new Error("Content item not found");
   const project = await db.query.projects.findFirst({ where: eq(schema.projects.id, item.projectId) });
   if (!project) throw new Error("Project not found");
-  await assertRenderAllowed(project.userId, 1);
+  const shouldChargeCredits = options?.chargeCredits !== false;
+  const policy = getBillingPolicy("content_item_render");
+  if (shouldChargeCredits && !policy.billable) {
+    throw new Error("Billing policy mismatch for content item render.");
+  }
+  const renderPolicy = policy.billable ? policy : null;
+  const existingRenderCharge =
+    shouldChargeCredits
+      ? await getCreditEntryByReference({
+          userId: project.userId,
+          referenceType: "content_item_render",
+          referenceId: contentItemId,
+        })
+      : null;
+  if (shouldChargeCredits && !existingRenderCharge && renderPolicy) {
+    await assertCanAffordAction(project.userId, [{ bucket: renderPolicy.bucket, amount: renderPolicy.amount }]);
+  }
   const renderer: RenderBackend = options?.renderer ?? "legacy";
   const targetChannel = resolveTargetChannel({ requested: options?.targetChannel, item, project });
   const resolvedTemplateId = resolveTemplateId(options?.templateId, item.templateId);
@@ -212,6 +230,25 @@ export async function renderContentItem(
         updatedAt: new Date(),
       })
       .where(eq(schema.contentItems.id, contentItemId));
+
+    if (shouldChargeCredits && renderPolicy) {
+      await chargeCredits({
+        userId: project.userId,
+        bucket: renderPolicy.bucket,
+        amount: renderPolicy.amount,
+        reason: renderPolicy.reason,
+        referenceType: "content_item_render",
+        referenceId: contentItemId,
+        metadata: {
+          contentItemId,
+          projectId: project.id,
+          targetChannel,
+          renderer: result.renderer,
+          templateId: result.templateId,
+          source: "non_chat_render",
+        },
+      });
+    }
 
     await incrementUsageCounter({
       userId: project.userId,

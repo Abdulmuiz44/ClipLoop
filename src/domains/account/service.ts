@@ -2,6 +2,7 @@ import { and, eq, sql } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
 import { env } from "@/lib/env";
 import { getLatestSubscriptionForUser, subscriptionConfersStarterAccess } from "@/domains/billing/service";
+import { OFFLINE_DEMO_USER_ID } from "@/lib/auth";
 
 export type PlanType = "free" | "starter" | "beta";
 
@@ -79,6 +80,36 @@ export class ProductAccessError extends Error {
   }
 }
 
+function isDatabaseUnavailableError(error: unknown) {
+  const message = error instanceof Error ? error.message : String(error);
+  return message.includes("ECONNREFUSED") || message.includes("Failed query:");
+}
+
+function buildOfflineMockPlanState(userId: string) {
+  const now = new Date();
+  return {
+    user: {
+      id: userId || OFFLINE_DEMO_USER_ID,
+      email: env.DEMO_USER_EMAIL,
+      fullName: "ClipLoop Demo User",
+      plan: "beta" as const,
+      billingStatus: "offline_mock",
+      stripeCustomerId: null,
+      lemonSqueezyCustomerId: null,
+      isBetaApproved: true,
+      betaApprovedAt: now,
+      createdAt: now,
+      updatedAt: now,
+    },
+    subscription: null,
+    effectivePlan: "beta" as const,
+    billingStatus: "offline_mock",
+    isBetaApproved: true,
+    inviteOnlyMode: env.INVITE_ONLY_MODE,
+    access: true,
+  };
+}
+
 export function getDisplayPlanName(plan: PlanType) {
   if (plan === "starter") return "pro";
   return plan;
@@ -89,8 +120,22 @@ export async function getSubscriptionForUser(userId: string) {
 }
 
 export async function getUserPlanState(userId: string) {
-  const user = await db.query.users.findFirst({ where: eq(schema.users.id, userId) });
-  if (!user) throw new Error("User not found");
+  let user: typeof schema.users.$inferSelect | undefined;
+  try {
+    user = await db.query.users.findFirst({ where: eq(schema.users.id, userId) });
+  } catch (error) {
+    if (env.MOCK_MODE && isDatabaseUnavailableError(error)) {
+      return buildOfflineMockPlanState(userId);
+    }
+    throw error;
+  }
+
+  if (!user) {
+    if (env.MOCK_MODE && userId === OFFLINE_DEMO_USER_ID) {
+      return buildOfflineMockPlanState(userId);
+    }
+    throw new Error("User not found");
+  }
 
   const subscription = await getSubscriptionForUser(userId);
   const hasStarterSubscription = subscriptionConfersStarterAccess(subscription);
