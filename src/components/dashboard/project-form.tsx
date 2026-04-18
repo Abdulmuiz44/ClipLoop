@@ -80,10 +80,10 @@ export function ProjectForm() {
   }
 
   return (
-    <form action={onSubmit} className="cl-card space-y-6 p-5 md:p-6">
+    <form action={onSubmit} className="cl-card space-y-7 p-5 md:p-6">
       <section className="space-y-3">
         <div>
-          <h2 className="text-base font-semibold">Basics</h2>
+          <h2 className="text-base font-semibold tracking-tight">Basics</h2>
           <p className="text-sm text-slate-600">Create a simple business profile first. Keep this practical.</p>
         </div>
         <div className="grid gap-3 md:grid-cols-2">
@@ -133,7 +133,7 @@ export function ProjectForm() {
 
       <section className="space-y-3">
         <div>
-          <h3 className="text-base font-semibold">Audience</h3>
+          <h3 className="text-base font-semibold tracking-tight">Audience</h3>
         </div>
         <label className="space-y-1 text-sm">
           <span className="font-medium">Target audience</span>
@@ -143,7 +143,7 @@ export function ProjectForm() {
 
       <section className="space-y-3">
         <div>
-          <h3 className="text-base font-semibold">Offer</h3>
+          <h3 className="text-base font-semibold tracking-tight">Offer</h3>
         </div>
         <label className="space-y-1 text-sm">
           <span className="font-medium">Primary offer</span>
@@ -163,20 +163,20 @@ export function ProjectForm() {
 
       <section className="space-y-3">
         <div>
-          <h3 className="text-base font-semibold">Channels</h3>
+          <h3 className="text-base font-semibold tracking-tight">Channels</h3>
         </div>
         <fieldset className="space-y-2 text-sm">
           <legend className="font-medium">Preferred channels</legend>
           <div className="grid gap-2 sm:grid-cols-3">
-            <label className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white p-2.5">
+            <label className="flex items-center gap-2 rounded-xl border bg-white p-2.5 cl-divider">
               <input type="checkbox" name="preferredChannels" value="instagram" defaultChecked />
               Instagram
             </label>
-            <label className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white p-2.5">
+            <label className="flex items-center gap-2 rounded-xl border bg-white p-2.5 cl-divider">
               <input type="checkbox" name="preferredChannels" value="tiktok" />
               TikTok
             </label>
-            <label className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white p-2.5">
+            <label className="flex items-center gap-2 rounded-xl border bg-white p-2.5 cl-divider">
               <input type="checkbox" name="preferredChannels" value="whatsapp" />
               WhatsApp
             </label>
@@ -206,7 +206,7 @@ export function ProjectForm() {
 
       <section className="space-y-3">
         <div>
-          <h3 className="text-base font-semibold">Style</h3>
+          <h3 className="text-base font-semibold tracking-tight">Style</h3>
         </div>
         <div className="grid gap-3 md:grid-cols-2">
           <label className="space-y-1 text-sm">
@@ -224,7 +224,7 @@ export function ProjectForm() {
         </div>
       </section>
 
-      {error ? <p className="text-sm text-red-600">{error}</p> : null}
+      {error ? <p className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2.5 text-sm text-rose-700">{error}</p> : null}
       <Button type="submit" disabled={loading}>
         {loading ? "Creating project..." : "Create project"}
       </Button>

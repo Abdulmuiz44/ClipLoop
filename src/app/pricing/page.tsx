@@ -19,10 +19,10 @@ function Feature({ children }: { children: React.ReactNode }) {
 
 export default function PricingPage() {
   return (
-    <div className="space-y-8">
-      <section className="cl-card p-8">
-        <p className="text-sm font-medium uppercase tracking-[0.22em] text-slate-500">Pricing</p>
-        <h1 className="mt-3 text-4xl font-semibold tracking-tight text-slate-950">Free chat. Pay for generation and render capacity.</h1>
+    <div className="space-y-6 md:space-y-8">
+      <section className="cl-card p-6 md:p-8">
+        <p className="cl-kicker">Pricing</p>
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950 md:text-4xl">Free chat. Pay for generation and render capacity.</h1>
         <p className="mt-3 max-w-3xl text-base leading-7 text-slate-600">
           ClipLoop chat stays free. Credits are consumed when you run promo copy generation and video rendering operations.
         </p>
@@ -49,7 +49,7 @@ export default function PricingPage() {
           </div>
         </article>
 
-        <article className="rounded-3xl border-2 border-slate-900 bg-white p-6">
+        <article className="rounded-3xl border border-slate-900 bg-white p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">Pro</p>
@@ -74,7 +74,7 @@ export default function PricingPage() {
               title="Upgrade to Pro"
               description="Internal billing identifiers still use starter for compatibility. User-facing plan is Pro."
               submitLabel="Start Pro checkout"
-              className="border-0 bg-slate-50 p-0 shadow-none"
+              className="border-0 bg-transparent p-0"
             />
           </div>
         </article>

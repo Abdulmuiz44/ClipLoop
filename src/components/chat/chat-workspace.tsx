@@ -165,16 +165,24 @@ export function ChatWorkspace(props: {
   }
 
   return (
-    <div className="relative -mx-4 flex min-h-[calc(100vh-5rem)] bg-slate-50 md:mx-0 md:overflow-hidden md:rounded-2xl md:border md:border-slate-200">
+    <div className="relative -mx-4 flex min-h-[calc(100vh-5rem)] bg-slate-50 md:mx-0 md:overflow-hidden md:rounded-3xl md:border md:cl-divider">
+      {sidebarOpen ? (
+        <button
+          type="button"
+          className="absolute inset-0 z-20 bg-slate-900/20 md:hidden"
+          aria-label="Close navigation drawer"
+          onClick={() => setSidebarOpen(false)}
+        />
+      ) : null}
       <aside
-        className={`absolute inset-y-0 left-0 z-30 w-[19rem] border-r border-slate-200 bg-white p-4 transition-transform md:static md:translate-x-0 ${
+        className={`absolute inset-y-0 left-0 z-30 w-[18.5rem] border-r bg-white p-4 transition-transform cl-divider md:static md:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="flex items-center justify-between gap-2 border-b border-slate-200 pb-4">
+        <div className="flex items-center justify-between gap-2 border-b pb-4 cl-divider">
           <ClipLoopLogo compact={false} />
           <button
-            className="rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs text-slate-700 md:hidden"
+            className="rounded-lg border px-2.5 py-1.5 text-xs text-slate-700 transition cl-divider md:hidden"
             onClick={() => setSidebarOpen(false)}
             type="button"
           >
@@ -183,17 +191,17 @@ export function ChatWorkspace(props: {
         </div>
 
         <nav className="mt-4 space-y-1 text-sm">
-          <NavLink href="/app" label="Workspace" />
+          <NavLink href="/app" label="Workspace" active />
           <NavLink href="/dashboard/settings" label="Settings" />
           <NavLink href="/pricing" label="Pricing" />
           <NavLink href="/dashboard/manual-queue" label="Manual queue" />
           <NavLink href="/request-access" label="Request access" />
         </nav>
 
-        <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50/70 p-4 text-xs">
-          <p className="font-semibold uppercase tracking-[0.14em] text-slate-500">{props.creditSummary.planLabel} plan</p>
+        <div className="mt-6 cl-muted-box text-xs">
+          <p className="cl-kicker">{props.creditSummary.planLabel} plan</p>
           <p className="mt-2 text-slate-700">Chat messages are free.</p>
-          <p className="mt-1 text-slate-700">
+          <p className="mt-1.5 text-slate-700">
             Generation credits: <strong>{creditSummary.generationRemaining}</strong> / {creditSummary.generationLimit}
           </p>
           <p className="mt-1 text-slate-700">
@@ -201,8 +209,8 @@ export function ChatWorkspace(props: {
           </p>
         </div>
 
-        <div className="mt-5 flex items-center justify-between">
-          <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Chats</h2>
+        <div className="mt-6 flex items-center justify-between">
+          <h2 className="cl-kicker">Chats</h2>
           <Button type="button" className="h-8 px-3 text-xs" onClick={createConversation}>
             New
           </Button>
@@ -215,7 +223,7 @@ export function ChatWorkspace(props: {
               className={`w-full rounded-xl border p-3 text-left text-sm transition ${
                 conversation.id === activeConversationId
                   ? "border-slate-900 bg-slate-900 text-white"
-                  : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                  : "bg-white text-slate-700 hover:bg-slate-50"
               }`}
               onClick={() => selectConversation(conversation.id)}
             >
@@ -226,24 +234,24 @@ export function ChatWorkspace(props: {
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3 md:px-6">
+        <header className="flex items-center justify-between border-b bg-white px-4 py-3.5 cl-divider md:px-6">
           <button
             type="button"
-            className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-700 md:hidden"
+            className="rounded-lg border px-3 py-1.5 text-sm text-slate-700 transition cl-divider md:hidden"
             onClick={() => setSidebarOpen(true)}
           >
             Menu
           </button>
           <div className="min-w-0">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">ClipLoop Operator</p>
+            <p className="cl-kicker">ClipLoop Operator</p>
             <h1 className="truncate text-base font-semibold tracking-tight">{activeConversation?.title ?? "Chat workspace"}</h1>
           </div>
-          <Link href="/pricing" className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50">
+          <Link href="/pricing" className="rounded-lg border px-3 py-1.5 text-xs font-medium text-slate-700 transition cl-divider hover:bg-slate-50">
             Upgrade to Pro
           </Link>
         </header>
 
-        <main className="flex-1 overflow-y-auto px-4 py-5 pb-40 md:px-8">
+        <main className="flex-1 overflow-y-auto px-4 py-6 pb-44 md:px-8">
           <div className="mx-auto w-full max-w-3xl space-y-4">
             {messages.length === 0 ? (
               <div className="cl-card p-5 text-sm text-slate-600">
@@ -253,12 +261,12 @@ export function ChatWorkspace(props: {
             {messages.map((message) => (
               <div
                 key={message.id}
-                className={`rounded-2xl border p-4 text-sm ${
+                className={`rounded-2xl border px-4 py-3.5 text-sm ${
                   message.role === "user"
-                    ? "ml-8 border-slate-900 bg-slate-900 text-white"
+                    ? "ml-6 border-slate-900 bg-slate-900 text-white"
                     : message.kind === "status"
-                      ? "mr-8 border-slate-200 bg-slate-50 text-slate-700"
-                      : "mr-8 border-slate-200 bg-white text-slate-800"
+                      ? "mr-6 bg-slate-50 text-slate-700"
+                      : "mr-6 bg-white text-slate-800"
                 }`}
               >
                 <p className={`mb-1.5 text-[11px] uppercase tracking-[0.14em] ${message.role === "user" ? "text-slate-300" : "text-slate-500"}`}>
@@ -271,7 +279,7 @@ export function ChatWorkspace(props: {
           </div>
         </main>
 
-        <div className="fixed inset-x-0 bottom-0 z-20 border-t border-slate-200 bg-white/95 p-3 backdrop-blur md:static md:border-t md:bg-white md:p-4">
+        <div className="fixed inset-x-0 bottom-0 z-20 border-t bg-white/97 p-3 backdrop-blur cl-divider md:static md:border-t md:bg-white md:p-4">
           <div className="mx-auto w-full max-w-3xl space-y-2.5">
             <div className="flex flex-wrap gap-1.5">
               <ModePill active={mode === "chat"} onClick={() => setMode("chat")} label="Ask (Free)" />
@@ -280,7 +288,7 @@ export function ChatWorkspace(props: {
             </div>
             <div className="flex items-end gap-2">
               <textarea
-                className="max-h-40 min-h-12 flex-1 rounded-2xl border border-slate-200 bg-white p-3 text-sm text-slate-900 outline-none transition focus:border-slate-400"
+                className="max-h-40 min-h-12 flex-1 rounded-2xl border bg-white p-3 text-sm text-slate-900 outline-none transition focus:border-slate-500 cl-divider"
                 placeholder={
                   mode === "chat"
                     ? "Ask anything about your promo strategy..."
@@ -323,7 +331,7 @@ function ModePill({ active, onClick, label }: { active: boolean; onClick: () => 
       type="button"
       onClick={onClick}
       className={`rounded-full border px-3 py-1.5 text-xs transition ${
-        active ? "border-slate-900 bg-slate-900 text-white" : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+        active ? "border-slate-900 bg-slate-900 text-white" : "bg-white text-slate-700 hover:bg-slate-50"
       }`}
     >
       {label}
@@ -331,9 +339,9 @@ function ModePill({ active, onClick, label }: { active: boolean; onClick: () => 
   );
 }
 
-function NavLink({ href, label }: { href: string; label: string }) {
+function NavLink({ href, label, active = false }: { href: string; label: string; active?: boolean }) {
   return (
-    <a href={href} className="block rounded-lg px-3 py-2 text-slate-700 transition hover:bg-slate-100 hover:text-slate-900">
+    <a href={href} className={`cl-nav-item ${active ? "cl-nav-item-active" : ""}`}>
       {label}
     </a>
   );
@@ -349,11 +357,11 @@ function ResultCard({ metadata }: { metadata: Record<string, unknown> }) {
   const receipts = Array.isArray(metadata.creditReceipts) ? metadata.creditReceipts : [];
 
   return (
-    <div className="mt-3 space-y-2 rounded-xl border border-slate-200 bg-slate-50/70 p-3 text-slate-800">
+    <div className="mt-3 space-y-2 rounded-xl border p-3 text-slate-800 cl-divider" style={{ background: "var(--cl-soft)" }}>
       {videoUrl ? (
-        <video src={videoUrl} controls className="w-full rounded-lg border border-slate-200 bg-black" />
+        <video src={videoUrl} controls className="w-full rounded-lg border bg-black cl-divider" />
       ) : (
-        <div className="rounded-lg border border-slate-200 bg-white p-2 text-xs text-slate-500">Copy generated. No render preview for this action.</div>
+        <div className="rounded-lg border bg-white p-2 text-xs text-slate-500 cl-divider">Copy generated. No render preview for this action.</div>
       )}
       <div className="grid gap-1 text-xs text-slate-700">
         <p>
@@ -385,11 +393,11 @@ function ResultCard({ metadata }: { metadata: Record<string, unknown> }) {
         ) : null}
       </div>
       {downloadUrl ? (
-        <a href={downloadUrl} className="inline-flex rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium hover:bg-slate-50">
+        <a href={downloadUrl} className="inline-flex rounded-lg border bg-white px-2.5 py-1 text-xs font-medium transition cl-divider hover:bg-slate-50">
           Download video
         </a>
       ) : null}
-      <a href="/dashboard/settings" className="inline-flex rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium hover:bg-slate-50">
+      <a href="/dashboard/settings" className="inline-flex rounded-lg border bg-white px-2.5 py-1 text-xs font-medium transition cl-divider hover:bg-slate-50">
         View credit history
       </a>
     </div>
