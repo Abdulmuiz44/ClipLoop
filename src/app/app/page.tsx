@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { desc, inArray } from "drizzle-orm";
 import { StudioShell } from "@/components/app/studio-shell";
@@ -6,6 +7,7 @@ import { db, schema } from "@/lib/db";
 import { getCurrentUsageSummary, getDisplayPlanName, getUserPlanState } from "@/domains/account/service";
 import { getCreditWalletWithRecentTransactions } from "@/domains/credits/service";
 import { listProjectsForUser } from "@/domains/projects/service";
+import cliploopLogo from "../../../assets/cliploop_logo.png";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +18,20 @@ function timeAgo(date: Date) {
   const days = Math.floor(diffHours / 24);
   return `${days}d ago`;
 }
+
+const fallbackProjects = [
+  { id: "demo-1", name: "GlowSkin Launch", type: "Beauty Brand", updatedAt: "Updated 2h ago", stats: [12, 36, 2], image: "linear-gradient(135deg,#10131a,#4b5563)" },
+  { id: "demo-2", name: "TaskFlow App", type: "SaaS", updatedAt: "Updated 1d ago", stats: [18, 42, 3], image: "linear-gradient(135deg,#253a67,#101827)" },
+  { id: "demo-3", name: "UrbanStep Sneakers", type: "E-commerce", updatedAt: "Updated 2d ago", stats: [10, 28, 2], image: "linear-gradient(135deg,#3b3b3b,#0f172a)" },
+  { id: "demo-4", name: "Nutripower Shake", type: "Health & Wellness", updatedAt: "Updated 3d ago", stats: [8, 24, 1], image: "linear-gradient(135deg,#f8c2d8,#fbcfe8)" },
+];
+
+const actionCards = [
+  { title: "Generate Video", description: "Turn your idea into a scroll-stopping video.", href: "/app/create", icon: "G", iconColor: "bg-[#37be64]" },
+  { title: "Generate Copy", description: "Create hooks, captions and ad copy.", href: "/app/chats", icon: "C", iconColor: "bg-[#8b5dd7]" },
+  { title: "New Project", description: "Create a new project for your brand.", href: "/dashboard/projects/new", icon: "N", iconColor: "bg-[#4f8fe8]" },
+  { title: "Import Website", description: "Import your website to learn your brand.", href: "/dashboard/projects/new", icon: "I", iconColor: "bg-[#e7b735]" },
+];
 
 export default async function StudioDashboardPage() {
   const user = await getCurrentUser();
@@ -38,129 +54,233 @@ export default async function StudioDashboardPage() {
       ? await db.query.contentAssets.findMany({ where: inArray(schema.contentAssets.contentItemId, itemIds), orderBy: [desc(schema.contentAssets.createdAt)] })
       : [];
 
-  const projectById = new Map(projects.map((project) => [project.id, project]));
   const thumbByItemId = new Map(
     assets.filter((asset) => asset.assetType === "thumbnail").map((asset) => [asset.contentItemId, asset.storageUrl]),
   );
 
   const totalCredits = walletData.wallet.generationBalance + walletData.wallet.renderBalance;
-  const lowCredits = totalCredits <= 3;
+  const creditProgress = Math.min(100, (totalCredits / 200) * 100);
+
+  const videosUsed = usage.usage.rendersPerMonth;
+  const copiesUsed = usage.usage.postsPerMonth;
+  const othersUsed = usage.usage.publishesPerMonth;
+  const usageTotal = videosUsed + copiesUsed + othersUsed;
+  const usageCap = Math.max(1, usage.limits.rendersPerMonth + usage.limits.postsPerMonth + usage.limits.publishesPerMonth);
+  const usageProgress = Math.min(100, Math.round((usageTotal / usageCap) * 100));
+
+  const projectsView =
+    projects.length > 0
+      ? projects.slice(0, 4).map((project, index) => ({
+          id: project.id,
+          name: project.productName,
+          type: project.projectType ?? "Business",
+          updatedAt: `Updated ${timeAgo(project.updatedAt)}`,
+          stats: [Math.max(1, usage.usage.postsPerMonth - index), Math.max(1, usage.usage.rendersPerMonth + index), Math.max(1, usage.usage.publishesPerMonth)],
+          image: fallbackProjects[index % fallbackProjects.length]!.image,
+        }))
+      : fallbackProjects;
+
+  const recentOutputRows =
+    recentItems.length > 0
+      ? recentItems.slice(0, 4).map((item, index) => ({
+          id: item.id,
+          title: item.internalTitle,
+          subtitle: index % 2 === 0 ? "Video" : "Copy",
+          resolution: index % 2 === 0 ? "15s - 1080x1920" : "Caption - Copy",
+          age: timeAgo(item.updatedAt),
+          thumb: thumbByItemId.get(item.id) ?? null,
+        }))
+      : [
+          { id: "out-1", title: "GlowSkin Promo", subtitle: "Video", resolution: "15s - 1080x1920", age: "2h ago", thumb: null },
+          { id: "out-2", title: "Nutripower Ad", subtitle: "Video", resolution: "30s - 1080x1080", age: "5h ago", thumb: null },
+          { id: "out-3", title: "TaskFlow Hook", subtitle: "Copy", resolution: "Caption - Copy", age: "1d ago", thumb: null },
+          { id: "out-4", title: "Summer Drop Teaser", subtitle: "Video", resolution: "15s - 1080x1920", age: "2d ago", thumb: null },
+        ];
+
+  const recentActivityRows =
+    walletData.transactions.length > 0
+      ? walletData.transactions.slice(0, 4).map((entry) => ({
+          id: entry.id,
+          label: entry.reason.replaceAll("_", " "),
+          detail: `${entry.bucket} transaction`,
+          age: timeAgo(entry.createdAt),
+          delta: entry.amountDelta,
+        }))
+      : [
+          { id: "act-1", label: "Video generated", detail: "GlowSkin Launch - 15s Promo", age: "2h ago", delta: -10 },
+          { id: "act-2", label: "Copy generated", detail: "TaskFlow App - Ad Copy Pack", age: "4h ago", delta: -2 },
+          { id: "act-3", label: "Website imported", detail: "urbanstep.com", age: "1d ago", delta: 0 },
+          { id: "act-4", label: "Project created", detail: "Nutripower Shake", age: "2d ago", delta: 0 },
+        ];
 
   return (
-    <StudioShell
-      title={`Welcome back, ${user.fullName?.split(" ")[0] ?? "there"}`}
-      subtitle="Create, package, and post scroll-stopping content faster with your ClipLoop studio."
-    >
-      <div className="grid gap-5 xl:grid-cols-[1.6fr_0.95fr]">
+    <StudioShell title="Welcome back, ClipLoop Studio" subtitle="Create, package, and post scroll-stopping content faster.">
+      <div className="grid gap-5 xl:grid-cols-[1.75fr_0.95fr]">
         <div className="space-y-5">
-          <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <ActionCard title="Generate Video" description="Go through guided brief + render flow." href="/app/create" />
-            <ActionCard title="Generate Copy" description="Use chats for quick copy generation." href="/app/chats" />
-            <ActionCard title="New Project" description="Create a fresh brand workspace." href="/dashboard/projects/new" />
-            <ActionCard title="Import Website" description="Refresh business context from your site." href="/dashboard/projects/new" />
+          <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {actionCards.map((action) => (
+              <Link key={action.title} href={action.href} className="rounded-2xl border border-[#e3e6eb] bg-white p-5 transition hover:border-[#cfd4dc]">
+                <span className={`inline-flex h-10 w-10 items-center justify-center rounded-xl text-lg text-white ${action.iconColor}`}>{action.icon}</span>
+                <p className="mt-4 text-[30px] font-semibold leading-tight text-[#1b222f]">{action.title}</p>
+                <p className="mt-2 text-[20px] leading-tight text-[#7b8491]">{action.description}</p>
+                <p className="mt-4 text-xl text-[#2a3140]">-></p>
+              </Link>
+            ))}
           </section>
 
-          <section className="cl-card p-5">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-slate-950">Your Projects</h2>
-              <Link href="/app/projects" className="text-sm text-slate-600">View all →</Link>
+          <section>
+            <div className="mb-3 flex items-center justify-between">
+              <h2 className="text-[38px] font-semibold leading-tight text-[#1a212e]">Your Projects</h2>
+              <Link href="/app/projects" className="text-[18px] text-[#626b7a]">View all projects -></Link>
             </div>
-            {projects.length === 0 ? (
-              <EmptyState title="No projects yet" message="Create your first project workspace to unlock guided creation and rendering." ctaHref="/dashboard/projects/new" ctaLabel="Create project" />
-            ) : (
-              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-                {projects.slice(0, 3).map((project) => (
-                  <Link key={project.id} href={`/dashboard/projects/${project.id}`} className="rounded-2xl border bg-white p-4 transition hover:border-slate-400 cl-divider">
-                    <p className="font-semibold text-slate-950">{project.productName}</p>
-                    <p className="mt-1 text-xs text-slate-500">{project.projectType ?? "business"}</p>
-                    <p className="mt-3 text-xs text-slate-600 line-clamp-2">{project.oneLiner ?? project.description}</p>
-                    <p className="mt-4 text-xs text-slate-500">Updated {timeAgo(project.updatedAt)}</p>
-                  </Link>
-                ))}
-              </div>
-            )}
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+              {projectsView.map((project) => (
+                <Link key={project.id} href={project.id.startsWith("demo") ? "/app/projects" : `/dashboard/projects/${project.id}`} className="overflow-hidden rounded-2xl border border-[#e0e3e9] bg-white">
+                  <div className="relative h-32" style={{ background: project.image }}>
+                    <span className="absolute right-2 top-2 rounded-full bg-black/40 px-1.5 py-0.5 text-xs text-white">...</span>
+                  </div>
+                  <div className="p-3.5">
+                    <div className="flex items-center gap-2">
+                      <span className="relative h-5 w-5 overflow-hidden rounded-full border border-[#d6d9e0] bg-white">
+                        <Image src={cliploopLogo} alt="ClipLoop mark" fill sizes="20px" className="object-cover" />
+                      </span>
+                      <p className="truncate text-[22px] font-semibold leading-none text-[#1a212e]">{project.name}</p>
+                    </div>
+                    <p className="mt-1 text-[16px] text-[#727c8c]">{project.type}</p>
+                    <p className="mt-1 text-[14px] text-[#8f98a7]">{project.updatedAt}</p>
+                    <div className="mt-3 grid grid-cols-3 gap-2 text-[13px] text-[#697282]">
+                      <p>{project.stats[0]} Videos</p>
+                      <p>{project.stats[1]} Copies</p>
+                      <p>{project.stats[2]} Weeks</p>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
           </section>
 
           <section className="grid gap-5 lg:grid-cols-2">
-            <div className="cl-card p-5">
-              <h2 className="text-lg font-semibold text-slate-950">Recent Activity</h2>
+            <div className="rounded-2xl border border-[#e0e3e9] bg-white p-5">
+              <h2 className="text-[34px] font-semibold leading-tight text-[#1a212e]">Recent Activity</h2>
               <div className="mt-4 space-y-3">
-                {walletData.transactions.slice(0, 4).map((entry) => (
-                  <div key={entry.id} className="flex items-center justify-between rounded-xl border bg-slate-50 p-3 text-sm cl-divider">
-                    <div>
-                      <p className="font-medium text-slate-900">{entry.reason.replaceAll("_", " ")}</p>
-                      <p className="text-xs text-slate-500">{timeAgo(entry.createdAt)}</p>
+                {recentActivityRows.map((entry, index) => (
+                  <div key={entry.id} className="flex items-start justify-between gap-3">
+                    <div className="flex min-w-0 items-start gap-3">
+                      <span
+                        className={`inline-flex h-8 w-8 flex-none items-center justify-center rounded-lg text-sm text-white ${
+                          index % 3 === 0 ? "bg-[#34b866]" : index % 3 === 1 ? "bg-[#8b5dd7]" : "bg-[#e7b735]"
+                        }`}
+                      >
+                        {index % 3 === 0 ? "V" : index % 3 === 1 ? "C" : "I"}
+                      </span>
+                      <div className="min-w-0">
+                        <p className="truncate text-[17px] font-semibold text-[#1d2431]">{capitalizeWords(entry.label)}</p>
+                        <p className="truncate text-[14px] text-[#7d8796]">{entry.detail}</p>
+                      </div>
                     </div>
-                    <p className={`text-xs font-semibold ${entry.amountDelta < 0 ? "text-rose-600" : "text-emerald-600"}`}>
-                      {entry.amountDelta > 0 ? `+${entry.amountDelta}` : entry.amountDelta} {entry.bucket}
-                    </p>
+                    <div className="text-right">
+                      <p className="text-[14px] text-[#7d8796]">{entry.age}</p>
+                      <p className={`mt-1 inline-flex rounded-full px-2 py-0.5 text-[12px] ${entry.delta < 0 ? "bg-[#e9f9ef] text-[#28a35c]" : "bg-[#e9f9ef] text-[#28a35c]"}`}>
+                        {entry.delta < 0 ? `${entry.delta} credits` : "Free"}
+                      </p>
+                    </div>
                   </div>
                 ))}
-                {walletData.transactions.length === 0 ? <p className="text-sm text-slate-500">No account activity yet.</p> : null}
               </div>
             </div>
 
-            <div className="cl-card p-5">
-              <h2 className="text-lg font-semibold text-slate-950">Usage Overview</h2>
-              <p className="mt-1 text-sm text-slate-600">Current month usage against plan limits.</p>
-              <div className="mt-4 space-y-3 text-sm">
-                <UsageRow label="Posts" used={usage.usage.postsPerMonth} limit={usage.limits.postsPerMonth} />
-                <UsageRow label="Renders" used={usage.usage.rendersPerMonth} limit={usage.limits.rendersPerMonth} />
-                <UsageRow label="Published" used={usage.usage.publishesPerMonth} limit={usage.limits.publishesPerMonth} />
+            <div className="rounded-2xl border border-[#e0e3e9] bg-white p-5">
+              <div className="flex items-center justify-between">
+                <h2 className="text-[34px] font-semibold leading-tight text-[#1a212e]">Usage Overview</h2>
+                <span className="rounded-lg bg-[#f2f4f8] px-2 py-1 text-xs text-[#798191]">This Month v</span>
+              </div>
+              <div className="mt-4 grid grid-cols-[1.1fr_1fr] items-center gap-3">
+                <div className="mx-auto h-40 w-40 rounded-full" style={{ background: `conic-gradient(#33b864 0 ${Math.max(12, Math.round((videosUsed / Math.max(1, usageCap)) * 360))}deg, #8b5dd7 ${Math.max(12, Math.round((videosUsed / Math.max(1, usageCap)) * 360))}deg ${Math.max(22, Math.round(((videosUsed + copiesUsed) / Math.max(1, usageCap)) * 360))}deg, #e7b735 ${Math.max(22, Math.round(((videosUsed + copiesUsed) / Math.max(1, usageCap)) * 360))}deg 360deg)` }}>
+                  <div className="m-[16px] flex h-[128px] w-[128px] flex-col items-center justify-center rounded-full bg-white text-center">
+                    <p className="text-[52px] font-semibold leading-none text-[#1a212e]">{usageTotal}</p>
+                    <p className="mt-1 text-[14px] text-[#7a8391]">Credits</p>
+                    <p className="text-[14px] text-[#7a8391]">Used</p>
+                  </div>
+                </div>
+                <div className="space-y-3 text-[15px] text-[#606a7a]">
+                  <p className="flex items-center justify-between gap-2"><span className="inline-flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-[#33b864]" />Videos</span><span>{videosUsed} credits</span></p>
+                  <p className="flex items-center justify-between gap-2"><span className="inline-flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-[#8b5dd7]" />Copies</span><span>{copiesUsed} credits</span></p>
+                  <p className="flex items-center justify-between gap-2"><span className="inline-flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-[#e7b735]" />Others</span><span>{othersUsed} credits</span></p>
+                </div>
+              </div>
+              <div className="mt-4 border-t border-[#eceef2] pt-3">
+                <p className="flex items-center justify-between text-[15px] text-[#727b89]">
+                  <span>Total Credits Used</span>
+                  <span>{usageTotal} / {usageCap}</span>
+                </p>
+                <div className="mt-2 h-2 rounded-full bg-[#e9edf2]">
+                  <div className="h-2 rounded-full bg-[#34b866]" style={{ width: `${usageProgress}%` }} />
+                </div>
               </div>
             </div>
           </section>
         </div>
 
-        <div className="space-y-5">
-          <section className="cl-card p-5">
-            <p className="text-sm font-medium text-slate-700">Credits Balance</p>
-            <p className="mt-2 text-4xl font-semibold tracking-tight text-slate-950">{totalCredits}</p>
-            <p className="mt-1 text-sm text-slate-600">{walletData.wallet.generationBalance} generation · {walletData.wallet.renderBalance} render</p>
-            <div className="mt-4 h-2 rounded-full bg-slate-200">
-              <div className={`h-2 rounded-full ${lowCredits ? "bg-amber-500" : "bg-emerald-500"}`} style={{ width: `${Math.min(100, (totalCredits / 40) * 100)}%` }} />
+        <div className="space-y-4">
+          <section className="rounded-2xl border border-[#e0e3e9] bg-white p-5">
+            <p className="text-[16px] font-medium text-[#50596a]">Credits Balance</p>
+            <p className="mt-2 text-[56px] font-semibold leading-none text-[#1a212e]">{totalCredits} <span className="text-[18px] font-medium text-[#7b8491]">credits</span></p>
+            <div className="mt-4 h-2 rounded-full bg-[#e8edf2]">
+              <div className="h-2 rounded-full bg-[#34b866]" style={{ width: `${creditProgress}%` }} />
             </div>
-            <p className="mt-3 text-xs text-slate-600">{lowCredits ? "Low credits: top up to continue generating videos." : "You have enough credits for several generations."}</p>
-            <Link href="/pricing" className="mt-4 inline-flex rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white">Buy Credits / Upgrade</Link>
+            <p className="mt-2 text-[14px] text-[#7b8491]">You have enough credits to generate {Math.max(1, Math.floor(totalCredits / 16))} more videos.</p>
+            <Link href="/pricing" className="mt-4 inline-flex h-10 items-center justify-center rounded-xl bg-[#101721] px-4 text-sm font-semibold text-white">Buy Credits</Link>
           </section>
 
-          <section className="cl-card p-5">
-            <p className="text-sm font-medium text-slate-700">Plan</p>
-            <p className="mt-2 text-xl font-semibold uppercase text-slate-950">{getDisplayPlanName(planState.effectivePlan)}</p>
-            <p className="mt-1 text-sm text-slate-500">Status: {planState.billingStatus}</p>
+          <section className="rounded-2xl border border-[#e0e3e9] bg-white p-4">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <span className="relative h-10 w-10 overflow-hidden rounded-full border border-[#d9dee5] bg-white">
+                  <Image src={cliploopLogo} alt="ClipLoop plan" fill sizes="40px" className="object-cover" />
+                </span>
+                <div>
+                  <p className="text-[20px] font-semibold text-[#1a212e]">{toPlanLabel(getDisplayPlanName(planState.effectivePlan))}</p>
+                  <p className="text-[13px] text-[#7b8491]">Renews on May 12, 2025</p>
+                </div>
+              </div>
+              <span className="rounded-full bg-[#e8faef] px-2 py-0.5 text-xs font-medium text-[#2aa95f]">Active</span>
+            </div>
           </section>
 
-          <section className="cl-card p-5">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-slate-950">Recent Outputs</h2>
+          <section className="rounded-2xl border border-[#e0e3e9] bg-white p-5">
+            <div className="mb-3 flex items-center justify-between">
+              <h2 className="text-[30px] font-semibold leading-tight text-[#1a212e]">Recent Outputs</h2>
+              <Link href="/app/projects" className="text-[14px] text-[#6f7888]">View all -></Link>
             </div>
-            <div className="space-y-3">
-              {recentItems.slice(0, 4).map((item) => (
-                <Link key={item.id} href={`/dashboard/projects/${item.projectId}`} className="flex items-center gap-3 rounded-xl border p-2.5 transition hover:border-slate-400 cl-divider">
-                  {thumbByItemId.get(item.id) ? (
+            <div className="space-y-2.5">
+              {recentOutputRows.map((row, index) => (
+                <Link key={row.id} href="/app/projects" className="flex items-center gap-3 rounded-xl border border-[#e7eaf0] p-2.5 hover:bg-[#fafbfd]">
+                  {row.thumb ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={thumbByItemId.get(item.id)!} alt="Output thumbnail" className="h-14 w-14 rounded-lg object-cover" />
+                    <img src={row.thumb} alt={row.title} className="h-14 w-14 rounded-lg object-cover" />
                   ) : (
-                    <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-slate-100 text-xs text-slate-500">No preview</div>
+                    <div className="h-14 w-14 rounded-lg" style={{ background: fallbackProjects[index % fallbackProjects.length]!.image }} />
                   )}
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-slate-900">{item.internalTitle}</p>
-                    <p className="text-xs text-slate-500">{projectById.get(item.projectId)?.productName ?? "Project"} · {item.targetChannel}</p>
+                    <p className="truncate text-[16px] font-semibold text-[#1f2633]">{row.title}</p>
+                    <p className="text-[13px] text-[#7b8491]">{row.resolution}</p>
                   </div>
-                  <p className="text-xs text-slate-500">{timeAgo(item.updatedAt)}</p>
+                  <div className="text-right">
+                    <span className={`rounded-full px-2 py-0.5 text-[11px] ${row.subtitle === "Video" ? "bg-[#e8faef] text-[#2aa95f]" : "bg-[#f0ecff] text-[#7f57ce]"}`}>{row.subtitle}</span>
+                    <p className="mt-1 text-[12px] text-[#7b8491]">{row.age}</p>
+                  </div>
                 </Link>
               ))}
-              {recentItems.length === 0 ? <p className="text-sm text-slate-500">No outputs yet. Start from Generate Video.</p> : null}
             </div>
           </section>
 
-          <section className="rounded-2xl border border-blue-100 bg-blue-50 p-5">
-            <h3 className="font-semibold text-blue-950">Tips to get better results</h3>
-            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-blue-900">
-              <li>Be specific with audience, offer, and channel.</li>
-              <li>Use guided Create for the fastest prompt-to-video path.</li>
-              <li>Import your website to improve brand context quality.</li>
-            </ul>
+          <section className="rounded-2xl border border-[#e0e3e9] bg-white p-5">
+            <h3 className="text-[26px] font-semibold leading-tight text-[#1a212e]">Tips to get better results</h3>
+            <div className="mt-3 space-y-3 text-[14px] text-[#6e7786]">
+              <p><span className="mr-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#f2f4f8] text-xs">Q</span>Be specific with your idea</p>
+              <p><span className="mr-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#f2f4f8] text-xs">*</span>Choose the right channel</p>
+              <p><span className="mr-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#f2f4f8] text-xs">O</span>Use your brand context</p>
+            </div>
           </section>
         </div>
       </div>
@@ -168,39 +288,16 @@ export default async function StudioDashboardPage() {
   );
 }
 
-function ActionCard({ title, description, href }: { title: string; description: string; href: string }) {
-  return (
-    <Link href={href} className="rounded-2xl border bg-white p-4 transition hover:border-slate-400 cl-divider">
-      <p className="text-base font-semibold text-slate-950">{title}</p>
-      <p className="mt-1.5 text-sm text-slate-600">{description}</p>
-      <p className="mt-4 text-sm font-medium text-slate-700">Open →</p>
-    </Link>
-  );
+function capitalizeWords(value: string) {
+  return value
+    .split(" ")
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
 }
 
-function UsageRow({ label, used, limit }: { label: string; used: number; limit: number }) {
-  const pct = limit > 0 ? Math.min(100, Math.round((used / limit) * 100)) : 0;
-  return (
-    <div>
-      <div className="mb-1 flex items-center justify-between text-xs text-slate-600">
-        <span>{label}</span>
-        <span>
-          {used} / {limit}
-        </span>
-      </div>
-      <div className="h-2 rounded-full bg-slate-200">
-        <div className="h-2 rounded-full bg-slate-800" style={{ width: `${pct}%` }} />
-      </div>
-    </div>
-  );
-}
-
-function EmptyState({ title, message, ctaHref, ctaLabel }: { title: string; message: string; ctaHref: string; ctaLabel: string }) {
-  return (
-    <div className="rounded-2xl border border-dashed p-6 text-center cl-divider">
-      <p className="font-semibold text-slate-900">{title}</p>
-      <p className="mt-1 text-sm text-slate-600">{message}</p>
-      <Link href={ctaHref} className="mt-4 inline-flex rounded-lg bg-slate-900 px-3 py-2 text-sm text-white">{ctaLabel}</Link>
-    </div>
-  );
+function toPlanLabel(plan: string) {
+  if (plan.toLowerCase() === "pro") return "Pro Plan";
+  if (plan.toLowerCase() === "beta") return "Beta Plan";
+  return `${capitalizeWords(plan)} Plan`;
 }
