@@ -198,7 +198,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ projec
             </div>
             <div className="cl-card-soft p-4">
               <p className="font-semibold text-slate-950 mb-1">3. Feedback</p>
-              After publishing, roll up results to inform next week's winners.
+              After publishing, roll up results to inform next week&apos;s winners.
             </div>
           </div>
         </div>
@@ -293,5 +293,4 @@ function MetricCard({ label, value }: { label: string; value: string | number })
       <p className="mt-2 text-2xl font-bold tracking-tight text-slate-950">{value}</p>
     </div>
   );
-}
 }

@@ -114,7 +114,7 @@ export default async function WeekPage({
         <section className="cl-card p-8 text-center">
           <p className="cl-kicker">No content generated</p>
           <h2 className="mt-2 text-xl font-semibold text-slate-950">Ready to build the pack?</h2>
-          <p className="mx-auto mt-3 max-w-md text-slate-600 mb-6">Generate the first batch of 5 promo posts based on this week's strategy.</p>
+          <p className="mx-auto mt-3 max-w-md text-slate-600 mb-6">Generate the first batch of 5 promo posts based on this week&apos;s strategy.</p>
           <ActionButton endpoint={`/api/strategy-cycles/${cycle.id}/generate-posts`} label="Generate 5-post pack" />
         </section>
       ) : (
@@ -293,7 +293,7 @@ export default async function WeekPage({
                           <div>
                             <p className="text-[11px] font-bold uppercase tracking-widest text-slate-500 mb-1.5">Channel Caption ({targetChannel})</p>
                             <p className="text-xs leading-relaxed text-slate-600 bg-slate-50 p-3 rounded-xl border cl-divider italic">
-                              "{previewCaption}"
+                              &quot;{previewCaption}&quot;
                             </p>
                           </div>
                         </div>
@@ -445,5 +445,4 @@ export default async function WeekPage({
       )}
     </div>
   );
-}
 }
