@@ -59,6 +59,7 @@ export function ChatWorkspace(props: {
     renderRemaining: number;
     renderLimit: number;
   };
+  embedded?: boolean;
 }) {
   const [conversations, setConversations] = useState<Conversation[]>(props.initialConversations);
   const [creditSummary, setCreditSummary] = useState(props.creditSummary);
@@ -164,8 +165,10 @@ export function ChatWorkspace(props: {
     setSending(false);
   }
 
+  const embedded = props.embedded ?? false;
+
   return (
-    <div className="relative -mx-4 flex min-h-[calc(100vh-5rem)] bg-slate-50 md:mx-0 md:overflow-hidden md:rounded-3xl md:border md:cl-divider">
+    <div className={`relative flex min-h-[calc(100vh-5rem)] bg-slate-50 ${embedded ? "rounded-2xl border cl-divider" : "-mx-4 md:mx-0 md:overflow-hidden md:rounded-3xl md:border md:cl-divider"}`}>
       {sidebarOpen ? (
         <button
           type="button"
@@ -177,7 +180,7 @@ export function ChatWorkspace(props: {
       <aside
         className={`absolute inset-y-0 left-0 z-30 w-[18.5rem] border-r bg-white p-4 transition-transform cl-divider md:static md:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        } ${embedded ? "hidden md:block" : ""}`}
       >
         <div className="flex items-center justify-between gap-2 border-b pb-4 cl-divider">
           <ClipLoopLogo compact={false} />
@@ -234,6 +237,7 @@ export function ChatWorkspace(props: {
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
+        {embedded ? null : (
         <header className="flex items-center justify-between border-b bg-white px-4 py-3.5 cl-divider md:px-6">
           <button
             type="button"
@@ -250,6 +254,7 @@ export function ChatWorkspace(props: {
             Upgrade to Pro
           </Link>
         </header>
+        )}
 
         <main className="flex-1 overflow-y-auto px-4 py-6 pb-44 md:px-8">
           <div className="mx-auto w-full max-w-3xl space-y-5">
@@ -267,22 +272,22 @@ export function ChatWorkspace(props: {
                   <div className="rounded-2xl border p-4 transition-all cl-divider hover:border-slate-400">
                     <p className="font-semibold text-slate-950">Ask strategy</p>
                     <p className="mt-1 text-xs leading-5 text-slate-500">Free conversation about your weekly promo angles or hooks.</p>
-                    <p className="mt-3 text-xs italic text-slate-600">"What are some hooks for our new winter sale?"</p>
+                    <p className="mt-3 text-xs italic text-slate-600">What are some hooks for our new winter sale?</p>
                   </div>
                   <div className="rounded-2xl border p-4 transition-all cl-divider hover:border-slate-400">
                     <p className="font-semibold text-slate-950">Generate copy</p>
                     <p className="mt-1 text-xs leading-5 text-slate-500">Create polished promo scripts, captions, and CTAs (1 credit).</p>
-                    <p className="mt-3 text-xs italic text-slate-600">"Generate an Instagram promo for our early-bird offer."</p>
+                    <p className="mt-3 text-xs italic text-slate-600">Generate an Instagram promo for our early-bird offer.</p>
                   </div>
                   <div className="rounded-2xl border p-4 transition-all cl-divider hover:border-slate-400">
                     <p className="font-semibold text-slate-950">Render video</p>
                     <p className="mt-1 text-xs leading-5 text-slate-500">Generate copy and render a vertical promo video (2 credits).</p>
-                    <p className="mt-3 text-xs italic text-slate-600">"Create a TikTok promo video for our app's new feature."</p>
+                    <p className="mt-3 text-xs italic text-slate-600">Create a TikTok promo video for our app feature.</p>
                   </div>
                   <div className="rounded-2xl border p-4 transition-all cl-divider hover:border-slate-400">
                     <p className="font-semibold text-slate-950">Quick draft</p>
                     <p className="mt-1 text-xs leading-5 text-slate-500">Draft short form copy for multiple channels at once (1 credit).</p>
-                    <p className="mt-3 text-xs italic text-slate-600">"Draft a WhatsApp and Instagram promo for our event."</p>
+                    <p className="mt-3 text-xs italic text-slate-600">Draft a WhatsApp and Instagram promo for our event.</p>
                   </div>
                 </div>
               </div>
@@ -308,7 +313,7 @@ export function ChatWorkspace(props: {
           </div>
         </main>
 
-        <div className="fixed inset-x-0 bottom-0 z-20 border-t bg-white/97 p-3 backdrop-blur cl-divider md:static md:border-t md:bg-white md:p-4">
+        <div className={`z-20 border-t bg-white/97 p-3 backdrop-blur cl-divider md:static md:border-t md:bg-white md:p-4 ${embedded ? "sticky bottom-0" : "fixed inset-x-0 bottom-0"}`}>
           <div className="mx-auto w-full max-w-3xl space-y-2.5">
             <div className="flex flex-wrap gap-1.5">
               <ModePill active={mode === "chat"} onClick={() => setMode("chat")} label="Chat (Free)" />
