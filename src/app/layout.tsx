@@ -6,25 +6,24 @@ import { ClipLoopLogo } from "@/components/ui/cliploop-logo";
 export const metadata: Metadata = {
   metadataBase: new URL("https://cliploop.app"),
   title: {
-    default: "ClipLoop | Localized Short-Form Engine for Businesses, Creators, and Apps",
+    default: "ClipLoop | Short form promo content for brands, businesses, and creators",
     template: "%s | ClipLoop",
   },
-  description: "ClipLoop helps businesses, creators, and apps generate, render, approve, schedule, track, and improve localized weekly short-form promo packs.",
+  description: "ClipLoop is building a simpler way for brands, businesses, and creators to create short form promo content faster.",
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "ClipLoop | Localized Short-Form Engine for Businesses, Creators, and Apps",
-    description:
-      "Generate the week, render the posts, schedule the pack, track outcomes, then build the next cycle from what worked.",
+    title: "ClipLoop | Short form promo content for brands, businesses, and creators",
+    description: "ClipLoop is building a simpler way for brands, businesses, and creators to create short form promo content faster.",
     url: "/",
     siteName: "ClipLoop",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "ClipLoop | Localized Short-Form Engine for Businesses, Creators, and Apps",
-    description: "A practical weekly content loop for Nigerian businesses, creators, and product teams.",
+    title: "ClipLoop | Short form promo content for brands, businesses, and creators",
+    description: "Short form promo content for brands, businesses, and creators.",
   },
 };
 

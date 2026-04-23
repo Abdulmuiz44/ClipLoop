@@ -16,8 +16,8 @@ type StarterCheckoutFormProps = {
 export function StarterCheckoutForm({
   email = "",
   name = "",
-  title = "Start Pro checkout",
-  description = "Use the email tied to your ClipLoop account. Pro access is granted by webhook sync after Lemon Squeezy confirms the subscription.",
+  title = "Upgrade to ClipLoop Pro",
+  description = "Unlock higher generation limits and video renders for your brands. Pro access is activated immediately after checkout.",
   showFields = true,
   submitLabel = "Start Pro checkout",
   className = "",

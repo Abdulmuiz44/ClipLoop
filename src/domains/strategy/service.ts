@@ -62,16 +62,16 @@ export async function generateWeeklyStrategyForProject(project: typeof schema.pr
       examplePosts: (project.examplePostsJson as string[] | null) ?? [],
     }),
     mockFactory: () => ({
-      strategy_summary: `Weekly local promo plan for ${project.businessName ?? project.productName}: push offer-led hooks, social-proof angles, and direct response CTAs for ${project.targetAudience ?? project.audience}.`,
+      strategy_summary: `Weekly promo plan for ${project.businessName ?? project.productName}: push offer-led hooks, social-proof angles, and direct response CTAs for ${project.targetAudience ?? project.audience}.`,
       angles: Array.from({ length: 5 }).map((_, idx) => ({
         angle_id: `angle-${idx + 1}`,
         angle_name: `Angle ${idx + 1}: ${project.businessCategory ?? project.niche} offer push`,
         target_pain: `Pain point ${idx + 1} for ${project.targetAudience ?? project.audience}`,
         core_claim: `${project.businessName ?? project.productName} helps solve this faster with ${project.primaryOffer ?? project.offer}.`,
-        why_this_angle_could_convert: "It is offer-led, locally relatable, and pushes a specific next action.",
+        why_this_angle_could_convert: "It is offer-led, practical, and pushes a specific next action.",
         hooks: [
           `${project.languageStyle === "pidgin" ? "No dulling" : "Stop"} ${idx + 1}: ${project.primaryOffer ?? project.offer}`,
-          `${project.city ?? "Your area"} customers are choosing this now`,
+          `${project.city ?? "The"} community is choosing this now`,
         ],
         recommended_cta_style: "direct",
         proof_mechanism: "customer result + offer urgency",

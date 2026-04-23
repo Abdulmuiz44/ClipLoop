@@ -67,18 +67,18 @@ export function OnboardingForm() {
         </label>
         <label className="space-y-1 text-sm">
           <span className="font-medium">Business name</span>
-          <input name="businessName" required className="cl-input" placeholder="Ada Beauty Hub" />
+          <input name="businessName" required className="cl-input" placeholder="Acme Analytics" />
         </label>
       </div>
 
       <div className="grid gap-3 md:grid-cols-2">
         <label className="space-y-1 text-sm">
           <span className="font-medium">Business category</span>
-          <input name="businessCategory" required className="cl-input" placeholder="Beauty products" />
+          <input name="businessCategory" required className="cl-input" placeholder="SaaS for marketers" />
         </label>
         <label className="space-y-1 text-sm">
           <span className="font-medium">Target audience</span>
-          <input name="targetAudience" required className="cl-input" placeholder="Women in Lagos looking for affordable beauty essentials" />
+          <input name="targetAudience" required className="cl-input" placeholder="Content creators looking for better insights" />
         </label>
       </div>
 
@@ -90,7 +90,7 @@ export function OnboardingForm() {
       <div className="grid gap-3 md:grid-cols-2">
         <label className="space-y-1 text-sm">
           <span className="font-medium">Primary offer</span>
-          <input name="primaryOffer" required className="cl-input" placeholder="Weekend package: 3 products for ₦15,000" />
+          <input name="primaryOffer" required className="cl-input" placeholder="Starter package: 5 projects for $19/month" />
         </label>
         <label className="space-y-1 text-sm">
           <span className="font-medium">Tone</span>
@@ -123,7 +123,7 @@ export function OnboardingForm() {
         </label>
         <label className="space-y-1 text-sm">
           <span className="font-medium">WhatsApp number (optional)</span>
-          <input name="whatsappNumber" className="cl-input" placeholder="+2348012345678" />
+          <input name="whatsappNumber" className="cl-input" placeholder="+1234567890" />
         </label>
       </div>
 

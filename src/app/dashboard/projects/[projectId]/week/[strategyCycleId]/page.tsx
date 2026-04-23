@@ -88,61 +88,77 @@ export default async function WeekPage({
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Week of {cycle.weekStart.toISOString().slice(0, 10)}</h1>
-      <section className="rounded border bg-white p-4">
-        <h2 className="font-semibold">Strategy summary</h2>
-        <p className="mt-2">{cycle.strategySummary ?? "No summary"}</p>
+      <section className="cl-card p-6 md:p-8">
+        <p className="cl-kicker font-bold tracking-widest text-slate-500 uppercase">Weekly Cycle</p>
+        <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">Week of {new Date(cycle.weekStart).toLocaleDateString()}</h1>
       </section>
 
-      <section className="rounded border bg-white p-4">
-        <h2 className="font-semibold">Angles</h2>
-        <ul className="mt-2 list-disc space-y-1 pl-5 text-sm">
-          {angles.map((angle) => (
-            <li key={angle.angle_id}>
-              {angle.angle_name}: {angle.core_claim}
-            </li>
-          ))}
-        </ul>
+      <section className="cl-card p-6">
+        <h2 className="text-lg font-semibold text-slate-950">Strategy summary</h2>
+        <p className="mt-3 text-base leading-7 text-slate-700">{cycle.strategySummary ?? "No strategy summary available for this week."}</p>
+        
+        <div className="mt-6 border-t pt-5 cl-divider">
+          <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-3">Weekly Angles</h3>
+          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {angles.map((angle) => (
+              <li key={angle.angle_id} className="cl-card-soft p-4 text-sm leading-relaxed">
+                <p className="font-semibold text-slate-950 mb-1">{angle.angle_name}</p>
+                <p className="text-slate-600">{angle.core_claim}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
       </section>
 
       {posts.length === 0 ? (
-        <ActionButton endpoint={`/api/strategy-cycles/${cycle.id}/generate-posts`} label="Generate 5 posts" />
+        <section className="cl-card p-8 text-center">
+          <p className="cl-kicker">No content generated</p>
+          <h2 className="mt-2 text-xl font-semibold text-slate-950">Ready to build the pack?</h2>
+          <p className="mx-auto mt-3 max-w-md text-slate-600 mb-6">Generate the first batch of 5 promo posts based on this week's strategy.</p>
+          <ActionButton endpoint={`/api/strategy-cycles/${cycle.id}/generate-posts`} label="Generate 5-post pack" />
+        </section>
       ) : (
         <>
-          <section className="space-y-3 rounded border bg-white p-4">
-            <h2 className="font-semibold">Weekly workflow controls</h2>
-            <div className="grid gap-3 md:grid-cols-6">
-              <ActionButton endpoint={`/api/strategy-cycles/${cycle.id}/approve`} label="Approve all posts" />
-              <RenderButton endpoint={`/api/strategy-cycles/${cycle.id}/render`} label="Render all posts" compact />
+          <section className="cl-card p-6">
+            <h2 className="text-lg font-semibold text-slate-950">Workflow controls</h2>
+            <p className="mt-1 text-sm text-slate-600">Execute batch actions for the entire weekly cycle.</p>
+            
+            <div className="mt-6 grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
+              <ActionButton endpoint={`/api/strategy-cycles/${cycle.id}/approve`} label="Approve all" />
+              <RenderButton endpoint={`/api/strategy-cycles/${cycle.id}/render`} label="Render all" compact />
               <ActionButton endpoint={`/api/strategy-cycles/${cycle.id}/rollup`} label="Roll up metrics" />
-              <ActionButton endpoint={`/api/strategy-cycles/${cycle.id}/analyze`} label="Analyze this week" />
-              <ActionButton endpoint={`/api/strategy-cycles/${cycle.id}/generate-next`} label="Generate next week" />
+              <ActionButton endpoint={`/api/strategy-cycles/${cycle.id}/analyze`} label="Analyze results" />
+              <ActionButton endpoint={`/api/strategy-cycles/${cycle.id}/generate-next`} label="Generate next" />
               <RunJobsButton />
             </div>
-            <div>
-              <p className="mb-1 text-sm font-medium">Bulk schedule</p>
-              <p className="mb-2 text-xs text-slate-600">Bulk scheduling applies to Instagram-targeted items. TikTok/WhatsApp remain manual export-first.</p>
-              <BulkScheduleControl endpoint={`/api/strategy-cycles/${cycle.id}/schedule`} />
+
+            <div className="mt-8 border-t pt-6 cl-divider">
+              <div className="max-w-xl">
+                <h3 className="text-sm font-semibold text-slate-950">Bulk scheduling</h3>
+                <p className="mt-1 text-xs text-slate-600 leading-relaxed">
+                  Bulk scheduling applies to Instagram-targeted items. TikTok and WhatsApp remain manual export-first in the current workflow.
+                </p>
+                <div className="mt-4">
+                  <BulkScheduleControl endpoint={`/api/strategy-cycles/${cycle.id}/schedule`} />
+                </div>
+              </div>
             </div>
           </section>
 
+          <section className="cl-card p-6">
+            <h2 className="text-lg font-semibold text-slate-950">Iteration analysis</h2>
+            <p className="mt-2 text-sm leading-7 text-slate-700">{summaryExperiment?.inputSummary ?? 'Performance insights will appear here once you "Analyze results".'}</p>
 
-
-          <section className="rounded border bg-white p-4">
-            <h2 className="font-semibold">Iteration analysis</h2>
-            <p className="mt-2 text-sm">{summaryExperiment?.inputSummary ?? 'Run "Analyze this week" to generate insights.'}</p>
-
-            <div className="mt-3 grid gap-4 md:grid-cols-2">
+            <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-4 border-t pt-6 cl-divider">
               <div>
-                <h3 className="text-sm font-semibold">Winner patterns</h3>
-                <ul className="mt-1 list-disc pl-5 text-sm">
+                <h3 className="text-[11px] font-bold uppercase tracking-widest text-emerald-600 mb-3">Winners</h3>
+                <ul className="space-y-3">
                   {angleExperiments.length === 0 ? (
-                    <li>No winner patterns yet.</li>
+                    <li className="text-xs text-slate-400 italic">None identified yet</li>
                   ) : (
                     angleExperiments.map((exp) => (
-                      <li key={exp.id}>
-                        {exp.hypothesis ?? ""}
-                        {exp.winnerContentItemId ? ` (from ${exp.winnerContentItemId.slice(0, 8)}...)` : ""}
+                      <li key={exp.id} className="text-xs leading-relaxed text-slate-700 bg-emerald-50/50 p-2 rounded-lg border border-emerald-100">
+                        {exp.hypothesis}
                       </li>
                     ))
                   )}
@@ -150,67 +166,81 @@ export default async function WeekPage({
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold">Loser reasons</h3>
-                <ul className="mt-1 list-disc pl-5 text-sm">
+                <h3 className="text-[11px] font-bold uppercase tracking-widest text-rose-600 mb-3">Losers</h3>
+                <ul className="space-y-3">
                   {loserExperiments.length === 0 ? (
-                    <li>No loser insights yet.</li>
+                    <li className="text-xs text-slate-400 italic">None identified yet</li>
                   ) : (
                     loserExperiments.map((exp) => (
-                      <li key={exp.id}>{exp.inputSummary}</li>
+                      <li key={exp.id} className="text-xs leading-relaxed text-slate-700 bg-rose-50/50 p-2 rounded-lg border border-rose-100">
+                        {exp.inputSummary}
+                      </li>
                     ))
                   )}
                 </ul>
               </div>
-            </div>
 
-            <div className="mt-3 grid gap-4 md:grid-cols-2">
               <div>
-                <h3 className="text-sm font-semibold">Improved hooks</h3>
-                <ul className="mt-1 list-disc pl-5 text-sm">
+                <h3 className="text-[11px] font-bold uppercase tracking-widest text-blue-600 mb-3">Refinements</h3>
+                <ul className="space-y-3">
                   {hookExperiments.length === 0 ? (
-                    <li>No hook mutations yet.</li>
+                    <li className="text-xs text-slate-400 italic">None identified yet</li>
                   ) : (
-                    hookExperiments.map((exp) => <li key={exp.id}>{exp.inputSummary}</li>)
+                    hookExperiments.map((exp) => (
+                      <li key={exp.id} className="text-xs leading-relaxed text-slate-700 bg-blue-50/50 p-2 rounded-lg border border-blue-100">
+                        {exp.inputSummary}
+                      </li>
+                    ))
                   )}
                 </ul>
               </div>
+
               <div>
-                <h3 className="text-sm font-semibold">Angles to stop</h3>
-                <ul className="mt-1 list-disc pl-5 text-sm">
+                <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-500 mb-3">Stop list</h3>
+                <ul className="space-y-3">
                   {anglesToStop.length === 0 ? (
-                    <li>No stop-list yet.</li>
+                    <li className="text-xs text-slate-400 italic">None identified yet</li>
                   ) : (
-                    anglesToStop.map((angle) => <li key={angle}>{angle}</li>)
+                    anglesToStop.map((angle) => (
+                      <li key={angle} className="text-xs leading-relaxed text-slate-700 bg-slate-50 p-2 rounded-lg border border-slate-100 line-through decoration-slate-300">
+                        {angle}
+                      </li>
+                    ))
                   )}
                 </ul>
               </div>
             </div>
 
             {nextCycle ? (
-              <div className="mt-4 rounded border bg-slate-50 p-3">
-                <p className="text-sm font-medium">Next cycle generated:</p>
-                <a className="text-sm" href={`/dashboard/projects/${project.id}/week/${nextCycle.id}`}>
-                  View next week ({nextCycle.weekStart.toISOString().slice(0, 10)})
-                </a>
+              <div className="mt-8 rounded-2xl border border-slate-900 bg-slate-950 p-5 text-white shadow-lg">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Next Iteration</p>
+                    <h3 className="mt-1 font-semibold">Future cycle generated</h3>
+                  </div>
+                  <a className="rounded-xl bg-white px-4 py-2 text-xs font-bold text-slate-950 transition hover:bg-slate-200" href={`/dashboard/projects/${project.id}/week/${nextCycle.id}`}>
+                    Open next week
+                  </a>
+                </div>
                 {nextCyclePosts.length > 0 ? (
-                  <ul className="mt-2 list-disc pl-5 text-sm">
+                  <div className="mt-4 grid gap-2">
                     {nextCyclePosts.map((post) => (
-                      <li key={post.id}>
-                        {post.internalTitle}
-                        {post.parentContentItemId ? ` ← derived from ${post.parentContentItemId.slice(0, 8)}...` : ""}
-                      </li>
+                      <div key={post.id} className="text-[11px] text-slate-400 flex items-center justify-between border-b border-white/10 pb-2">
+                        <span>{post.internalTitle}</span>
+                        {post.parentContentItemId ? <span className="text-[9px] uppercase tracking-tighter opacity-60">Derived from {post.parentContentItemId.slice(0, 8)}</span> : null}
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 ) : null}
               </div>
             ) : null}
           </section>
 
-          <section className="grid gap-4">
+          <section className="grid gap-6">
             {posts.map((post, index) => {
               const assets = assetsByPost[index];
               const perf = perfByContentId.get(post.id);
-              const trackingLink = `/r/${post.trackingSlug}`;
+              const trackingLink = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/r/${post.trackingSlug}`;
               const targetChannel = resolveContentItemTargetChannel(post.targetChannel, post.platform);
               const channelCaptions = (post.channelCaptionsJson as Record<string, string> | null) ?? {};
               const channelCtas = (post.channelCtaTextJson as Record<string, string> | null) ?? {};
@@ -224,169 +254,186 @@ export default async function WeekPage({
                 (post.externalPostUrl?.includes("/mock/") || post.externalPostId?.startsWith("mock-post-") ? "mock" : post.externalPostId ? "instagram" : "n/a");
 
               return (
-                <article key={post.id} className="rounded border bg-white p-4">
-                  <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-                    <h3 className="font-semibold">{post.internalTitle}</h3>
-                    <div className="flex gap-2">
-                      {renderBadge(post.renderStatus)}
-                      {publishBadge(post.publishStatus)}
-                      {post.approvedAt ? (
-                        <span className="rounded bg-green-50 px-2 py-1 text-xs text-green-700">Approved</span>
+                <article key={post.id} className="cl-card overflow-hidden">
+                  <div className="flex flex-col lg:flex-row">
+                    <div className="flex-1 p-6 md:p-8 space-y-6">
+                      <div className="flex flex-wrap items-center justify-between gap-4 border-b pb-5 cl-divider">
+                        <div>
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Post {index + 1}</p>
+                          <h3 className="mt-1 text-xl font-bold text-slate-950">{post.internalTitle}</h3>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {renderBadge(post.renderStatus)}
+                          {publishBadge(post.publishStatus)}
+                          {post.approvedAt ? (
+                            <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold uppercase text-emerald-700">Approved</span>
+                          ) : (
+                            <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold uppercase text-slate-600">Draft</span>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="grid gap-6 md:grid-cols-2">
+                        <div className="space-y-4">
+                          <div>
+                            <p className="text-[11px] font-bold uppercase tracking-widest text-slate-500 mb-1.5">Hook</p>
+                            <p className="text-sm font-medium leading-relaxed text-slate-950">{post.hook}</p>
+                          </div>
+                          <div>
+                            <p className="text-[11px] font-bold uppercase tracking-widest text-slate-500 mb-1.5">Slides</p>
+                            <ol className="space-y-2 text-sm text-slate-700">
+                              {((post.slidesJson as string[]) ?? []).map((slide, i) => (
+                                <li key={slide} className="flex gap-2">
+                                  <span className="font-bold text-slate-300">{i + 1}.</span>
+                                  {slide}
+                                </li>
+                              ))}
+                            </ol>
+                          </div>
+                          <div>
+                            <p className="text-[11px] font-bold uppercase tracking-widest text-slate-500 mb-1.5">Channel Caption ({targetChannel})</p>
+                            <p className="text-xs leading-relaxed text-slate-600 bg-slate-50 p-3 rounded-xl border cl-divider italic">
+                              "{previewCaption}"
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <p className="text-[11px] font-bold uppercase tracking-widest text-slate-500 mb-1">Target Channel</p>
+                              <p className="text-xs font-bold text-slate-950 uppercase">{targetChannel}</p>
+                            </div>
+                            <div>
+                              <p className="text-[11px] font-bold uppercase tracking-widest text-slate-500 mb-1">Publish Flow</p>
+                              <p className="text-xs font-bold text-slate-950 uppercase">{publishStrategy.replace(/_/g, " ")}</p>
+                            </div>
+                          </div>
+                          <div>
+                            <p className="text-[11px] font-bold uppercase tracking-widest text-slate-500 mb-1.5">Call to Action</p>
+                            <p className="text-sm font-medium text-slate-950">{previewCta}</p>
+                          </div>
+                          <div>
+                            <p className="text-[11px] font-bold uppercase tracking-widest text-slate-500 mb-1.5">Tracking Link</p>
+                            <div className="flex items-center gap-2 text-xs">
+                              <code className="truncate rounded bg-slate-100 px-2 py-1 text-blue-700">{trackingLink}</code>
+                              <CopyButton text={trackingLink} />
+                            </div>
+                          </div>
+                          <div className="pt-2">
+                             <div className="flex items-center justify-between text-xs border-t pt-3 cl-divider">
+                               <span className="text-slate-500 font-medium">Weekly Score:</span>
+                               <span className="font-bold text-slate-950">{perf?.score ?? 0}</span>
+                             </div>
+                             <div className="flex items-center justify-between text-xs mt-2">
+                               <span className="text-slate-500 font-medium">Performance:</span>
+                               <span className={`font-bold uppercase tracking-wider ${perf?.classification === "winner" ? "text-emerald-600" : "text-slate-700"}`}>{perf?.classification ?? "Pending"}</span>
+                             </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {!canDirectPublish ? (
+                        <div className="rounded-xl border border-blue-100 bg-blue-50/50 p-4 text-xs leading-relaxed text-blue-800">
+                          <p className="font-bold uppercase tracking-widest mb-1">Manual Export required</p>
+                          This item is set for manual delivery. Render the post, download the bundle, and upload it manually to {targetChannel} using the preview caption and CTA provided.
+                        </div>
+                      ) : null}
+
+                      <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
+                        <div className="space-y-1">
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Target</p>
+                          <TargetChannelControl contentItemId={post.id} value={targetChannel} />
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Delivery</p>
+                          <PublishStrategyControl contentItemId={post.id} targetChannel={targetChannel} value={publishStrategy} />
+                        </div>
+                        <div className="space-y-1 flex flex-col justify-end">
+                          <ActionButton endpoint={`/api/content-items/${post.id}/approve`} label="Approve" />
+                        </div>
+                        <ActionButton endpoint={`/api/content-items/${post.id}/regenerate`} label="Regenerate" />
+                        <RenderButton endpoint={`/api/content-items/${post.id}/render`} label="Render Preview" initialTargetChannel={targetChannel} />
+                        {canDirectPublish ? (
+                          <ScheduleItemControl endpoint={`/api/content-items/${post.id}/schedule`} />
+                        ) : (
+                          <ExportBundleButton contentItemId={post.id} disabled={!assets.video} />
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="w-full lg:w-80 bg-slate-50 border-l cl-divider p-6 md:p-8 flex flex-col items-center justify-center gap-6">
+                      <p className="text-[11px] font-bold uppercase tracking-widest text-slate-500 self-start">Visual Preview</p>
+                      {assets.video ? (
+                        <div className="w-full max-w-[240px] space-y-4">
+                          <video controls className="w-full rounded-2xl border-4 border-slate-900 bg-black shadow-2xl" src={assets.video.storageUrl} />
+                          <a className="flex w-full items-center justify-center rounded-xl bg-slate-900 px-4 py-2.5 text-xs font-bold text-white transition hover:bg-slate-800" href={assets.video.storageUrl} download>
+                            Download MP4
+                          </a>
+                        </div>
+                      ) : assets.thumbnail ? (
+                        <div className="w-full max-w-[240px] space-y-4">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={assets.thumbnail.storageUrl} alt="Post thumbnail" className="w-full rounded-2xl border cl-divider shadow-lg" />
+                          <p className="text-center text-[10px] text-slate-500 italic leading-relaxed">Video is pending render. Thumbnail shows initial composition.</p>
+                        </div>
                       ) : (
-                        <span className="rounded bg-slate-100 px-2 py-1 text-xs text-slate-600">Not approved</span>
+                        <div className="flex aspect-[9/16] w-full max-w-[200px] items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 text-center p-6">
+                          <p className="text-xs text-slate-400">No render preview available yet. Run the render step to see the final clip.</p>
+                        </div>
                       )}
                     </div>
                   </div>
-
-                  <p className="mt-1 text-sm">
-                    <strong>Hook:</strong> {post.hook}
-                  </p>
-                  <p className="mt-1 text-sm">
-                    <strong>Slides:</strong>
-                  </p>
-                  <ol className="ml-5 list-decimal text-sm">
-                    {((post.slidesJson as string[]) ?? []).map((slide) => (
-                      <li key={slide}>{slide}</li>
-                    ))}
-                  </ol>
-                  <p className="mt-1 text-sm">
-                    <strong>Target channel:</strong> {targetChannel}
-                  </p>
-                  <p className="mt-1 text-sm">
-                    <strong>Publish strategy:</strong> {publishStrategy}
-                  </p>
-                  <p className="mt-1 text-sm">
-                    <strong>Preview caption:</strong> {previewCaption}
-                  </p>
-                  {Object.keys((post.channelCaptionsJson as Record<string, string> | null) ?? {}).length > 0 ? (
-                    <div className="mt-1 text-sm">
-                      <strong>Per-channel captions:</strong>
-                      <ul className="ml-5 list-disc">
-                        {Object.entries((post.channelCaptionsJson as Record<string, string> | null) ?? {}).map(([channel, value]) => (
-                          <li key={`${post.id}-${channel}`}>
-                            <strong>{channel}:</strong> {value}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ) : null}
-                  <p className="mt-1 text-sm">
-                    <strong>Hashtags:</strong> {((post.hashtagsJson as string[]) ?? []).join(" ")}
-                  </p>
-                  <p className="mt-1 text-sm">
-                    <strong>Preview CTA:</strong> {previewCta}
-                  </p>
-                  {Object.keys((post.channelCtaTextJson as Record<string, string> | null) ?? {}).length > 0 ? (
-                    <div className="mt-1 text-sm">
-                      <strong>Per-channel CTA:</strong>
-                      <ul className="ml-5 list-disc">
-                        {Object.entries((post.channelCtaTextJson as Record<string, string> | null) ?? {}).map(([channel, value]) => (
-                          <li key={`${post.id}-cta-${channel}`}>
-                            <strong>{channel}:</strong> {value}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ) : null}
-                  <p className="mt-1 text-sm">
-                    <strong>Tracking link:</strong> <a href={trackingLink}>{trackingLink}</a>
-                    <span className="ml-2 inline-block"><CopyButton text={trackingLink} /></span>
-                  </p>
-                  <p className="mt-1 text-sm">
-                    <strong>Clicks / Signups / Revenue:</strong> {perf?.clicks ?? 0} / {perf?.signups ?? 0} / {perf?.revenue ?? 0}
-                  </p>
-                  <p className="mt-1 text-sm">
-                    <strong>Score:</strong> {perf?.score ?? 0} | <strong>Classification:</strong> {perf?.classification ?? "-"}
-                  </p>
-                  <p className="mt-1 text-sm">
-                    <strong>Scheduled:</strong> {post.scheduledFor ? post.scheduledFor.toISOString() : "Not scheduled"}
-                  </p>
-                  <p className="mt-1 text-sm">
-                    <strong>Published:</strong> {post.publishedAt ? post.publishedAt.toISOString() : "Not published"}
-                  </p>
-                  <p className="mt-1 text-sm">
-                    <strong>External:</strong> {post.externalPostUrl ? (
-                      <a href={post.externalPostUrl} target="_blank" rel="noreferrer">
-                        {post.externalPostId ?? post.externalPostUrl}
-                      </a>
-                    ) : "N/A"}
-                  </p>
-                  <p className="mt-1 text-sm">
-                    <strong>Publish mode:</strong> {publishMode}
-                  </p>
-                  {!canDirectPublish ? (
-                    <p className="mt-1 text-sm text-amber-700">
-                      This item uses manual export flow. Use render + export bundle with the preview caption/CTA.
-                    </p>
-                  ) : null}
-                  <p className="mt-1 text-sm">
-                    <strong>Publish error:</strong> {latestJob?.job.lastError ?? "None"}
-                  </p>
-
-                  <div className="mt-3 grid gap-3 md:grid-cols-2">
-                    <TargetChannelControl contentItemId={post.id} value={targetChannel} />
-                    <PublishStrategyControl contentItemId={post.id} targetChannel={targetChannel} value={publishStrategy} />
-                    <ActionButton endpoint={`/api/content-items/${post.id}/regenerate`} label="Regenerate this post" />
-                    <RenderButton endpoint={`/api/content-items/${post.id}/render`} label="Render this post" initialTargetChannel={targetChannel} />
-                    <ActionButton endpoint={`/api/content-items/${post.id}/approve`} label="Approve this post" />
-                    {canDirectPublish ? (
-                      <ScheduleItemControl endpoint={`/api/content-items/${post.id}/schedule`} />
-                    ) : (
-                      <ExportBundleButton contentItemId={post.id} disabled={!assets.video} />
-                    )}
-                  </div>
-
-                  {assets.thumbnail ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={assets.thumbnail.storageUrl} alt="Post thumbnail" className="mt-4 max-w-48 rounded border" />
-                  ) : null}
-
-                  {assets.video ? (
-                    <div className="mt-4 space-y-2">
-                      <video controls className="max-h-[500px] rounded border" src={assets.video.storageUrl} />
-                      <a className="inline-block rounded border px-3 py-2 text-sm" href={assets.video.storageUrl} download>
-                        Download MP4
-                      </a>
-                    </div>
-                  ) : null}
                 </article>
               );
             })}
           </section>
 
-          <section className="rounded border bg-white p-4">
-            <h2 className="font-semibold">Tracking helper</h2>
-            <p className="mt-1 text-sm">Add this script on your site to persist `clp_click` into localStorage/cookie.</p>
-            <pre className="mt-2 overflow-x-auto rounded bg-slate-100 p-2 text-xs">{trackingSnippet}</pre>
-            <p className="mt-2 text-xs text-slate-600">
-              After signup/purchase, send `clickId` to `/api/track/conversion` or `/api/track/revenue`.
+          <section className="cl-card p-6">
+            <h2 className="text-lg font-semibold text-slate-950">Conversion tracking</h2>
+            <p className="mt-1 text-sm text-slate-600">Integrate this snippet into your product to track clicks and conversions back to your weekly cycles.</p>
+            <div className="mt-5 relative group">
+               <pre className="overflow-x-auto rounded-2xl bg-slate-950 p-5 text-[11px] font-mono leading-relaxed text-slate-300">
+                 {trackingSnippet}
+               </pre>
+               <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                 <CopyButton text={trackingSnippet} />
+               </div>
+            </div>
+            <p className="mt-4 text-xs leading-relaxed text-slate-500">
+              The script persists <code className="text-slate-700 font-bold">clp_click</code>. When a user converts, send that ID to the <code className="text-slate-700 font-bold">/api/track</code> endpoints to roll up performance data automatically.
             </p>
           </section>
 
-          <section className="rounded border bg-white p-4">
-            <h2 className="font-semibold">Job queue</h2>
+          <section className="cl-card p-6">
+            <h2 className="text-lg font-semibold text-slate-950">Operational job queue</h2>
+            <p className="mt-1 text-sm text-slate-600">Current status of asynchronous publishing and background tasks for this week.</p>
             {jobs.length === 0 ? (
-              <p className="text-sm text-slate-600">No jobs queued yet.</p>
+              <p className="mt-6 text-sm text-slate-400 italic">No background jobs have been queued for this cycle.</p>
             ) : (
-              <div className="mt-2 overflow-x-auto">
-                <table className="min-w-full text-left text-sm">
+              <div className="mt-6 overflow-x-auto">
+                <table className="min-w-full text-left text-[13px]">
                   <thead>
-                    <tr>
-                      <th className="pr-4">Type</th>
-                      <th className="pr-4">Run at</th>
-                      <th className="pr-4">Status</th>
-                      <th className="pr-4">Attempts</th>
-                      <th className="pr-4">Last error</th>
+                    <tr className="text-[11px] font-bold uppercase tracking-widest text-slate-500 border-b cl-divider">
+                      <th className="pb-3 pr-4">Job Type</th>
+                      <th className="pb-3 pr-4">Scheduled For</th>
+                      <th className="pb-3 pr-4">Status</th>
+                      <th className="pb-3 pr-4">Retries</th>
+                      <th className="pb-3 pr-4">Observations</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody className="divide-y cl-divider">
                     {jobs.map((job) => (
-                      <tr key={job.id} className="border-t align-top">
-                        <td className="pr-4">{job.type}</td>
-                        <td className="pr-4">{job.runAt.toISOString()}</td>
-                        <td className="pr-4">{job.status}</td>
-                        <td className="pr-4">{job.attempts}/{job.maxAttempts}</td>
-                        <td className="pr-4 text-red-700">{job.lastError ?? "-"}</td>
+                      <tr key={job.id} className="align-top">
+                        <td className="py-3 pr-4 font-medium text-slate-900">{job.type}</td>
+                        <td className="py-3 pr-4 text-slate-600">{new Date(job.runAt).toLocaleTimeString()}</td>
+                        <td className="py-3 pr-4">
+                           <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${job.status === "completed" ? "bg-emerald-50 text-emerald-700" : job.status === "failed" ? "bg-rose-50 text-rose-700" : "bg-amber-50 text-amber-700"}`}>
+                             {job.status}
+                           </span>
+                        </td>
+                        <td className="py-3 pr-4 text-slate-500">{job.attempts} / {job.maxAttempts}</td>
+                        <td className="py-3 pr-4 text-xs text-red-700 max-w-xs truncate">{job.lastError ?? "-"}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -398,4 +445,5 @@ export default async function WeekPage({
       )}
     </div>
   );
+}
 }

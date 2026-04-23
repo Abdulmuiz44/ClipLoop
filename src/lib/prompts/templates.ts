@@ -36,7 +36,7 @@ export type ProjectPromptContext = {
 function languageInstruction(languageStyle: ProjectPromptContext["languageStyle"]) {
   if (languageStyle === "pidgin") return "Write in natural Nigerian Pidgin.";
   if (languageStyle === "mixed") return "Blend clear English with light natural Nigerian Pidgin where it feels conversational.";
-  return "Write in clear English with local Nigerian business context where relevant.";
+  return "Write in clear, practical, and business-aware English.";
 }
 
 function channelsInstruction(channels: ProjectPromptContext["preferredChannels"]) {
@@ -64,7 +64,7 @@ export function weeklyStrategyPrompt(project: ProjectPromptContext) {
 
   return [
     "Generate one weekly strategy JSON with exactly 5 angles.",
-    "Focus on short-form promo content for local Nigerian businesses and creators.",
+    "Focus on short-form promo content for brands, businesses, and creators.",
     "Bias angles toward offer-led hooks, practical urgency/scarcity when appropriate, social proof style proof points, and clear CTAs.",
     languageInstruction(project.languageStyle),
     `Project type: ${type}`,
@@ -76,7 +76,7 @@ export function weeklyStrategyPrompt(project: ProjectPromptContext) {
     `CTA: ${project.callToAction ?? "Send a message or click to start"}`,
     `Preferred channels: ${channels.normalized.join(",")}`,
     ...channels.notes,
-    `Location: ${location || "Nigeria"}`,
+    `Location: ${location || "Global"}`,
     `Goal type: ${project.goalType}`,
     `Website: ${project.websiteUrl ?? "n/a"}`,
     `CTA URL: ${project.ctaUrl}`,
@@ -94,7 +94,7 @@ export function postGenerationPrompt(project: ProjectPromptContext, strategy: We
 
   return [
     "Generate exactly 5 short-form post drafts in JSON.",
-    "Posts must feel local, practical, and business-aware for Nigeria.",
+    "Posts must feel practical, grounded, and business-aware.",
     "Rules:",
     "- lead with promo or offer-led hooks",
     "- use urgency or scarcity only when context supports it",
@@ -161,7 +161,7 @@ export function iterationNextPackPrompt(input: {
     `Preferred channels: ${channels.normalized.join(",")}`,
     ...channels.notes,
     `Language style: ${input.languageStyle ?? "english"} (${languageInstruction(input.languageStyle)})`,
-    "Bias the pack toward short promo, offer-first hooks, local relatability, urgency when relevant, and social proof framing.",
+    "Bias the pack toward short promo, offer-first hooks, practical relatability, urgency when relevant, and social proof framing.",
     `Analysis JSON: ${JSON.stringify(input.analysis)}`,
   ].join("\n");
 }

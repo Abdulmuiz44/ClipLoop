@@ -46,12 +46,12 @@ export default async function ManualQueuePage({ searchParams }: { searchParams: 
   return (
     <div className="space-y-6">
       <section className="cl-card p-5 md:p-6">
-        <p className="cl-kicker">Manual operations</p>
+        <p className="cl-kicker">Packaging & Delivery</p>
         <h1 className="mt-1 text-2xl font-semibold tracking-tight">Manual Publish Queue</h1>
-        <p className="mt-1 text-sm leading-6 text-slate-600">
-          Operational queue for manual-export items. Export bundles quickly and mark posted after platform upload.
+        <p className="mt-2 text-sm leading-6 text-slate-600">
+          Manage items set for manual export. Download bundles for TikTok, WhatsApp, or other platforms, then mark as posted once live.
         </p>
-        <form className="mt-3 grid gap-3 md:grid-cols-4" method="GET">
+        <form className="mt-5 grid gap-3 md:grid-cols-4" method="GET">
           <select name="channel" defaultValue={channel} className="cl-select">
             <option value="all">All channels</option>
             <option value="instagram">Instagram</option>
@@ -59,16 +59,16 @@ export default async function ManualQueuePage({ searchParams }: { searchParams: 
             <option value="whatsapp">WhatsApp</option>
           </select>
           <select name="status" defaultValue={status} className="cl-select">
-            <option value="all">All manual statuses</option>
-            <option value="ready_for_export">ready_for_export</option>
-            <option value="exported">exported</option>
-            <option value="posted">posted</option>
+            <option value="all">All statuses</option>
+            <option value="ready_for_export">Ready to export</option>
+            <option value="exported">Exported</option>
+            <option value="posted">Posted</option>
           </select>
           <select name="sort" defaultValue={sort} className="cl-select">
             <option value="newest">Newest first</option>
             <option value="oldest">Oldest first</option>
           </select>
-          <button className="rounded-xl border bg-white px-3 py-2 text-sm font-medium text-slate-700 transition cl-divider hover:bg-slate-50">
+          <button className="rounded-xl border bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800">
             Apply filters
           </button>
         </form>
@@ -76,35 +76,39 @@ export default async function ManualQueuePage({ searchParams }: { searchParams: 
 
       <section className="grid gap-4">
         {items.length === 0 ? (
-          <div className="cl-card p-4 text-sm text-slate-600">No manual-export items for current filters.</div>
+          <div className="cl-card p-8 text-center text-sm text-slate-600">
+            <p className="cl-kicker">Queue empty</p>
+            <p className="mt-2">No manual-export items match your current filters.</p>
+          </div>
         ) : (
           items.map((item) => (
             <article key={item.id} className="cl-card p-5 md:p-6">
-              <div className="flex flex-wrap items-start justify-between gap-2">
-                <div>
-                  <p className="font-semibold tracking-tight">{item.internalTitle}</p>
-                  <p className="text-sm text-slate-600">{item.project?.productName ?? "Project"}</p>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <p className="cl-kicker uppercase">{item.project?.productName ?? "Project"}</p>
+                  <h3 className="mt-1 font-semibold text-slate-950">{item.internalTitle}</h3>
                 </div>
-                <div className="flex flex-wrap gap-2 text-xs">
-                  <span className="cl-badge">channel: {item.targetChannel}</span>
-                  <span className="cl-badge">strategy: {item.publishStrategy}</span>
-                  <span className="cl-badge">manual: {item.manualPublishStatus}</span>
-                  <span className={`rounded-full border px-2 py-1 ${item.isRendered ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-slate-300 bg-slate-100 text-slate-700"}`}>
-                    {item.isRendered ? "rendered" : "needs render"}
+                <div className="flex flex-wrap gap-2 text-[11px] font-medium uppercase tracking-wider">
+                  <span className="cl-badge bg-slate-100 text-slate-600">{item.targetChannel}</span>
+                  <span className="cl-badge bg-blue-50 text-blue-700">{item.manualPublishStatus.replace(/_/g, " ")}</span>
+                  <span className={`rounded-full px-2 py-1 ${item.isRendered ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-600"}`}>
+                    {item.isRendered ? "Rendered" : "Needs render"}
                   </span>
                 </div>
               </div>
 
-              <div className="mt-2 grid gap-2 text-sm md:grid-cols-2">
-                <p>
-                  <strong>Created:</strong> {item.createdAt.toISOString()}
-                </p>
-                <p>
-                  <strong>Scheduled:</strong> {item.scheduledFor ? item.scheduledFor.toISOString() : "Not scheduled"}
-                </p>
+              <div className="mt-4 grid gap-4 border-t pt-4 text-xs text-slate-500 cl-divider md:grid-cols-2">
+                <div className="flex items-center gap-2">
+                  <span className="font-medium text-slate-700">Created:</span>
+                  <span>{new Date(item.createdAt).toLocaleDateString()}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium text-slate-700">Scheduled:</span>
+                  <span>{item.scheduledFor ? new Date(item.scheduledFor).toLocaleDateString() : "Not scheduled"}</span>
+                </div>
               </div>
 
-              <div className="mt-3 grid gap-3 md:grid-cols-3">
+              <div className="mt-5 grid gap-3 md:grid-cols-3">
                 {!item.isRendered ? (
                   <RenderButton endpoint={`/api/content-items/${item.id}/render`} label="Render for export" initialTargetChannel={item.targetChannel} />
                 ) : (
@@ -113,9 +117,11 @@ export default async function ManualQueuePage({ searchParams }: { searchParams: 
                 {item.manualPublishStatus !== "posted" ? (
                   <ActionButton endpoint={`/api/content-items/${item.id}/manual-posted`} label="Mark as posted" />
                 ) : (
-                  <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">Posted confirmed</div>
+                  <div className="flex items-center justify-center rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-700">
+                    Posted confirmed
+                  </div>
                 )}
-                <a className="inline-flex items-center justify-center rounded-xl border px-3 py-2 text-sm text-slate-700 transition cl-divider hover:bg-slate-50" href={`/dashboard/projects/${item.projectId}`}>
+                <a className="inline-flex items-center justify-center rounded-xl border px-3 py-2 text-sm font-medium text-slate-700 transition cl-divider hover:bg-slate-50" href={`/dashboard/projects/${item.projectId}`}>
                   Open project
                 </a>
               </div>

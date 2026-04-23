@@ -16,10 +16,12 @@ export default async function ChatAppPage() {
   if (!primaryProject) {
     return (
       <div className="mx-auto max-w-3xl space-y-4">
-        <div className="cl-card p-6">
+        <div className="cl-card p-6 md:p-8 text-center">
           <p className="cl-kicker">Welcome to ClipLoop</p>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight">Chat-first promo operator</h1>
-          <p className="mt-2 text-sm leading-6 text-slate-600">Complete onboarding once. Then ask for promo videos directly in chat.</p>
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">Set up your brand to start creating</h1>
+          <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-slate-600">
+            Complete your business profile once, then use the chat workspace to generate, render, and package short form promo content for your channels.
+          </p>
         </div>
         <OnboardingForm />
       </div>

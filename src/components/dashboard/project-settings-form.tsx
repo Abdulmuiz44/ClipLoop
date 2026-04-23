@@ -97,111 +97,178 @@ export function ProjectSettingsForm({
   }
 
   return (
-    <form action={onSubmit} className="space-y-3 rounded border bg-white p-4">
-      <div>
-        <h3 className="font-semibold">Project settings</h3>
-        <p className="mt-1 text-sm text-slate-600">Update this profile anytime. Generation uses these fields directly.</p>
+    <form action={onSubmit} className="cl-card p-6 space-y-6">
+      <div className="border-b pb-4 cl-divider">
+        <h3 className="text-lg font-semibold text-slate-950">Workspace Settings</h3>
+        <p className="mt-1 text-sm text-slate-600">Update your brand profile. Changes reflect in future generations.</p>
       </div>
 
-      <div className="grid gap-3 md:grid-cols-2">
-        <input className="w-full rounded border p-2" name="name" defaultValue={project.name} placeholder="Workspace name" />
-        <input className="w-full rounded border p-2" name="productName" defaultValue={project.productName} placeholder="Product name" />
+      <div className="grid gap-4 md:grid-cols-2">
+        <label className="space-y-1">
+          <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Workspace name</span>
+          <input className="cl-input" name="name" defaultValue={project.name} placeholder="Main profile" />
+        </label>
+        <label className="space-y-1">
+          <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Brand/Product name</span>
+          <input className="cl-input" name="productName" defaultValue={project.productName} placeholder="Acme Analytics" />
+        </label>
       </div>
 
-      <div className="grid gap-3 md:grid-cols-2">
-        <select className="w-full rounded border p-2" name="projectType" defaultValue={project.projectType ?? ""}>
-          <option value="">Project type</option>
-          <option value="business">Business</option>
-          <option value="creator">Creator</option>
-          <option value="app">App</option>
-        </select>
-        <select className="w-full rounded border p-2" name="languageStyle" defaultValue={project.languageStyle ?? ""}>
-          <option value="">Language style</option>
-          <option value="english">English</option>
-          <option value="pidgin">Pidgin</option>
-          <option value="mixed">Mixed</option>
-        </select>
+      <div className="grid gap-4 md:grid-cols-2">
+        <label className="space-y-1">
+          <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Project type</span>
+          <select className="cl-select" name="projectType" defaultValue={project.projectType ?? ""}>
+            <option value="">Select type</option>
+            <option value="business">Business</option>
+            <option value="creator">Creator</option>
+            <option value="app">App</option>
+          </select>
+        </label>
+        <label className="space-y-1">
+          <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Language style</span>
+          <select className="cl-select" name="languageStyle" defaultValue={project.languageStyle ?? ""}>
+            <option value="">Select style</option>
+            <option value="english">English</option>
+            <option value="pidgin">Pidgin</option>
+            <option value="mixed">Mixed</option>
+          </select>
+        </label>
       </div>
 
-      <div className="grid gap-3 md:grid-cols-2">
-        <input className="w-full rounded border p-2" name="businessName" defaultValue={project.businessName ?? ""} placeholder="Business name" />
-        <input className="w-full rounded border p-2" name="businessCategory" defaultValue={project.businessCategory ?? ""} placeholder="Business category" />
-      </div>
-      <textarea
-        className="min-h-24 w-full rounded border p-2"
-        name="businessDescription"
-        defaultValue={project.businessDescription ?? ""}
-        placeholder="Business description"
-      />
-      <div className="grid gap-3 md:grid-cols-2">
-        <input className="w-full rounded border p-2" name="city" defaultValue={project.city ?? ""} placeholder="City" />
-        <input className="w-full rounded border p-2" name="state" defaultValue={project.state ?? ""} placeholder="State" />
+      <div className="grid gap-4 md:grid-cols-2">
+        <label className="space-y-1">
+          <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Category</span>
+          <input className="cl-input" name="businessCategory" defaultValue={project.businessCategory ?? ""} placeholder="SaaS for marketers" />
+        </label>
+        <label className="space-y-1">
+          <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">One-liner</span>
+          <input className="cl-input" name="oneLiner" defaultValue={project.oneLiner ?? ""} placeholder="Growth automation for indie teams" />
+        </label>
       </div>
 
-      <input className="w-full rounded border p-2" name="targetAudience" defaultValue={project.targetAudience ?? ""} placeholder="Target audience" />
-      <div className="grid gap-3 md:grid-cols-2">
-        <input className="w-full rounded border p-2" name="primaryOffer" defaultValue={project.primaryOffer ?? ""} placeholder="Primary offer" />
-        <input className="w-full rounded border p-2" name="priceRange" defaultValue={project.priceRange ?? ""} placeholder="Price range" />
+      <label className="space-y-1">
+        <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Description</span>
+        <textarea
+          className="cl-textarea min-h-24"
+          name="businessDescription"
+          defaultValue={project.businessDescription ?? ""}
+          placeholder="What you sell and why it matters."
+        />
+      </label>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <label className="space-y-1">
+          <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">City</span>
+          <input className="cl-input" name="city" defaultValue={project.city ?? ""} placeholder="San Francisco" />
+        </label>
+        <label className="space-y-1">
+          <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">State / Region</span>
+          <input className="cl-input" name="state" defaultValue={project.state ?? ""} placeholder="CA" />
+        </label>
       </div>
-      <div className="grid gap-3 md:grid-cols-2">
-        <input className="w-full rounded border p-2" name="tone" defaultValue={project.tone ?? ""} placeholder="Tone" />
-        <input className="w-full rounded border p-2" name="callToAction" defaultValue={project.callToAction ?? ""} placeholder="Call to action" />
+
+      <label className="space-y-1">
+        <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Target audience</span>
+        <input className="cl-input" name="targetAudience" defaultValue={project.targetAudience ?? ""} placeholder="Founders and marketers" />
+      </label>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <label className="space-y-1">
+          <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Primary offer</span>
+          <input className="cl-input" name="primaryOffer" defaultValue={project.primaryOffer ?? ""} placeholder="Starter pack: $19/mo" />
+        </label>
+        <label className="space-y-1">
+          <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Price range</span>
+          <input className="cl-input" name="priceRange" defaultValue={project.priceRange ?? ""} placeholder="$19 - $99" />
+        </label>
       </div>
-      <div className="grid gap-3 md:grid-cols-2">
-        <input className="w-full rounded border p-2" name="instagramHandle" defaultValue={project.instagramHandle ?? ""} placeholder="Instagram handle" />
-        <input className="w-full rounded border p-2" name="whatsappNumber" defaultValue={project.whatsappNumber ?? ""} placeholder="WhatsApp number" />
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <label className="space-y-1">
+          <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Voice Tone</span>
+          <input className="cl-input" name="tone" defaultValue={project.tone ?? ""} placeholder="Calm and premium" />
+        </label>
+        <label className="space-y-1">
+          <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Call to action</span>
+          <input className="cl-input" name="callToAction" defaultValue={project.callToAction ?? ""} placeholder="Get started now" />
+        </label>
       </div>
-      <fieldset className="space-y-2 text-sm">
-        <legend className="font-medium">Preferred channels</legend>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <label className="space-y-1">
+          <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Instagram Handle</span>
+          <input className="cl-input" name="instagramHandle" defaultValue={project.instagramHandle ?? ""} placeholder="@brand" />
+        </label>
+        <label className="space-y-1">
+          <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">WhatsApp Number</span>
+          <input className="cl-input" name="whatsappNumber" defaultValue={project.whatsappNumber ?? ""} placeholder="+1..." />
+        </label>
+      </div>
+
+      <fieldset className="space-y-2">
+        <legend className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Preferred channels</legend>
         <div className="grid gap-2 sm:grid-cols-3">
-          <label className="flex items-center gap-2 rounded border p-2">
+          <label className="flex items-center gap-2 rounded-xl border p-3 cl-divider bg-white">
             <input type="checkbox" name="preferredChannels" value="instagram" defaultChecked={selectedChannels.includes("instagram")} />
-            Instagram
+            <span className="text-sm font-medium">Instagram</span>
           </label>
-          <label className="flex items-center gap-2 rounded border p-2">
+          <label className="flex items-center gap-2 rounded-xl border p-3 cl-divider bg-white">
             <input type="checkbox" name="preferredChannels" value="tiktok" defaultChecked={selectedChannels.includes("tiktok")} />
-            TikTok
+            <span className="text-sm font-medium">TikTok</span>
           </label>
-          <label className="flex items-center gap-2 rounded border p-2">
+          <label className="flex items-center gap-2 rounded-xl border p-3 cl-divider bg-white">
             <input type="checkbox" name="preferredChannels" value="whatsapp" defaultChecked={selectedChannels.includes("whatsapp")} />
-            WhatsApp
+            <span className="text-sm font-medium">WhatsApp</span>
           </label>
         </div>
       </fieldset>
 
-      <div className="grid gap-3 md:grid-cols-2">
-        <input className="w-full rounded border p-2" name="websiteUrl" defaultValue={project.websiteUrl ?? ""} placeholder="Website URL" />
-        <input className="w-full rounded border p-2" name="ctaUrl" defaultValue={project.ctaUrl} placeholder="CTA URL" />
+      <div className="grid gap-4 md:grid-cols-2">
+        <label className="space-y-1">
+          <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Website URL</span>
+          <input className="cl-input" name="websiteUrl" defaultValue={project.websiteUrl ?? ""} placeholder="https://..." />
+        </label>
+        <label className="space-y-1">
+          <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Conversion Destination</span>
+          <input className="cl-input" name="ctaUrl" defaultValue={project.ctaUrl} placeholder="https://..." />
+        </label>
       </div>
 
-      <div className="grid gap-3 md:grid-cols-3">
-        <input className="w-full rounded border p-2" name="oneLiner" defaultValue={project.oneLiner ?? ""} placeholder="One-liner" />
-        <input className="w-full rounded border p-2" name="audience" defaultValue={project.audience} placeholder="Audience (legacy)" />
-        <input className="w-full rounded border p-2" name="niche" defaultValue={project.niche} placeholder="Niche (legacy)" />
+      <div className="space-y-4 border-t pt-6 cl-divider">
+        <label className="space-y-1 block">
+          <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Conversion Goal</span>
+          <select className="cl-select" name="goalType" defaultValue={project.goalType}>
+            <option value="clicks">Drive clicks</option>
+            <option value="signups">Drive signups</option>
+            <option value="revenue">Drive revenue</option>
+          </select>
+        </label>
+        
+        <label className="space-y-1 block">
+          <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Detailed voice notes</span>
+          <textarea
+            className="cl-textarea min-h-20"
+            name="voiceStyleNotes"
+            defaultValue={((project.voicePrefsJson as { style_notes?: string } | null)?.style_notes ?? "") as string}
+            placeholder="Additional notes about your brand voice..."
+          />
+        </label>
+        
+        <label className="space-y-1 block">
+          <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Example posts</span>
+          <textarea
+            className="cl-textarea min-h-24 font-mono text-xs"
+            name="examplePosts"
+            defaultValue={((project.examplePostsJson as string[] | null) ?? []).join("\n")}
+            placeholder="Paste your past successful hooks or posts, one per line..."
+          />
+        </label>
       </div>
-      <input className="w-full rounded border p-2" name="offer" defaultValue={project.offer} placeholder="Offer (legacy)" />
-      <textarea className="min-h-20 w-full rounded border p-2" name="description" defaultValue={project.description} placeholder="Description (legacy)" />
 
-      <select className="w-full rounded border p-2" name="goalType" defaultValue={project.goalType}>
-        <option value="clicks">Drive clicks</option>
-        <option value="signups">Drive signups</option>
-        <option value="revenue">Drive revenue</option>
-      </select>
-      <textarea
-        className="min-h-20 w-full rounded border p-2"
-        name="voiceStyleNotes"
-        defaultValue={((project.voicePrefsJson as { style_notes?: string } | null)?.style_notes ?? "") as string}
-        placeholder="Voice notes"
-      />
-      <textarea
-        className="min-h-20 w-full rounded border p-2"
-        name="examplePosts"
-        defaultValue={((project.examplePostsJson as string[] | null) ?? []).join("\n")}
-        placeholder="Example posts, one per line"
-      />
-
-      {message ? <p className="text-xs text-slate-600">{message}</p> : null}
-      <Button disabled={loading}>{loading ? "Saving..." : "Save settings"}</Button>
+      <div className="pt-4 border-t cl-divider flex items-center justify-between gap-4">
+        {message ? <p className="text-sm font-medium text-emerald-600">{message}</p> : <div />}
+        <Button className="px-8" disabled={loading}>{loading ? "Saving..." : "Save changes"}</Button>
+      </div>
     </form>
   );
 }
