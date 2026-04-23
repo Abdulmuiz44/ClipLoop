@@ -4,10 +4,22 @@ ClipLoop is building a simpler way for brands, businesses, and creators to creat
 
 ## MVP slices currently implemented
 
-- Chat-first workspace at `/app` with:
-  - conversation sidebar
-  - mobile-first thread UX
-  - fixed bottom input bar on small screens
+- Premium studio dashboard at `/app` with:
+  - dark sidebar + mobile drawer
+  - clean command/search style top bar
+  - quick action cards for create/chat/project/import paths
+  - projects, credits, recent outputs, recent activity, and usage overview sections
+- Guided create flow at `/app/create`:
+  - rough prompt input
+  - prompt-to-brief upgrade
+  - editable brief fields (channel, tone, duration, style, CTA, caption hint)
+  - pre-generation credit cost visibility
+  - final billable generation + render with result preview/download
+- Chat workspace at `/app/chats` with:
+  - conversation list
+  - free chat mode + paid generation modes
+  - in-thread result cards with previews and receipts
+- Projects hub at `/app/projects` for quick workspace access
 - Guided onboarding that captures business profile + preferred channels
 - Website ingestion pipeline (code-first crawl + text extraction, no scraping SaaS)
 - Business context storage:
@@ -32,16 +44,31 @@ ClipLoop is building a simpler way for brands, businesses, and creators to creat
 - FFmpeg (system dependency for rendering)
 - Optional Mistral chat provider via REST API
 
-## Product direction (chat-first)
+## Product direction (dashboard + guided creation)
 
 Primary authenticated experience:
-- `/app`: chat workspace (default destination from `/dashboard`)
-- onboarding-first flow for users without a project context
-- conversations and results handled inside chat thread
+- `/app`: studio dashboard (operational home)
+- `/app/create`: guided prompt-to-video path
+- `/app/chats`: chat strategy and generation workspace
+- `/app/projects`: project list and entry point into project detail pages
+- `/dashboard/manual-queue` and `/dashboard/settings`: operational surfaces retained
+- onboarding-first behavior still applies for users without project context
 
 Secondary surfaces still available:
 - settings, manual queue, legacy workflow pages
 - existing backend loops remain operational and reusable by chat orchestration
+
+### Dashboard sections: real vs fallback
+
+- Real data-backed:
+  - credits balance + plan status (`credit_accounts`, plan state)
+  - usage overview (`usage_counters` + plan limits)
+  - projects list (`projects`)
+  - recent outputs (`content_items` + `content_assets` thumbnails where available)
+  - recent activity (`credit_ledger_entries`)
+- Graceful fallback states:
+  - outputs without thumbnails show a clean "No preview" tile
+  - empty projects/activity/outputs sections show actionable CTAs, not fake metrics
 
 ## UI direction (Mistral-inspired)
 
