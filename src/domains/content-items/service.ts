@@ -30,7 +30,7 @@ function buildMockChannelCaptions(input: {
       variants[channel] = `${input.businessName} for ${input.audience}. ${input.offer}. ${input.cta}`;
     }
     if (channel === "tiktok") {
-      variants[channel] = `Quick gist: ${input.offer}. ${input.businessName} for ${input.audience}. ${input.cta}`;
+      variants[channel] = `Quick look: ${input.offer}. ${input.businessName} for ${input.audience}. ${input.cta}`;
     }
     if (channel === "whatsapp") {
       variants[channel] = `${input.offer}. ${input.cta}`;
@@ -43,7 +43,7 @@ function buildMockChannelCtas(input: { channels: ProjectChannel[]; cta: string }
   const variants: Partial<Record<ProjectChannel, string>> = {};
   for (const channel of input.channels) {
     if (channel === "instagram") variants[channel] = input.cta;
-    if (channel === "tiktok") variants[channel] = `Watch am finish, then ${input.cta.toLowerCase()}`;
+    if (channel === "tiktok") variants[channel] = `Watch until the end, then ${input.cta.toLowerCase()}`;
     if (channel === "whatsapp") variants[channel] = `Tap to order now`;
   }
   return variants;
@@ -254,7 +254,7 @@ export async function generatePostsForStrategyCycle(strategyCycleId: string) {
         slides: [
           `Offer: ${project.primaryOffer ?? project.offer}`,
           `Audience: ${project.targetAudience ?? project.audience}`,
-          `Proof: Trusted by local buyers${project.city ? ` in ${project.city}` : ""}`,
+          `Proof: Trusted by customers${project.city ? ` in ${project.city}` : ""}`,
           `CTA: ${project.callToAction ?? "Send us a DM now"}`,
         ],
         caption:
@@ -273,8 +273,8 @@ export async function generatePostsForStrategyCycle(strategyCycleId: string) {
           channels: preferredChannels,
           cta: project.callToAction ?? "Send us a DM now",
         }),
-        hashtags: ["#nigeriabusiness", "#smallbusiness", "#promo"],
-        why_it_should_work: "Offer-led local hook with direct CTA, urgency, and social-proof framing.",
+        hashtags: ["#business", "#promo", "#growth"],
+        why_it_should_work: "Offer-led hook with direct CTA, urgency, and social-proof framing.",
       })),
     }),
   });

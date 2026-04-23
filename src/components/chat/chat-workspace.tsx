@@ -252,10 +252,39 @@ export function ChatWorkspace(props: {
         </header>
 
         <main className="flex-1 overflow-y-auto px-4 py-6 pb-44 md:px-8">
-          <div className="mx-auto w-full max-w-3xl space-y-4">
+          <div className="mx-auto w-full max-w-3xl space-y-5">
             {messages.length === 0 ? (
-              <div className="cl-card p-5 text-sm text-slate-600">
-                Ask anything for free, or switch mode below for paid actions. Example: <em>Generate a WhatsApp promo for weekend sale</em>.
+              <div className="cl-card space-y-6 p-6 text-sm text-slate-700 md:p-8">
+                <div className="space-y-2 text-center">
+                  <p className="cl-kicker">New conversation</p>
+                  <h2 className="text-xl font-semibold tracking-tight text-slate-950">How can ClipLoop help today?</h2>
+                  <p className="mx-auto max-w-lg text-slate-600">
+                    ClipLoop uses your saved business profile to generate content that fits your brand voice and target audience.
+                  </p>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-2xl border p-4 transition-all cl-divider hover:border-slate-400">
+                    <p className="font-semibold text-slate-950">Ask strategy</p>
+                    <p className="mt-1 text-xs leading-5 text-slate-500">Free conversation about your weekly promo angles or hooks.</p>
+                    <p className="mt-3 text-xs italic text-slate-600">"What are some hooks for our new winter sale?"</p>
+                  </div>
+                  <div className="rounded-2xl border p-4 transition-all cl-divider hover:border-slate-400">
+                    <p className="font-semibold text-slate-950">Generate copy</p>
+                    <p className="mt-1 text-xs leading-5 text-slate-500">Create polished promo scripts, captions, and CTAs (1 credit).</p>
+                    <p className="mt-3 text-xs italic text-slate-600">"Generate an Instagram promo for our early-bird offer."</p>
+                  </div>
+                  <div className="rounded-2xl border p-4 transition-all cl-divider hover:border-slate-400">
+                    <p className="font-semibold text-slate-950">Render video</p>
+                    <p className="mt-1 text-xs leading-5 text-slate-500">Generate copy and render a vertical promo video (2 credits).</p>
+                    <p className="mt-3 text-xs italic text-slate-600">"Create a TikTok promo video for our app's new feature."</p>
+                  </div>
+                  <div className="rounded-2xl border p-4 transition-all cl-divider hover:border-slate-400">
+                    <p className="font-semibold text-slate-950">Quick draft</p>
+                    <p className="mt-1 text-xs leading-5 text-slate-500">Draft short form copy for multiple channels at once (1 credit).</p>
+                    <p className="mt-3 text-xs italic text-slate-600">"Draft a WhatsApp and Instagram promo for our event."</p>
+                  </div>
+                </div>
               </div>
             ) : null}
             {messages.map((message) => (
@@ -282,19 +311,19 @@ export function ChatWorkspace(props: {
         <div className="fixed inset-x-0 bottom-0 z-20 border-t bg-white/97 p-3 backdrop-blur cl-divider md:static md:border-t md:bg-white md:p-4">
           <div className="mx-auto w-full max-w-3xl space-y-2.5">
             <div className="flex flex-wrap gap-1.5">
-              <ModePill active={mode === "chat"} onClick={() => setMode("chat")} label="Ask (Free)" />
-              <ModePill active={mode === "generate_copy"} onClick={() => setMode("generate_copy")} label="Generate Copy (1 credit)" />
-              <ModePill active={mode === "generate_video"} onClick={() => setMode("generate_video")} label="Generate + Render (2 credits)" />
+              <ModePill active={mode === "chat"} onClick={() => setMode("chat")} label="Chat (Free)" />
+              <ModePill active={mode === "generate_copy"} onClick={() => setMode("generate_copy")} label="Copy (1 credit)" />
+              <ModePill active={mode === "generate_video"} onClick={() => setMode("generate_video")} label="Video (2 credits)" />
             </div>
             <div className="flex items-end gap-2">
               <textarea
                 className="max-h-40 min-h-12 flex-1 rounded-2xl border bg-white p-3 text-sm text-slate-900 outline-none transition focus:border-slate-500 cl-divider"
                 placeholder={
                   mode === "chat"
-                    ? "Ask anything about your promo strategy..."
+                    ? "Ask strategy or refine ideas..."
                     : mode === "generate_copy"
-                      ? "Describe the promo copy you want..."
-                      : "Describe the promo video you want..."
+                      ? "Describe the promo copy you need..."
+                      : "Describe the promo video you want to render..."
                 }
                 value={input}
                 onChange={(event) => setInput(event.target.value)}

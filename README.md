@@ -1,6 +1,6 @@
 # ClipLoop
 
-ClipLoop is a chat-first AI promo video operator for businesses, creators, and apps.
+ClipLoop is building a simpler way for brands, businesses, and creators to create short form promo content faster.
 
 ## MVP slices currently implemented
 
@@ -386,16 +386,16 @@ Public routes:
 - `/request-access`
 
 Public positioning:
-- localized short-form growth automation for Nigerian businesses, creators, and apps
+- Short form promo content for brands, businesses, and creators.
 - one weekly generated promo pack
 - render, approve, schedule, publish, track, learn, repeat
 - invite-only beta
 - cheap, opinionated, intentionally narrow
 
 Good fit:
-- Nigerian small businesses
-- local creators
-- app teams with local distribution goals
+- Brands and small businesses
+- Creators and solo builders
+- App teams with distribution goals
 - operators who want one weekly loop instead of a broad social suite
 
 Not a fit:
@@ -418,7 +418,7 @@ Generation behavior is now biased toward:
 - offer-led hooks
 - urgency/scarcity framing when appropriate
 - social-proof style angles
-- local business friendliness
+- practical business friendliness
 - English/Pidgin output based on project language style
 
 ## Channel-aware generation

@@ -33,19 +33,19 @@ export function UsageSummary({
 }) {
   const rows = [
     {
-      label: "Generation credits used this week",
+      label: "Weekly generation",
       used: usage.postsPerWeek,
       limit: limits.postsPerWeek,
       remaining: remaining?.postsPerWeek ?? Math.max(0, limits.postsPerWeek - usage.postsPerWeek),
     },
     {
-      label: "Generation credits used this month",
+      label: "Monthly generation",
       used: usage.postsPerMonth,
       limit: limits.postsPerMonth,
       remaining: remaining?.postsPerMonth ?? Math.max(0, limits.postsPerMonth - usage.postsPerMonth),
     },
     {
-      label: "Manual regenerations this week",
+      label: "Weekly refinements",
       used: usage.manualRegenerationsPerWeek,
       limit: limits.manualRegenerationsPerWeek,
       remaining:
@@ -53,13 +53,13 @@ export function UsageSummary({
         Math.max(0, limits.manualRegenerationsPerWeek - usage.manualRegenerationsPerWeek),
     },
     {
-      label: "Render credits used this month",
+      label: "Monthly video renders",
       used: usage.rendersPerMonth,
       limit: limits.rendersPerMonth,
       remaining: remaining?.rendersPerMonth ?? Math.max(0, limits.rendersPerMonth - usage.rendersPerMonth),
     },
     {
-      label: "Published posts this month",
+      label: "Monthly published posts",
       used: usage.publishesPerMonth,
       limit: limits.publishesPerMonth,
       remaining: remaining?.publishesPerMonth ?? Math.max(0, limits.publishesPerMonth - usage.publishesPerMonth),
@@ -69,44 +69,50 @@ export function UsageSummary({
   const hasProductAccess = rows.some((row) => row.limit > 0);
 
   return (
-    <section className="cl-card p-5 md:p-6">
-      <div className="flex flex-wrap items-start justify-between gap-3">
+    <section className="cl-card p-6">
+      <div className="flex flex-wrap items-start justify-between gap-4 border-b pb-4 cl-divider">
         <div>
-          <h2 className="text-lg font-semibold tracking-tight">{title}</h2>
-          {subtitle ? <p className="mt-1 text-sm text-slate-600">{subtitle}</p> : null}
+          <h2 className="text-lg font-semibold tracking-tight text-slate-950">{title}</h2>
+          {subtitle ? <p className="mt-1 text-sm text-slate-600 leading-relaxed">{subtitle}</p> : null}
         </div>
-        <div className="flex flex-wrap gap-2 text-xs">
+        <div className="flex flex-wrap gap-2 text-[10px] font-bold uppercase tracking-wider">
           {typeof limits.activeProjects === "number" ? (
-            <span className="cl-badge">Active projects: {limits.activeProjects}</span>
+            <span className="cl-badge bg-slate-100 text-slate-600">Active projects: {limits.activeProjects}</span>
           ) : null}
           {typeof limits.connectedChannels === "number" ? (
-            <span className="cl-badge">Channels: {limits.connectedChannels}</span>
+            <span className="cl-badge bg-slate-100 text-slate-600">Max channels: {limits.connectedChannels}</span>
           ) : null}
         </div>
       </div>
 
       {!hasProductAccess ? (
-        <p className="mt-3 text-sm text-slate-600">
-          Product access is currently blocked. Upgrade to Pro or request access to continue.
-        </p>
+        <div className="mt-6 rounded-xl border border-rose-100 bg-rose-50 p-4 text-sm text-rose-800 leading-relaxed">
+          Your workspace access is currently restricted. Upgrade to Pro or request beta approval to start creating.
+        </div>
       ) : null}
 
-      <ul className="mt-4 space-y-2.5 text-sm">
+      <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {rows.map((row) => (
-          <li key={row.label} className="rounded-xl border px-3 py-2.5 cl-divider" style={{ background: "var(--cl-soft)" }}>
+          <li key={row.label} className="rounded-2xl border p-4 cl-divider bg-slate-50/50">
             <div className="flex items-center justify-between gap-3">
-              <span>{row.label}</span>
-              <span className={row.limit > 0 && row.used >= row.limit ? "font-semibold text-red-600" : "text-slate-700"}>
+              <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">{row.label}</span>
+              <span className={`text-sm font-bold ${row.limit > 0 && row.used >= row.limit ? "text-rose-600" : "text-slate-950"}`}>
                 {row.used} / {row.limit}
               </span>
             </div>
-            <p className="mt-1 text-xs text-slate-500">{row.remaining} remaining in the current window</p>
-            {row.limit > 0 && row.used >= row.limit ? (
-              <p className="mt-1 text-xs font-medium text-red-600">Limit reached for this window.</p>
-            ) : null}
+            <div className="mt-3 h-1.5 w-full rounded-full bg-slate-200 overflow-hidden">
+               <div 
+                 className={`h-full transition-all ${row.limit > 0 && row.used >= row.limit ? "bg-rose-500" : "bg-slate-900"}`}
+                 style={{ width: `${Math.min(100, (row.used / (row.limit || 1)) * 100)}%` }}
+               />
+            </div>
+            <p className="mt-3 text-[10px] text-slate-500 font-medium uppercase tracking-tight">
+               {row.remaining} credits available
+            </p>
           </li>
         ))}
       </ul>
     </section>
   );
+}
 }

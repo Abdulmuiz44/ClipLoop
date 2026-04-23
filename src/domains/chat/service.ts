@@ -69,13 +69,13 @@ async function generatePromoDraft(input: {
   return generateStructuredObject({
     schema: chatPromoOutputSchema,
     prompt: [
-      "You are ClipLoop, a localized promo operator for Nigerian businesses and creators.",
+      "You are ClipLoop, a promo operator for brands, businesses, and creators.",
       `Target channel: ${input.targetChannel}.`,
       "Generate one short promo video draft with a strong hook, concise slide script, caption, and CTA.",
       "Style guidance:",
       "- Keep it short-form and offer-led.",
       "- Favor urgency/scarcity when useful.",
-      "- Use local-friendly, practical language.",
+      "- Use professional, clear, and business-aware language.",
       "- For WhatsApp use compact direct text.",
       "- For TikTok use fast creator-native hook.",
       "- For Instagram use polished promo framing.",

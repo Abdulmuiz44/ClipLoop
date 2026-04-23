@@ -64,97 +64,82 @@ export default async function ProjectPage({ params }: { params: Promise<{ projec
 
   return (
     <div className="space-y-6">
-      <section className="rounded border bg-white p-5">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <p className="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">Project</p>
-            <h1 className="mt-1 text-3xl font-bold">{project.productName}</h1>
-            <p className="mt-2 max-w-3xl text-sm text-slate-600">{project.oneLiner ?? project.description}</p>
+      <section className="cl-card p-6 md:p-8">
+        <div className="flex flex-wrap items-start justify-between gap-6">
+          <div className="min-w-0 flex-1">
+            <p className="cl-kicker uppercase tracking-widest text-slate-500">Project Profile</p>
+            <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">{project.productName}</h1>
+            <p className="mt-3 max-w-3xl text-base leading-7 text-slate-600">{project.oneLiner ?? project.description}</p>
           </div>
-          <div className="flex flex-wrap gap-2 text-xs">
-            <span className="rounded-full bg-slate-100 px-3 py-1">Goal: {project.goalType}</span>
-            {project.projectType ? <span className="rounded-full bg-slate-100 px-3 py-1">Type: {project.projectType}</span> : null}
-            {project.languageStyle ? <span className="rounded-full bg-slate-100 px-3 py-1">Language: {project.languageStyle}</span> : null}
-            <span className="rounded-full bg-slate-100 px-3 py-1">Readiness: {readiness.score}</span>
-            {latestCycle ? <span className="rounded-full bg-slate-100 px-3 py-1">Current cycle: {latestCycle.weekStart.toISOString().slice(0, 10)}</span> : null}
+          <div className="flex flex-wrap gap-2 text-[11px] font-semibold uppercase tracking-wider">
+            <span className="cl-badge bg-slate-100 text-slate-600">Goal: {project.goalType}</span>
+            {project.projectType ? <span className="cl-badge bg-slate-100 text-slate-600">Type: {project.projectType}</span> : null}
+            <span className="cl-badge bg-blue-50 text-blue-700">Readiness: {readiness.score}</span>
+            {latestCycle ? <span className="cl-badge bg-slate-100 text-slate-600">Week: {latestCycle.weekStart.toISOString().slice(0, 10)}</span> : null}
           </div>
         </div>
       </section>
 
-      <section className="rounded border bg-white p-4">
-        <h2 className="font-semibold">Business profile</h2>
-        <div className="mt-3 grid gap-3 text-sm md:grid-cols-2">
-          <p>
-            <strong>Name:</strong> {project.businessName ?? project.productName}
-          </p>
-          <p>
-            <strong>Category:</strong> {project.businessCategory ?? project.niche}
-          </p>
-          <p>
-            <strong>Location:</strong> {[project.city, project.state].filter(Boolean).join(", ") || "Not set"}
-          </p>
-          <p>
-            <strong>Target audience:</strong> {project.targetAudience ?? project.audience}
-          </p>
-          <p>
-            <strong>Primary offer:</strong> {project.primaryOffer ?? project.offer}
-          </p>
-          <p>
-            <strong>Price range:</strong> {project.priceRange ?? "Not set"}
-          </p>
-          <p>
-            <strong>Tone:</strong> {project.tone ?? "Not set"}
-          </p>
-          <p>
-            <strong>Call to action:</strong> {project.callToAction ?? "Use default CTA URL"}
-          </p>
-          <p>
-            <strong>Preferred channels:</strong> {preferredChannels.join(", ")}
-          </p>
-          <p>
-            <strong>Instagram:</strong> {project.instagramHandle ?? "Not set"}
-          </p>
-          <p>
-            <strong>WhatsApp:</strong> {project.whatsappNumber ?? "Not set"}
-          </p>
-          <p>
-            <strong>Website:</strong> {project.websiteUrl ?? "Not set"}
-          </p>
+      <section className="cl-card p-6">
+        <div className="flex items-center justify-between border-b pb-4 cl-divider">
+          <h2 className="text-lg font-semibold text-slate-950">Business context</h2>
+          <span className="text-xs text-slate-500 italic">Saved profile for content generation</span>
         </div>
-        {project.businessDescription ? <p className="mt-3 text-sm text-slate-700">{project.businessDescription}</p> : null}
+        <div className="mt-5 grid gap-4 text-sm md:grid-cols-2 lg:grid-cols-3">
+          <DetailItem label="Brand Name" value={project.businessName ?? project.productName} />
+          <DetailItem label="Category" value={project.businessCategory ?? project.niche} />
+          <DetailItem label="Location" value={[project.city, project.state].filter(Boolean).join(", ")} />
+          <DetailItem label="Target Audience" value={project.targetAudience ?? project.audience} />
+          <DetailItem label="Primary Offer" value={project.primaryOffer ?? project.offer} />
+          <DetailItem label="Price Range" value={project.priceRange} />
+          <DetailItem label="Voice Tone" value={project.tone} />
+          <DetailItem label="Call to Action" value={project.callToAction} />
+          <DetailItem label="Website" value={project.websiteUrl} />
+        </div>
+        {project.businessDescription ? (
+          <div className="mt-6 border-t pt-4 cl-divider">
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-500">Description</p>
+            <p className="mt-2 text-sm leading-6 text-slate-700">{project.businessDescription}</p>
+          </div>
+        ) : null}
       </section>
 
-      <section className="grid gap-4 md:grid-cols-[0.9fr_1.1fr]">
-        <div className="rounded border bg-white p-4">
-          <h2 className="font-semibold">Workflow status</h2>
-          <p className="mt-1 text-sm text-slate-600">This should make it obvious what is ready and what still blocks the weekly loop.</p>
-          <div className="mt-4 grid gap-3 md:grid-cols-2">
-            <ReadinessItem label="Onboarding complete" value={readiness.onboardingComplete} />
-            <ReadinessItem label="Strategy generated" value={readiness.strategyGenerated} />
-            <ReadinessItem label="Content rendered" value={readiness.rendered} />
-            <ReadinessItem label="Publish flow configured" value={readiness.publishFlowConfigured} />
-            <ReadinessItem label="Tracking active" value={readiness.trackingActive} />
-            <ReadinessItem label="Weekly pack exists" value={readiness.postsGenerated} />
+      <section className="grid gap-6 lg:grid-cols-[1fr_1.2fr]">
+        <div className="cl-card p-6">
+          <h2 className="text-lg font-semibold text-slate-950">Workflow readiness</h2>
+          <p className="mt-1 text-sm text-slate-600">Track the progress of your weekly content loop.</p>
+          <div className="mt-5 grid gap-3 sm:grid-cols-2">
+            <ReadinessItem label="Onboarding" value={readiness.onboardingComplete} />
+            <ReadinessItem label="Strategy" value={readiness.strategyGenerated} />
+            <ReadinessItem label="Render" value={readiness.rendered} />
+            <ReadinessItem label="Publishing" value={readiness.publishFlowConfigured} />
+            <ReadinessItem label="Tracking" value={readiness.trackingActive} />
+            <ReadinessItem label="Weekly Pack" value={readiness.postsGenerated} />
           </div>
         </div>
         <ProjectSettingsForm project={project} />
       </section>
 
-      <section className="rounded border bg-white p-4">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h2 className="font-semibold">Publishing channel</h2>
-            <p className="mt-1 text-sm text-slate-600">Instagram is the first real publishing channel. Mock publishing is used only in local/dev fallback mode.</p>
-            <p className="mt-2 text-sm">
-              <strong>Status:</strong> {channelStatus.status}
-            </p>
-            <p className="mt-1 text-sm">
-              <strong>Platform:</strong> instagram
-            </p>
-            <p className="mt-1 text-sm">
-              <strong>Account:</strong> {channelStatus.channel?.accountName ?? "Not connected"}
-            </p>
-            <p className="mt-1 text-sm text-slate-600">{channelStatus.reason}</p>
+      <section className="cl-card p-6">
+        <div className="flex flex-wrap items-start justify-between gap-6">
+          <div className="max-w-2xl">
+            <h2 className="text-lg font-semibold text-slate-950">Publishing channel</h2>
+            <p className="mt-1 text-sm text-slate-600">Connect your platform handles to enable direct publishing and tracking.</p>
+            <div className="mt-5 flex flex-col gap-2 text-sm">
+              <p className="flex items-center justify-between border-b pb-2 cl-divider">
+                <span className="font-medium text-slate-700">Platform</span>
+                <span className="text-slate-950 uppercase text-[11px] font-semibold tracking-wider">Instagram</span>
+              </p>
+              <p className="flex items-center justify-between border-b pb-2 cl-divider">
+                <span className="font-medium text-slate-700">Account</span>
+                <span className="text-slate-950">{channelStatus.channel?.accountName ?? "Not connected"}</span>
+              </p>
+              <p className="flex items-center justify-between border-b pb-2 cl-divider">
+                <span className="font-medium text-slate-700">Status</span>
+                <span className={`font-semibold ${channelStatus.connected ? "text-emerald-600" : "text-slate-500"}`}>{channelStatus.status.replace(/_/g, " ")}</span>
+              </p>
+            </div>
+            {channelStatus.reason ? <p className="mt-3 text-xs text-slate-500 italic">{channelStatus.reason}</p> : null}
           </div>
           <div className="flex flex-wrap gap-2">
             {!channelStatus.connected || channelStatus.status === "disconnected" ? (
@@ -171,73 +156,63 @@ export default async function ProjectPage({ params }: { params: Promise<{ projec
         usage={usage.usage}
         limits={usage.limits}
         remaining={usage.remaining}
-        subtitle="These are account-level hard caps for the free and Pro plans."
+        subtitle="Credits remaining in the current billing window."
       />
 
-      <section className="grid gap-3 md:grid-cols-4">
-        <div className="rounded border bg-white p-4 text-sm">
-          <p className="text-slate-500">Posts in latest week</p>
-          <p className="mt-2 text-2xl font-semibold">{latestPosts.length}</p>
-        </div>
-        <div className="rounded border bg-white p-4 text-sm">
-          <p className="text-slate-500">Rendered</p>
-          <p className="mt-2 text-2xl font-semibold">{publishSummary.rendered}</p>
-        </div>
-        <div className="rounded border bg-white p-4 text-sm">
-          <p className="text-slate-500">Scheduled / published</p>
-          <p className="mt-2 text-2xl font-semibold">
-            {publishSummary.scheduled} / {publishSummary.published}
-          </p>
-        </div>
-        <div className="rounded border bg-white p-4 text-sm">
-          <p className="text-slate-500">Clicks / signups / revenue</p>
-          <p className="mt-2 text-xl font-semibold">
-            {perfProject.totalClicks} / {perfProject.totalSignups} / {perfProject.totalRevenue}
-          </p>
-        </div>
+      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <MetricCard label="Current week posts" value={latestPosts.length} />
+        <MetricCard label="Ready for delivery" value={publishSummary.rendered} />
+        <MetricCard label="Published" value={publishSummary.published} />
+        <MetricCard label="Performance (C/S/R)" value={`${perfProject.totalClicks} / ${perfProject.totalSignups} / $${perfProject.totalRevenue}`} />
       </section>
 
-      <section className="rounded border bg-white p-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h2 className="font-semibold">Next action</h2>
-            <p className="mt-1 text-sm text-slate-600">Move the project into the next weekly step instead of hunting through settings.</p>
+      <section className="cl-card p-6">
+        <div className="flex flex-wrap items-start justify-between gap-6">
+          <div className="max-w-xl">
+            <h2 className="text-lg font-semibold text-slate-950">Next actions</h2>
+            <p className="mt-1 text-sm text-slate-600">Move this project forward through the weekly loop.</p>
           </div>
           <div className="flex flex-wrap gap-3">
             {latestCycle ? (
-              <Link href={`/dashboard/projects/${project.id}/week/${latestCycle.id}`} className="inline-flex rounded border bg-white px-3 py-2 text-sm">
-                Open latest week
+              <Link href={`/dashboard/projects/${project.id}/week/${latestCycle.id}`} className="inline-flex rounded-xl border px-4 py-2 text-sm font-medium transition cl-divider hover:bg-slate-50">
+                Open current week
               </Link>
             ) : null}
             {nextCycle ? (
-              <Link href={`/dashboard/projects/${project.id}/week/${nextCycle.id}`} className="inline-flex rounded border bg-white px-3 py-2 text-sm">
-                Open next generated cycle
+              <Link href={`/dashboard/projects/${project.id}/week/${nextCycle.id}`} className="inline-flex rounded-xl border px-4 py-2 text-sm font-medium transition cl-divider hover:bg-slate-50">
+                Open next cycle
               </Link>
             ) : null}
-            <Link href="/dashboard/settings" className="inline-flex rounded border bg-white px-3 py-2 text-sm">
-              Account and limits
-            </Link>
           </div>
         </div>
-        <div className="mt-4">
-          <ActionButton endpoint={`/api/projects/${project.id}/generate-strategy`} label={latestCycle ? "Refresh current weekly strategy" : "Generate weekly strategy"} />
-        </div>
-        <div className="mt-4 grid gap-3 md:grid-cols-3 text-sm">
-          <div className="rounded border border-slate-200 bg-slate-50 p-3">If there is no strategy yet, generate the week first.</div>
-          <div className="rounded border border-slate-200 bg-slate-50 p-3">If posts exist but nothing is rendered, run the render step next.</div>
-          <div className="rounded border border-slate-200 bg-slate-50 p-3">Once posts are published, roll up performance and generate the next cycle.</div>
+        <div className="mt-6 border-t pt-6 cl-divider">
+          <ActionButton endpoint={`/api/projects/${project.id}/generate-strategy`} label={latestCycle ? "Refresh weekly strategy" : "Generate weekly strategy"} />
+          <div className="mt-5 grid gap-4 text-[13px] leading-relaxed text-slate-600 sm:grid-cols-3">
+            <div className="cl-card-soft p-4">
+              <p className="font-semibold text-slate-950 mb-1">1. Strategy</p>
+              If no strategy cycle exists, generate it to create your weekly angles.
+            </div>
+            <div className="cl-card-soft p-4">
+              <p className="font-semibold text-slate-950 mb-1">2. Rendering</p>
+              Once posts are generated, render the slideshows to prepare for delivery.
+            </div>
+            <div className="cl-card-soft p-4">
+              <p className="font-semibold text-slate-950 mb-1">3. Feedback</p>
+              After publishing, roll up results to inform next week's winners.
+            </div>
+          </div>
         </div>
       </section>
 
       {assets.length > 0 ? (
-        <section className="rounded border bg-white p-4">
-          <h2 className="font-semibold">Latest rendered assets</h2>
-          <div className="mt-3 grid gap-3 md:grid-cols-3">
+        <section className="cl-card p-6">
+          <h2 className="text-lg font-semibold text-slate-950">Preview assets</h2>
+          <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {assets.map((assetSet) =>
               assetSet.thumbnail ? (
-                <a key={assetSet.thumbnail.id} href={assetSet.video?.storageUrl ?? assetSet.thumbnail.storageUrl}>
+                <a key={assetSet.thumbnail.id} href={assetSet.video?.storageUrl ?? assetSet.thumbnail.storageUrl} target="_blank" rel="noreferrer" className="group overflow-hidden rounded-2xl border transition-all cl-divider hover:border-slate-400">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={assetSet.thumbnail.storageUrl} alt="Rendered thumbnail" className="rounded border" />
+                  <img src={assetSet.thumbnail.storageUrl} alt="Rendered thumbnail" className="w-full transition-transform group-hover:scale-105" />
                 </a>
               ) : null,
             )}
@@ -246,29 +221,33 @@ export default async function ProjectPage({ params }: { params: Promise<{ projec
       ) : null}
 
       {latestWeekPerformance.length > 0 ? (
-        <section className="rounded border bg-white p-4">
-          <h2 className="font-semibold">Performance snapshot</h2>
-          <div className="mt-2 overflow-x-auto">
+        <section className="cl-card p-6">
+          <h2 className="text-lg font-semibold text-slate-950">Performance snapshot</h2>
+          <div className="mt-5 overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead>
-                <tr>
-                  <th className="pr-3 text-left">Content item</th>
-                  <th className="pr-3 text-left">Clicks</th>
-                  <th className="pr-3 text-left">Signups</th>
-                  <th className="pr-3 text-left">Revenue</th>
-                  <th className="pr-3 text-left">Score</th>
-                  <th className="pr-3 text-left">Class</th>
+                <tr className="text-[11px] font-semibold uppercase tracking-widest text-slate-500">
+                  <th className="pb-3 text-left">Post</th>
+                  <th className="pb-3 text-left">Clicks</th>
+                  <th className="pb-3 text-left">Signups</th>
+                  <th className="pb-3 text-left">Revenue</th>
+                  <th className="pb-3 text-left">Score</th>
+                  <th className="pb-3 text-left text-right">Class</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y cl-divider">
                 {latestWeekPerformance.map((metric) => (
-                  <tr key={metric.id} className="border-t">
-                    <td className="pr-3">{metric.contentItemId.slice(0, 8)}...</td>
-                    <td className="pr-3">{metric.clicks}</td>
-                    <td className="pr-3">{metric.signups}</td>
-                    <td className="pr-3">{metric.revenue}</td>
-                    <td className="pr-3">{metric.score}</td>
-                    <td className="pr-3">{metric.classification ?? "-"}</td>
+                  <tr key={metric.id}>
+                    <td className="py-3 font-medium text-slate-900">{metric.contentItemId.slice(0, 8)}</td>
+                    <td className="py-3">{metric.clicks}</td>
+                    <td className="py-3">{metric.signups}</td>
+                    <td className="py-3 font-medium text-slate-950">${metric.revenue}</td>
+                    <td className="py-3">{metric.score}</td>
+                    <td className="py-3 text-right">
+                      <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${metric.classification === "winner" ? "bg-emerald-50 text-emerald-700" : metric.classification === "loser" ? "bg-rose-50 text-rose-700" : "bg-slate-100 text-slate-600"}`}>
+                        {metric.classification ?? "-"}
+                      </span>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -277,15 +256,42 @@ export default async function ProjectPage({ params }: { params: Promise<{ projec
         </section>
       ) : null}
 
-      <section className="rounded border bg-white p-4">
-        <h2 className="font-semibold">Iteration state</h2>
-        {latestAnalysisSummary ? <p className="mt-2 text-sm">{latestAnalysisSummary}</p> : <p className="mt-2 text-sm text-slate-600">No iteration analysis yet. Publish content, roll up outcomes, then analyze the current week.</p>}
-        {nextCycle ? (
-          <Link className="mt-3 inline-flex rounded border px-3 py-2 text-sm" href={`/dashboard/projects/${project.id}/week/${nextCycle.id}`}>
-            Open next generated cycle ({nextCycle.weekStart.toISOString().slice(0, 10)})
-          </Link>
-        ) : null}
+      <section className="cl-card p-6">
+        <h2 className="text-lg font-semibold text-slate-950">Iteration state</h2>
+        <div className="mt-4 border-t pt-4 cl-divider">
+          {latestAnalysisSummary ? (
+            <p className="text-sm leading-7 text-slate-700">{latestAnalysisSummary}</p>
+          ) : (
+            <p className="text-sm text-slate-600 italic">No iteration analysis yet. Publish content and roll up performance to see insights.</p>
+          )}
+          {nextCycle ? (
+            <div className="mt-5">
+              <Link className="inline-flex rounded-xl border bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800" href={`/dashboard/projects/${project.id}/week/${nextCycle.id}`}>
+                Open next cycle ({nextCycle.weekStart.toISOString().slice(0, 10)})
+              </Link>
+            </div>
+          ) : null}
+        </div>
       </section>
     </div>
   );
+}
+
+function DetailItem({ label, value }: { label: string; value: string | null | undefined }) {
+  return (
+    <div className="space-y-1">
+      <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-500">{label}</p>
+      <p className="text-sm font-medium text-slate-950">{value || "Not set"}</p>
+    </div>
+  );
+}
+
+function MetricCard({ label, value }: { label: string; value: string | number }) {
+  return (
+    <div className="cl-card p-5">
+      <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-500">{label}</p>
+      <p className="mt-2 text-2xl font-bold tracking-tight text-slate-950">{value}</p>
+    </div>
+  );
+}
 }

@@ -80,19 +80,19 @@ export function ProjectForm() {
   }
 
   return (
-    <form action={onSubmit} className="cl-card space-y-7 p-5 md:p-6">
-      <section className="space-y-3">
-        <div>
-          <h2 className="text-base font-semibold tracking-tight">Basics</h2>
-          <p className="text-sm text-slate-600">Create a simple business profile first. Keep this practical.</p>
+    <form action={onSubmit} className="cl-card space-y-8 p-6 md:p-8">
+      <section className="space-y-4">
+        <div className="border-b pb-4 cl-divider">
+          <h2 className="text-lg font-semibold tracking-tight text-slate-950">Brand Profile</h2>
+          <p className="text-sm text-slate-600 leading-relaxed">Establish your brand identity. This context is used for every content generation.</p>
         </div>
-        <div className="grid gap-3 md:grid-cols-2">
-          <label className="space-y-1 text-sm">
-            <span className="font-medium">Workspace name</span>
+        <div className="grid gap-4 md:grid-cols-2">
+          <label className="space-y-1">
+            <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Workspace name</span>
             <input name="name" placeholder="Main profile" className="cl-input" required />
           </label>
-          <label className="space-y-1 text-sm">
-            <span className="font-medium">Project type</span>
+          <label className="space-y-1">
+            <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Project type</span>
             <select name="projectType" className="cl-select" defaultValue="business" required>
               <option value="business">Business</option>
               <option value="creator">Creator</option>
@@ -100,121 +100,123 @@ export function ProjectForm() {
             </select>
           </label>
         </div>
-        <div className="grid gap-3 md:grid-cols-2">
-          <label className="space-y-1 text-sm">
-            <span className="font-medium">Business/brand name</span>
-            <input name="businessName" placeholder="Ada Beauty Hub" className="cl-input" required />
+        <div className="grid gap-4 md:grid-cols-2">
+          <label className="space-y-1">
+            <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Brand/Product name</span>
+            <input name="businessName" placeholder="Acme Analytics" className="cl-input" required />
           </label>
-          <label className="space-y-1 text-sm">
-            <span className="font-medium">Category</span>
-            <input name="businessCategory" placeholder="Beauty products" className="cl-input" required />
-          </label>
-        </div>
-        <div className="grid gap-3 md:grid-cols-2">
-          <label className="space-y-1 text-sm">
-            <span className="font-medium">City</span>
-            <input name="city" placeholder="Lagos" className="cl-input" />
-          </label>
-          <label className="space-y-1 text-sm">
-            <span className="font-medium">State</span>
-            <input name="state" placeholder="Lagos State" className="cl-input" />
+          <label className="space-y-1">
+            <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Category</span>
+            <input name="businessCategory" placeholder="SaaS for marketers" className="cl-input" required />
           </label>
         </div>
-        <label className="space-y-1 text-sm">
-          <span className="font-medium">Business description</span>
+        <div className="grid gap-4 md:grid-cols-2">
+          <label className="space-y-1">
+            <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">City</span>
+            <input name="city" placeholder="San Francisco" className="cl-input" />
+          </label>
+          <label className="space-y-1">
+            <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">State / Region</span>
+            <input name="state" placeholder="CA" className="cl-input" />
+          </label>
+        </div>
+        <label className="space-y-1 block">
+          <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Business description</span>
           <textarea
             name="businessDescription"
-            placeholder="What you sell, who you help, and why customers choose you."
-            className="cl-textarea"
+            placeholder="Describe what you sell, who you help, and why your offer is unique."
+            className="cl-textarea min-h-24"
             required
           />
         </label>
       </section>
 
-      <section className="space-y-3">
-        <div>
-          <h3 className="text-base font-semibold tracking-tight">Audience</h3>
+      <section className="space-y-4">
+        <div className="border-b pb-4 cl-divider">
+          <h3 className="text-lg font-semibold tracking-tight text-slate-950">Target Audience</h3>
+          <p className="text-sm text-slate-600 leading-relaxed">Define who you are reaching to improve hook relevance.</p>
         </div>
-        <label className="space-y-1 text-sm">
-          <span className="font-medium">Target audience</span>
-          <input name="targetAudience" placeholder="Busy women in Lagos who want affordable beauty products" className="cl-input" required />
+        <label className="space-y-1 block">
+          <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Primary audience</span>
+          <input name="targetAudience" placeholder="Founders and marketers looking for distribution" className="cl-input" required />
         </label>
       </section>
 
-      <section className="space-y-3">
-        <div>
-          <h3 className="text-base font-semibold tracking-tight">Offer</h3>
+      <section className="space-y-4">
+        <div className="border-b pb-4 cl-divider">
+          <h3 className="text-lg font-semibold tracking-tight text-slate-950">Core Offer</h3>
+          <p className="text-sm text-slate-600 leading-relaxed">What should the promos push? Specific offers convert better than broad brand awareness.</p>
         </div>
-        <label className="space-y-1 text-sm">
-          <span className="font-medium">Primary offer</span>
-          <input name="primaryOffer" placeholder="Weekend bundle: 3 products for ₦15,000" className="cl-input" required />
+        <label className="space-y-1 block">
+          <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Primary offer</span>
+          <input name="primaryOffer" placeholder="Starter package: 5 projects for $19/month" className="cl-input" required />
         </label>
-        <div className="grid gap-3 md:grid-cols-2">
-          <label className="space-y-1 text-sm">
-            <span className="font-medium">Price range</span>
-            <input name="priceRange" placeholder="₦5,000 - ₦20,000" className="cl-input" />
+        <div className="grid gap-4 md:grid-cols-2">
+          <label className="space-y-1">
+            <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Price range</span>
+            <input name="priceRange" placeholder="$19 - $99" className="cl-input" />
           </label>
-          <label className="space-y-1 text-sm">
-            <span className="font-medium">Call to action</span>
-            <input name="callToAction" placeholder="Send us a WhatsApp message now" className="cl-input" />
+          <label className="space-y-1">
+            <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Preferred CTA</span>
+            <input name="callToAction" placeholder="Get started now" className="cl-input" />
           </label>
         </div>
       </section>
 
-      <section className="space-y-3">
-        <div>
-          <h3 className="text-base font-semibold tracking-tight">Channels</h3>
+      <section className="space-y-4">
+        <div className="border-b pb-4 cl-divider">
+          <h3 className="text-lg font-semibold tracking-tight text-slate-950">Channels & Destinations</h3>
         </div>
-        <fieldset className="space-y-2 text-sm">
-          <legend className="font-medium">Preferred channels</legend>
+        <fieldset className="space-y-2">
+          <legend className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Preferred channels</legend>
           <div className="grid gap-2 sm:grid-cols-3">
-            <label className="flex items-center gap-2 rounded-xl border bg-white p-2.5 cl-divider">
+            <label className="flex items-center gap-2 rounded-xl border bg-white p-3 cl-divider transition hover:bg-slate-50 cursor-pointer">
               <input type="checkbox" name="preferredChannels" value="instagram" defaultChecked />
-              Instagram
+              <span className="text-sm font-medium">Instagram</span>
             </label>
-            <label className="flex items-center gap-2 rounded-xl border bg-white p-2.5 cl-divider">
+            <label className="flex items-center gap-2 rounded-xl border bg-white p-3 cl-divider transition hover:bg-slate-50 cursor-pointer">
               <input type="checkbox" name="preferredChannels" value="tiktok" />
-              TikTok
+              <span className="text-sm font-medium">TikTok</span>
             </label>
-            <label className="flex items-center gap-2 rounded-xl border bg-white p-2.5 cl-divider">
+            <label className="flex items-center gap-2 rounded-xl border bg-white p-3 cl-divider transition hover:bg-slate-50 cursor-pointer">
               <input type="checkbox" name="preferredChannels" value="whatsapp" />
-              WhatsApp
+              <span className="text-sm font-medium">WhatsApp</span>
             </label>
           </div>
         </fieldset>
-        <div className="grid gap-3 md:grid-cols-2">
-          <label className="space-y-1 text-sm">
-            <span className="font-medium">Instagram handle</span>
-            <input name="instagramHandle" placeholder="@adabeautyhub" className="cl-input" />
+        <div className="grid gap-4 md:grid-cols-2">
+          <label className="space-y-1">
+            <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Instagram handle</span>
+            <input name="instagramHandle" placeholder="@brand" className="cl-input" />
           </label>
-          <label className="space-y-1 text-sm">
-            <span className="font-medium">WhatsApp number</span>
-            <input name="whatsappNumber" placeholder="+2348012345678" className="cl-input" />
+          <label className="space-y-1">
+            <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">WhatsApp number</span>
+            <input name="whatsappNumber" placeholder="+1..." className="cl-input" />
           </label>
         </div>
-        <div className="grid gap-3 md:grid-cols-2">
-          <label className="space-y-1 text-sm">
-            <span className="font-medium">Website URL</span>
-            <input name="websiteUrl" placeholder="https://yourbusiness.com" className="cl-input" />
+        <div className="grid gap-4 md:grid-cols-2">
+          <label className="space-y-1">
+            <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Website URL</span>
+            <input name="websiteUrl" placeholder="https://..." className="cl-input" />
           </label>
-          <label className="space-y-1 text-sm">
-            <span className="font-medium">Primary destination URL</span>
-            <input name="ctaUrl" placeholder="https://wa.me/2348012345678" className="cl-input" required />
+          <label className="space-y-1">
+            <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Conversion destination URL</span>
+            <input name="ctaUrl" placeholder="https://..." className="cl-input" required />
           </label>
         </div>
       </section>
 
-      <section className="space-y-3">
-        <div>
-          <h3 className="text-base font-semibold tracking-tight">Style</h3>
+      <section className="space-y-4">
+        <div className="border-b pb-4 cl-divider">
+          <h3 className="text-lg font-semibold tracking-tight text-slate-950">Voice & Style</h3>
         </div>
-        <div className="grid gap-3 md:grid-cols-2">
-          <label className="space-y-1 text-sm">
-            <span className="font-medium">Tone</span>
-            <input name="tone" placeholder="Friendly, confident, and urgent" className="cl-input" />
+        <div className="grid gap-4 md:grid-cols-2">
+          <label className="space-y-1">
+            <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Brand tone</span>
+            <input name="tone" placeholder="Calm, premium, and direct" className="cl-input" />
           </label>
-          <label className="space-y-1 text-sm">
-            <span className="font-medium">Language style</span>
+          <label className="space-y-1">
+            <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Language style</span>
             <select name="languageStyle" className="cl-select" defaultValue="english">
               <option value="english">English</option>
               <option value="pidgin">Pidgin</option>
@@ -224,10 +226,12 @@ export function ProjectForm() {
         </div>
       </section>
 
-      {error ? <p className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2.5 text-sm text-rose-700">{error}</p> : null}
-      <Button type="submit" disabled={loading}>
-        {loading ? "Creating project..." : "Create project"}
-      </Button>
+      <div className="pt-6 border-t cl-divider">
+        {error ? <p className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700">{error}</p> : null}
+        <Button type="submit" className="w-full md:w-auto md:px-12" disabled={loading}>
+          {loading ? "Creating workspace..." : "Create project workspace"}
+        </Button>
+      </div>
     </form>
   );
 }

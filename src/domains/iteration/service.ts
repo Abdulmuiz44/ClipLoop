@@ -278,7 +278,7 @@ export async function generateNextContentPackFromIteration(
         slides: [
           `Pain point for ${project.targetAudience ?? project.audience}`,
           `Mutation insight: ${analysis.angle_mutations[idx % Math.max(analysis.angle_mutations.length, 1)]?.new_angle ?? "new angle"}`,
-          `Proof: local buyer response and offer pull`,
+          `Proof: positive customer response and offer pull`,
           `CTA: ${project.callToAction ?? project.ctaUrl}`,
         ],
         caption: `Next-cycle variant informed by winners for ${project.businessName ?? project.productName}.`,
@@ -295,8 +295,8 @@ export async function generateNextContentPackFromIteration(
           offer: project.primaryOffer ?? project.offer,
           cta: project.callToAction ?? "Try this offer now",
         }),
-        hashtags: ["#nigeriabusiness", "#shortform", "#iteration"],
-        why_it_should_work: "Derived from winner patterns with clearer local offer and CTA.",
+        hashtags: ["#business", "#shortform", "#iteration"],
+        why_it_should_work: "Derived from winner patterns with clearer offer and CTA.",
       })),
     }),
   });

@@ -9,16 +9,16 @@ export const metadata: Metadata = {
 const weeklyPack = [
   {
     title: "Post 1",
-    hook: "Still marketing your app from a blank page every Monday?",
-    slides: ["Call out the pain", "Frame the shift", "Show the weekly loop", "Push the CTA"],
-    caption: "ClipLoop turns one product into one sharp weekly short-form pack.",
+    hook: "Still creating promo content from a blank page every week?",
+    slides: ["Call out the pain", "Frame the solution", "Show the offer", "Direct CTA"],
+    caption: "ClipLoop turns your brand context into a sharp weekly short-form pack.",
     metrics: "42 clicks · 7 signups · $49 revenue",
   },
   {
     title: "Post 2",
-    hook: "Most indie SaaS content dies because the loop is inconsistent.",
-    slides: ["Why consistency breaks", "What gets generated", "Where tracked links fit", "What to test next week"],
-    caption: "Generate, render, approve, schedule, track, learn, repeat.",
+    hook: "Most growth experiments fail because the content loop is inconsistent.",
+    slides: ["Why consistency breaks", "What gets generated", "Where tracking fits", "What to test next"],
+    caption: "Generate, package, post, track, learn, repeat.",
     metrics: "31 clicks · 4 signups · winner",
   },
 ];
@@ -31,10 +31,10 @@ export default function HomePage() {
           <div className="space-y-3">
             <p className="text-sm font-medium uppercase tracking-[0.24em] text-slate-500">Invite-only beta</p>
             <h1 className="max-w-3xl text-4xl font-bold tracking-tight text-slate-950 md:text-6xl">
-              Short-form growth automation for indie apps.
+              Building a simpler way to create short form promo content faster.
             </h1>
             <p className="max-w-2xl text-base leading-7 text-slate-600 md:text-lg">
-              ClipLoop gives you one weekly growth loop: add your app, generate the week, render and approve the posts, schedule the pack, track what converts, then build the next week from the winners.
+              ClipLoop gives you one weekly growth loop: set up your brand, generate the week, render and approve the posts, schedule the pack, track what converts, then iterate.
             </p>
           </div>
 
@@ -49,16 +49,16 @@ export default function HomePage() {
 
           <div className="grid gap-3 md:grid-cols-3">
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm">
-              <p className="font-medium text-slate-950">Cheap and narrow</p>
-              <p className="mt-2 leading-6 text-slate-600">Free chat + paid credits, one clear weekly promo loop.</p>
+              <p className="font-medium text-slate-950">Intentionally narrow</p>
+              <p className="mt-2 leading-6 text-slate-600">Free strategy chat + paid credits for one clear weekly promo loop.</p>
             </div>
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm">
-              <p className="font-medium text-slate-950">Grounded in the real product</p>
-              <p className="mt-2 leading-6 text-slate-600">Generated posts, rendering, scheduling, tracked links, and manual winner-based iteration already exist.</p>
+              <p className="font-medium text-slate-950">Grounded workflow</p>
+              <p className="mt-2 leading-6 text-slate-600">Generated posts, rendering, scheduling, and conversion tracking that actually works.</p>
             </div>
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm">
-              <p className="font-medium text-slate-950">Invite-only for now</p>
-              <p className="mt-2 leading-6 text-slate-600">Beta access is reviewed manually while billing and product fit harden.</p>
+              <p className="font-medium text-slate-950">Invite-only</p>
+              <p className="mt-2 leading-6 text-slate-600">Beta access is reviewed manually to ensure high quality for every onboarded brand.</p>
             </div>
           </div>
         </div>
@@ -94,11 +94,11 @@ export default function HomePage() {
 
       <section className="grid gap-4 md:grid-cols-5">
         {[
-          ["1. Add your app", "Store product context, offer, CTA, and voice notes once."],
-          ["2. Generate the week", "Create one strategy cycle and a batch of 5 short-form post drafts."],
-          ["3. Render and approve", "Turn drafts into simple vertical slideshow videos, then keep the ones you want."],
-          ["4. Schedule and publish", "Use the current mock publish flow and tracked links to ship the pack."],
-          ["5. Learn and repeat", "Roll up clicks, signups, and revenue, then generate the next cycle from winners."],
+          ["1. Connect your brand", "Store brand context, audience, and core offers once."],
+          ["2. Generate strategy", "Create a weekly strategy cycle and a batch of 5 short-form post drafts."],
+          ["3. Render preview", "Turn drafts into simple vertical slideshow videos, then approve your pack."],
+          ["4. Post content", "Use direct publishing or manual export to ship your pack with tracked links."],
+          ["5. Track & Iterate", "Roll up clicks and conversions, then generate the next cycle from what worked."],
         ].map(([title, body]) => (
           <div key={title} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <h2 className="text-base font-semibold text-slate-950">{title}</h2>
@@ -111,21 +111,21 @@ export default function HomePage() {
         <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm">
           <p className="text-sm font-medium uppercase tracking-[0.22em] text-slate-500">What you get each week</p>
           <ul className="mt-5 space-y-3 text-sm leading-6 text-slate-700">
-            <li>5 short-form promo posts built from your product context</li>
+            <li>5 short-form promo posts built from your brand context</li>
             <li>Hooks, slides, captions, CTAs, and tracked destination links</li>
-            <li>Rendered MP4 previews and approval before scheduling</li>
-            <li>Simple click, signup, and revenue feedback once posts are in market</li>
-            <li>Manual next-cycle generation informed by winners and losers</li>
+            <li>Rendered previews and batch approval before delivery</li>
+            <li>Direct conversion tracking for clicks and revenue</li>
+            <li>Next-cycle generation informed by performance results</li>
           </ul>
         </div>
 
         <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm">
           <p className="text-sm font-medium uppercase tracking-[0.22em] text-slate-500">Why ClipLoop</p>
           <ul className="mt-5 space-y-3 text-sm leading-6 text-slate-700">
-            <li>It is opinionated on purpose. One project, one weekly pack, one simple loop.</li>
-            <li>It is cheap by design. Pro is positioned around a $5 monthly workflow, not a giant platform tax.</li>
-            <li>It focuses on outcomes. Generate, ship, track, learn, repeat.</li>
-            <li>It is not pretending to be a bloated social media suite or creative studio.</li>
+            <li>It is outcome-driven. One workspace, one weekly pack, one simple loop.</li>
+            <li>It is affordable by design. Pro is built for active brands, not enterprise budgets.</li>
+            <li>It focuses on consistency. Generate, package, post, learn, repeat.</li>
+            <li>It is a focused operator, not a bloated social media suite.</li>
           </ul>
         </div>
       </section>
@@ -134,17 +134,17 @@ export default function HomePage() {
         <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
           <div className="max-w-3xl">
             <p className="text-sm font-medium uppercase tracking-[0.22em] text-slate-500">Built for</p>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950">Indie builders who need a repeatable weekly loop</h2>
+            <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950">Brands, businesses, and creators</h2>
             <p className="mt-4 text-base leading-7 text-slate-600">
-              ClipLoop is for indie hackers, SaaS founders, solo builders, and app creators who want distribution without manually planning, writing, rendering, and testing content every week.
+              ClipLoop is for growing brands and creators who want distribution without manually planning, writing, rendering, and testing content every week.
             </p>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-700">
             <p className="font-medium text-slate-950">Not a fit</p>
             <ul className="mt-3 space-y-2 leading-6">
-              <li>Agencies managing many brands</li>
-              <li>Large social teams with collaboration needs</li>
-              <li>Anyone expecting unlimited AI generation or custom creative tooling</li>
+              <li>Agencies managing dozens of brands</li>
+              <li>Enterprise teams with heavy approval layers</li>
+              <li>Anyone expecting generic AI hype over practical workflow</li>
             </ul>
           </div>
         </div>
@@ -153,9 +153,9 @@ export default function HomePage() {
       <section className="grid gap-6 rounded-3xl border border-slate-200 bg-slate-950 p-8 text-white shadow-sm md:grid-cols-[0.8fr_1.2fr]">
         <div>
           <p className="text-sm font-medium uppercase tracking-[0.22em] text-slate-400">Pro pricing</p>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight">$5/month, intentionally capped</h2>
+          <h2 className="mt-3 text-3xl font-bold tracking-tight">$5/month</h2>
           <p className="mt-4 text-sm leading-7 text-slate-300">
-            Free chat is live for everyone. Pro unlocks higher generation and render credits for real production throughput.
+            Free strategy chat is open to everyone. Pro unlocks high-volume generation and video renders for your brands.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
             <Link href="/pricing" className="inline-flex rounded-xl bg-white px-4 py-2.5 text-sm text-slate-950 hover:bg-slate-200">
@@ -171,19 +171,19 @@ export default function HomePage() {
           <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
             <p className="text-sm font-medium">What happens after approval</p>
             <ul className="mt-3 space-y-2 text-sm leading-6 text-slate-300">
-              <li>Set up one product</li>
-              <li>Generate the first weekly strategy</li>
-              <li>Create and review the 5-post pack</li>
-              <li>Render, approve, schedule, publish, track</li>
+              <li>Set up your brand profile</li>
+              <li>Generate your first weekly strategy</li>
+              <li>Review the 5-post content pack</li>
+              <li>Render, approve, and track conversions</li>
             </ul>
           </div>
           <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
             <p className="text-sm font-medium">What improves over time</p>
             <ul className="mt-3 space-y-2 text-sm leading-6 text-slate-300">
               <li>Winners and losers get classified</li>
-              <li>Hooks and angles get mutated</li>
-              <li>Next week is generated from results</li>
-              <li>The loop stays simple and inspectable</li>
+              <li>Hooks and angles get refined</li>
+              <li>Next week is generated from real results</li>
+              <li>Your content loop gets faster and sharper</li>
             </ul>
           </div>
         </div>
