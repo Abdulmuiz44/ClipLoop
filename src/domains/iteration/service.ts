@@ -189,6 +189,11 @@ export async function getNextStrategyCycle(projectId: string, sourceStrategyCycl
   });
   if (!source) return null;
 
+  // Validate source has required date field before proceeding
+  if (!source.weekStart) {
+    throw new Error("Source strategy cycle has invalid weekStart date. Cannot compute next cycle.");
+  }
+
   const nextWeekStart = addDays(source.weekStart, 7);
 
   return db.query.strategyCycles.findFirst({
@@ -203,6 +208,10 @@ export async function getNextStrategyCycle(projectId: string, sourceStrategyCycl
 export async function generateNextStrategyCycleFromResults(strategyCycleId: string) {
   const sourceCycle = await db.query.strategyCycles.findFirst({ where: eq(schema.strategyCycles.id, strategyCycleId) });
   if (!sourceCycle) throw new Error("Source strategy cycle not found");
+
+  if (!sourceCycle.weekStart) {
+    throw new Error("Source strategy cycle has invalid weekStart date. Cannot generate next cycle.");
+  }
 
   const project = await db.query.projects.findFirst({ where: eq(schema.projects.id, sourceCycle.projectId) });
   if (!project) throw new Error("Project not found");
