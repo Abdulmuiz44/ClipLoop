@@ -75,3 +75,7 @@ export async function getBusinessProfileWithPacksForUser(id: string, userId: str
   const packs = await listPromoPacksForBusiness(id, userId);
   return { profile, packs };
 }
+import { db, schema } from "@/lib/db";import { eq } from "drizzle-orm";import type { BusinessProfile, PromoPack } from "./schemas";
+export async function saveBusinessProfile(userId:string|null, profile:BusinessProfile, rawExtractedText?:string){const result:any = await db.insert((schema as any).businessProfiles).values({userId,websiteUrl:profile.websiteUrl,businessName:profile.businessName,industry:profile.industry,targetAudience:profile.targetAudience,mainOffer:profile.mainOffer,productsOrServices:profile.productsOrServices,keyBenefits:profile.keyBenefits,painPointsSolved:profile.painPointsSolved,brandTone:profile.brandTone,contentAngles:profile.contentAngles,ctaIdeas:profile.ctaIdeas,oneLineSummary:profile.oneLineSummary,longSummary:profile.longSummary,rawExtractedText:rawExtractedText??null}).returning();return Array.isArray(result) ? result[0] : result.rows?.[0];}
+export async function savePromoPack(userId:string|null,businessProfileId:string,pack:PromoPack){const result:any = await db.insert((schema as any).promoPacks).values({userId,businessProfileId,campaignTitle:pack.campaignTitle,positioningAngle:pack.positioningAngle,content:pack}).returning();return Array.isArray(result) ? result[0] : result.rows?.[0];}
+export async function getBusinessProfileById(id:string){return db.query.businessProfiles.findFirst({where:eq((schema as any).businessProfiles.id,id)} as any);}
