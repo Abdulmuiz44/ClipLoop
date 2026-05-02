@@ -256,7 +256,7 @@ export default async function StudioDashboardPage() {
                   <Image src={cliploopLogo} alt="ClipLoop plan" fill sizes="40px" className="object-cover" />
                 </span>
                 <div>
-                  <p className="text-[20px] font-semibold text-[#1a212e]">{toPlanLabel(getDisplayPlanName(planState.effectivePlan))}</p>
+                  <p className="text-[20px] font-semibold text-[#1a212e]">{toPlanLabel(getDisplayPlanName(planState.effectivePlan as any))}</p>
                   <p className="text-[13px] text-[#7b8491]">Renews on May 12, 2025</p>
                 </div>
               </div>
