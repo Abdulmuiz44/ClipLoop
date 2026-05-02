@@ -13,6 +13,8 @@ const primaryNav: NavItem[] = [
   { href: "/app/projects", label: "Projects", icon: "P" },
   { href: "/dashboard/analytics", label: "Analytics", icon: "A" },
   { href: "/dashboard/manual-queue", label: "Manual Queue", icon: "M" },
+  { href: "/dashboard/business", label: "Business Context", icon: "C" },
+  { href: "/dashboard/business/profiles", label: "Saved Businesses", icon: "V" },
   { href: "/dashboard/brand-kit", label: "Brand Kit", icon: "B" },
   { href: "/dashboard/templates", label: "Templates", icon: "T" },
   { href: "/dashboard/inspiration", label: "Inspiration", icon: "I" },
