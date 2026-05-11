@@ -2,6 +2,7 @@ import { and, desc, eq } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
 import { createProject } from "@/domains/projects/service";
 import { crawlWebsiteContext, hashContent } from "@/domains/context/ingestion";
+import { refreshProjectMemory } from "@/domains/memory/service";
 import type { OnboardingInput } from "@/lib/validation/chat";
 import { env } from "@/lib/env";
 import { OFFLINE_DEMO_USER_ID } from "@/lib/auth";
@@ -118,6 +119,8 @@ export async function completeOnboarding(userId: string, input: OnboardingInput)
   if (input.websiteUrl) {
     pagesIngested = await ingestWebsiteIntoProjectContext(project.id, input.websiteUrl);
   }
+
+  await refreshProjectMemory(project.id, "onboarding");
 
   return { projectId: project.id, pagesIngested };
 }

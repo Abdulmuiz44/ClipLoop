@@ -633,6 +633,23 @@ export const iterationExperiments = pgTable(
   }),
 );
 
+export const projectMemorySnapshots = pgTable(
+  "project_memory_snapshots",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    projectId: uuid("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    version: integer("version").notNull().default(1),
+    snapshotJson: jsonb("snapshot_json").notNull().default(sql`'{}'::jsonb`),
+    source: text("source").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => ({
+    projectIdx: index("pms_project_id_idx").on(table.projectId),
+    projectVersionIdx: index("pms_project_version_idx").on(table.projectId, table.version),
+  }),
+);
 export const businessProfiles = pgTable("business_profiles", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id").references(() => users.id, { onDelete: "set null" }),
@@ -669,6 +686,11 @@ export const projectsRelations = relations(projects, ({ one, many }) => ({
   connectedChannels: many(connectedChannels),
   contextDocuments: many(projectContextDocuments),
   conversations: many(conversations),
+  memorySnapshots: many(projectMemorySnapshots),
+}));
+
+export const projectMemorySnapshotsRelations = relations(projectMemorySnapshots, ({ one }) => ({
+  project: one(projects, { fields: [projectMemorySnapshots.projectId], references: [projects.id] }),
 }));
 
 export const subscriptionsRelations = relations(subscriptions, ({ one }) => ({

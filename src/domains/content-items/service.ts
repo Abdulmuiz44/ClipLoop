@@ -1,13 +1,14 @@
 import { and, desc, eq, inArray } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
 import { generateStructuredObject } from "@/lib/llm";
-import { postGenerationPrompt, regeneratePostPrompt } from "@/lib/prompts/templates";
+import { postGenerationPrompt, regeneratePostPrompt, type WebsiteDocSnippet } from "@/lib/prompts/templates";
 import { PROMPT_VERSIONS } from "@/lib/prompts/versions";
 import { postBatchOutputSchema, singlePostOutputSchema } from "@/lib/validation/content";
 import { buildTrackingSlug } from "@/lib/utils/slugs";
 import { incrementUsageCounter } from "@/domains/usage/service";
 import { assertCanAffordAction, chargeCredits } from "@/domains/credits/service";
 import { getBillingPolicy } from "@/domains/credits/policy";
+import { assembleProjectContext } from "@/domains/memory/assembler";
 import {
   defaultPublishStrategyForChannel,
   normalizeProjectChannels,
@@ -207,6 +208,14 @@ export async function generatePostsForStrategyCycle(strategyCycleId: string) {
   await assertCanAffordAction(project.userId, [{ bucket: generatePostsPolicy.bucket, amount: generatePostsPolicy.amount }]);
   const preferredChannels = normalizeProjectChannels(project.preferredChannelsJson, project.preferredChannels);
 
+  let websiteContext: WebsiteDocSnippet[] = [];
+  try {
+    const assembled = await assembleProjectContext({ projectId: project.id, mode: "strategy" });
+    websiteContext = assembled.websiteContext;
+  } catch {
+    // Assembler may fail; fall back to empty website context
+  }
+
   const structured = await generateStructuredObject({
     schema: postBatchOutputSchema,
     prompt: postGenerationPrompt(
@@ -243,6 +252,7 @@ export async function generatePostsForStrategyCycle(strategyCycleId: string) {
         strategy_summary: strategyCycle.strategySummary ?? "",
         angles: (strategyCycle.anglesJson as any[]) as any,
       },
+      websiteContext,
     ),
     mockFactory: () => ({
       posts: Array.from({ length: 5 }).map((_, idx) => ({
