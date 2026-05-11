@@ -1,11 +1,12 @@
 import { and, desc, eq } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
 import { generateStructuredObject } from "@/lib/llm";
-import { weeklyStrategyPrompt } from "@/lib/prompts/templates";
+import { weeklyStrategyPrompt, type WebsiteDocSnippet } from "@/lib/prompts/templates";
 import { PROMPT_VERSIONS } from "@/lib/prompts/versions";
 import { weeklyStrategyOutputSchema } from "@/lib/validation/strategy";
 import { getWeekEnd, getWeekStart } from "@/lib/utils/dates";
 import { normalizeProjectChannels } from "@/lib/utils/channels";
+import { assembleProjectContext } from "@/domains/memory/assembler";
 
 export async function getStrategyCycleById(strategyCycleId: string) {
   return db.query.strategyCycles.findFirst({ where: eq(schema.strategyCycles.id, strategyCycleId) });
@@ -28,6 +29,14 @@ export async function generateWeeklyStrategyForProject(project: typeof schema.pr
 
   if (existing) {
     return existing;
+  }
+
+  let websiteContext: WebsiteDocSnippet[] = [];
+  try {
+    const assembled = await assembleProjectContext({ projectId: project.id, mode: "strategy" });
+    websiteContext = assembled.websiteContext;
+  } catch {
+    // Assembler may fail if DB is down; fall back to empty website context
   }
 
   const structured = await generateStructuredObject({
@@ -60,7 +69,7 @@ export async function generateWeeklyStrategyForProject(project: typeof schema.pr
       goalType: project.goalType,
       voiceStyleNotes: (project.voicePrefsJson as { style_notes?: string } | null)?.style_notes,
       examplePosts: (project.examplePostsJson as string[] | null) ?? [],
-    }),
+    }, websiteContext),
     mockFactory: () => ({
       strategy_summary: `Weekly promo plan for ${project.businessName ?? project.productName}: push offer-led hooks, social-proof angles, and direct response CTAs for ${project.targetAudience ?? project.audience}.`,
       angles: Array.from({ length: 5 }).map((_, idx) => ({

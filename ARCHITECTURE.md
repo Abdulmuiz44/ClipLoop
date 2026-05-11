@@ -294,3 +294,80 @@ src/
     publishing/
     metrics/
     iterations/
+
+---
+
+## Project Memory / Context Assembly
+
+### Purpose
+
+Ground every LLM interaction in structured project truth. Instead of shallow inference from loose fields, the system maintains a durable, versioned project memory snapshot and assembles a rich context payload before any generation or chat response.
+
+### Project Memory Snapshot
+
+Stored in the `project_memory_snapshots` table (1 project → many versioned snapshots).
+
+A snapshot captures the full project truth at a point in time:
+
+- **Summaries**: `whatThisProjectIsAbout` and `howClipLoopShouldCreate` — template-assembled from business fields
+- **Identity block**: business name, category, type, description, location
+- **Audience block**: target audience, niche
+- **Offer block**: primary offer, pricing, CTA, goal type
+- **Voice block**: tone, language style, voice notes
+- **Channels block**: preferred channels, social handles
+- **Website block**: URL, page count, last ingestion time, top page titles
+
+### Snapshot Refresh Triggers
+
+| Trigger | Source label | Where |
+|---|---|---|
+| Onboarding completed | `onboarding` | `context/service.ts::completeOnboarding` |
+| Project settings updated | `settings_update` | `projects/service.ts::updateProjectSettings` |
+
+Both call `refreshProjectMemory()` which generates a new versioned row. Snapshots are deterministic — no LLM call needed.
+
+### Context Assembly Order
+
+`assembleProjectContext()` in `src/domains/memory/assembler.ts` builds the full payload with strict priority:
+
+1. **projectMemory** — latest snapshot (primary grounding source)
+2. **liveFields** — current project row fields (supplements snapshot, catches drift)
+3. **websiteContext** — top 3 `project_context_documents` (title + 1200-char snippet each)
+4. **recentConversation** — last 5 user messages (chat mode only)
+5. **currentBrief** — create brief text (create mode only)
+
+Modes: `chat`, `generate`, `strategy`, `debug`.
+
+### Where Context Is Injected
+
+| Flow | How |
+|---|---|
+| **Chat (free)** | `buildGroundedChatPrompt()` injects `[PROJECT MEMORY]` + `[WEBSITE CONTEXT]` + `[GROUNDING]` sections |
+| **Generate (paid)** | `generatePromoDraft()` receives full `AssembledContext`, renders summaries + website context |
+| **Strategy generation** | `weeklyStrategyPrompt()` accepts optional `websiteContext` parameter via assembler |
+| **Post generation** | `postGenerationPrompt()` accepts optional `websiteContext` parameter via assembler |
+
+### Grounded Answering
+
+The chat prompt instructs the LLM to answer from PROJECT MEMORY as primary source. If memory lacks information, the LLM tells the user what's missing and suggests updating project settings.
+
+### Debug Visibility
+
+`GET /api/projects/[projectId]/memory` returns the latest snapshot + current assembled context. Auth-protected.
+
+### What Stays Heuristic
+
+- **Brief planner** (`makeBrief()`) — deterministic keyword parser; memory injected at generation step
+- **Channel inference** (`inferTargetChannel()`) — keyword matching; project memory provides default channel
+- **Snapshot summaries** — template-assembled, not AI-written; LLM synthesizes from full structured data
+
+### Files
+
+```
+src/domains/memory/
+  service.ts       — generateProjectMemorySnapshot, getLatestProjectMemory, refreshProjectMemory
+  assembler.ts     — assembleProjectContext with mode discriminator
+src/app/api/projects/[projectId]/memory/
+  route.ts         — GET debug endpoint
+migrations/0017_project_memory_snapshots.sql  — DDL
+```

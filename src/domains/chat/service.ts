@@ -1,14 +1,14 @@
 import { and, asc, desc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { db, schema } from "@/lib/db";
-import { getPrimaryProjectForUser, getProjectContextDocuments } from "@/domains/context/service";
+import { getPrimaryProjectForUser } from "@/domains/context/service";
+import { assembleProjectContext, type AssembledContext } from "@/domains/memory/assembler";
 import { generateStructuredObject, generateText } from "@/lib/llm";
 import { generateWeeklyStrategyForProject } from "@/domains/strategy/service";
 import { renderContentItem } from "@/domains/rendering/service";
 import { buildTrackingSlug } from "@/lib/utils/slugs";
 import {
   defaultPublishStrategyForChannel,
-  normalizeProjectChannels,
   pickDeterministicChannel,
   type ProjectChannel,
 } from "@/lib/utils/channels";
@@ -40,32 +40,99 @@ function inferTargetChannel(prompt: string, fallbackChannels: ProjectChannel[]) 
   return pickDeterministicChannel(fallbackChannels, 0);
 }
 
-function buildBusinessContext(project: typeof schema.projects.$inferSelect, docs: Array<typeof schema.projectContextDocuments.$inferSelect>) {
-  const topDocs = docs.slice(0, 3).map((doc) => ({
-    source: doc.sourceUrl,
-    title: doc.title,
-    snippet: doc.contentText.slice(0, 1200),
-  }));
+function buildGroundedChatPrompt(ctx: AssembledContext, userMessage: string): string {
+  const memory = ctx.projectMemory;
 
-  return {
-    businessName: project.businessName ?? project.productName,
-    businessCategory: project.businessCategory ?? project.niche,
-    businessDescription: project.businessDescription ?? project.description,
-    targetAudience: project.targetAudience ?? project.audience,
-    primaryOffer: project.primaryOffer ?? project.offer,
-    tone: project.tone ?? "direct, clear, local-friendly",
-    callToAction: project.callToAction ?? "Send us a DM now",
-    languageStyle: project.languageStyle ?? "english",
-    preferredChannels: normalizeProjectChannels(project.preferredChannelsJson, project.preferredChannels),
-    websiteContext: topDocs,
-  };
+  const lines: string[] = [];
+
+  if (memory) {
+    lines.push("[PROJECT MEMORY]");
+    lines.push(`This project: ${memory.whatThisProjectIsAbout}`);
+    lines.push(`How ClipLoop should create: ${memory.howClipLoopShouldCreate}`);
+    lines.push(`Identity: ${memory.identity.businessName ?? ""} | ${memory.identity.businessCategory ?? ""} | ${memory.identity.projectType ?? ""}`);
+    if (memory.identity.businessDescription) lines.push(`Business: ${memory.identity.businessDescription}`);
+    if (memory.identity.city || memory.identity.state) lines.push(`Location: ${[memory.identity.city, memory.identity.state].filter(Boolean).join(", ")}`);
+    lines.push(`Audience: ${memory.audience.targetAudience}`);
+    lines.push(`Offer: ${memory.offer.primaryOffer}${memory.offer.priceRange ? ` (${memory.offer.priceRange})` : ""}`);
+    lines.push(`CTA: ${memory.offer.callToAction} | Goal: ${memory.offer.goalType}`);
+    lines.push(`Voice: ${memory.voice.tone} | Language: ${memory.voice.languageStyle}`);
+    lines.push(`Channels: ${memory.channels.preferredChannels.join(", ") || "Instagram"}`);
+    if (memory.website.topPageTitles.length > 0) {
+      lines.push(`Website pages: ${memory.website.topPageTitles.join(", ")}`);
+    }
+    lines.push("");
+  }
+
+  if (ctx.websiteContext.length > 0) {
+    lines.push("[WEBSITE CONTEXT]");
+    for (const doc of ctx.websiteContext) {
+      lines.push(`${doc.title ?? doc.source}: ${doc.snippet.slice(0, 400)}`);
+    }
+    lines.push("");
+  }
+
+  lines.push("[GROUNDING]");
+  lines.push("You are ClipLoop, a promo video operator assistant. This is a free conversation response.");
+  lines.push("Answer questions using the PROJECT MEMORY above as your primary source.");
+  lines.push("If the memory does not contain the answer, tell the user what's missing and suggest they update project settings.");
+  lines.push("Suggest next paid action (generate_copy or generate_video) when appropriate.");
+
+  if (ctx.recentConversation.length > 0) {
+    lines.push("");
+    lines.push("[RECENT CONVERSATION]");
+    for (const msg of ctx.recentConversation) {
+      lines.push(`${msg.role}: ${msg.content}`);
+    }
+  }
+
+  lines.push("");
+  lines.push("[USER MESSAGE]");
+  lines.push(userMessage);
+
+  return lines.join("\n");
 }
 
 async function generatePromoDraft(input: {
   requestText: string;
-  targetChannel: ProjectChannel;
-  context: ReturnType<typeof buildBusinessContext>;
+  targetChannel: string;
+  context: AssembledContext;
 }) {
+  const memory = input.context.projectMemory;
+  const live = input.context.liveFields;
+
+  const contextLines = [
+    `Target channel: ${input.targetChannel}.`,
+    `Business name: ${live.businessName}`,
+    `Category: ${live.businessCategory}`,
+    `Business: ${live.businessDescription}`,
+    `Audience: ${live.targetAudience}`,
+    `Offer: ${live.primaryOffer}`,
+    `Tone: ${live.tone}`,
+    `CTA: ${live.callToAction}`,
+    `Language: ${live.languageStyle}`,
+    `Channels: ${live.preferredChannels.join(", ")}`,
+  ];
+
+  if (memory) {
+    contextLines.push("");
+    contextLines.push("Project memory summaries:");
+    contextLines.push(`- What this project is about: ${memory.whatThisProjectIsAbout}`);
+    contextLines.push(`- How ClipLoop should create: ${memory.howClipLoopShouldCreate}`);
+  }
+
+  if (input.context.websiteContext.length > 0) {
+    contextLines.push("");
+    contextLines.push("Website pages:");
+    for (const doc of input.context.websiteContext) {
+      contextLines.push(`${doc.title ?? doc.source}: ${doc.snippet.slice(0, 600)}`);
+    }
+  }
+
+  if (input.context.currentBrief) {
+    contextLines.push("");
+    contextLines.push(`Create brief: ${input.context.currentBrief}`);
+  }
+
   return generateStructuredObject({
     schema: chatPromoOutputSchema,
     prompt: [
@@ -81,25 +148,25 @@ async function generatePromoDraft(input: {
       "- For Instagram use polished promo framing.",
       "",
       `User request: ${input.requestText}`,
-      `Business context JSON: ${JSON.stringify(input.context)}`,
+      `Business context:\n${contextLines.join("\n")}`,
     ].join("\n"),
     mockFactory: () => ({
-      internal_title: `${input.context.businessName} promo`,
+      internal_title: `${live.businessName} promo`,
       hook:
-        input.context.languageStyle === "pidgin"
-          ? `${input.context.primaryOffer} dey run this weekend`
-          : `${input.context.primaryOffer} is live this weekend`,
+        live.languageStyle === "pidgin"
+          ? `${live.primaryOffer} dey run this weekend`
+          : `${live.primaryOffer} is live this weekend`,
       slides: [
-        `Offer: ${input.context.primaryOffer}`,
-        `For: ${input.context.targetAudience}`,
-        `Why trust us: ${input.context.businessDescription.slice(0, 80)}`,
-        `Action: ${input.context.callToAction}`,
+        `Offer: ${live.primaryOffer}`,
+        `For: ${live.targetAudience}`,
+        `Why trust us: ${live.businessDescription.slice(0, 80)}`,
+        `Action: ${live.callToAction}`,
       ],
       caption:
         input.targetChannel === "whatsapp"
-          ? `${input.context.primaryOffer}. ${input.context.callToAction}`
-          : `${input.context.businessName} for ${input.context.targetAudience}. ${input.context.primaryOffer}. ${input.context.callToAction}`,
-      cta_text: input.context.callToAction,
+          ? `${live.primaryOffer}. ${live.callToAction}`
+          : `${live.businessName} for ${live.targetAudience}. ${live.primaryOffer}. ${live.callToAction}`,
+      cta_text: live.callToAction,
       why: "Offer-led, channel-aware promo draft generated from business context.",
     }),
   });
@@ -273,21 +340,18 @@ export async function sendChatMessageAndGenerate(params: {
     .returning();
 
   try {
-    const docs = await getProjectContextDocuments(project.id);
-    const context = buildBusinessContext(project, docs);
+    const assembled = await assembleProjectContext({
+      projectId: project.id,
+      mode: mode === "chat" ? "chat" : "generate",
+      conversationId: conversation.id,
+      recentMessageCount: 5,
+    });
+
     if (mode === "chat") {
+      const prompt = buildGroundedChatPrompt(assembled, params.content);
+
       const response = await generateText(
-        [
-          "You are ClipLoop, a promo video operator assistant.",
-          "This is a free conversation response. Do not run generation/render steps.",
-          "Use business context to answer clearly and suggest next paid action if appropriate.",
-          `Business: ${context.businessName}`,
-          `Category: ${context.businessCategory}`,
-          `Audience: ${context.targetAudience}`,
-          `Offer: ${context.primaryOffer}`,
-          `Tone: ${context.tone}`,
-          `User message: ${params.content}`,
-        ].join("\n"),
+        prompt,
         "Here is a quick recommendation from your saved business context.",
       );
 
@@ -342,8 +406,8 @@ export async function sendChatMessageAndGenerate(params: {
           })(),
     );
 
-    const targetChannel = inferTargetChannel(params.content, context.preferredChannels);
-    const promo = await generatePromoDraft({ requestText: params.content, targetChannel, context });
+    const targetChannel = inferTargetChannel(params.content, assembled.liveFields.preferredChannels as ProjectChannel[]);
+    const promo = await generatePromoDraft({ requestText: params.content, targetChannel, context: assembled });
     const strategyCycle = await generateWeeklyStrategyForProject(project);
     const contentItem = await createContentItemForChat({
       project,
