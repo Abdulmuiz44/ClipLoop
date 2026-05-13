@@ -158,6 +158,7 @@ export async function listManualQueueItemsForUser(
     sort?: "newest" | "oldest";
   },
 ) {
+  // Get user's projects in a single query
   const projects = await db.query.projects.findMany({
     where: eq(schema.projects.userId, userId),
     columns: { id: true, name: true, productName: true },
@@ -165,25 +166,31 @@ export async function listManualQueueItemsForUser(
   const projectIds = projects.map((project) => project.id);
   if (projectIds.length === 0) return [];
 
+  // Get content items with proper filtering using database where clause
+  const whereConditions: any[] = [
+    eq(schema.contentItems.publishStrategy, "manual_export"),
+    inArray(schema.contentItems.projectId, projectIds),
+  ];
+
+  // Apply channel filter at database level
+  if (input?.targetChannel && input.targetChannel !== "all") {
+    whereConditions.push(eq(schema.contentItems.targetChannel, input.targetChannel));
+  }
+
+  // Apply status filter at database level
+  if (input?.manualStatus && input.manualStatus !== "all") {
+    whereConditions.push(eq(schema.contentItems.manualPublishStatus, input.manualStatus));
+  }
+
   const rows = await db.query.contentItems.findMany({
-    where: and(eq(schema.contentItems.publishStrategy, "manual_export"), inArray(schema.contentItems.projectId, projectIds)),
-    orderBy: [desc(schema.contentItems.createdAt)],
+    where: and(...whereConditions),
+    orderBy: [input?.sort === "oldest" ? asc(schema.contentItems.createdAt) : desc(schema.contentItems.createdAt)],
   });
 
+  // Create project map for enrichment
   const byProject = new Map(projects.map((project) => [project.id, project]));
-  let filtered = rows;
 
-  if (input?.targetChannel && input.targetChannel !== "all") {
-    filtered = filtered.filter((row) => row.targetChannel === input.targetChannel);
-  }
-  if (input?.manualStatus && input.manualStatus !== "all") {
-    filtered = filtered.filter((row) => row.manualPublishStatus === input.manualStatus);
-  }
-  if (input?.sort === "oldest") {
-    filtered = [...filtered].sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
-  }
-
-  return filtered.map((row) => ({
+  return rows.map((row) => ({
     ...row,
     project: byProject.get(row.projectId) ?? null,
     isRendered: row.renderStatus === "completed",

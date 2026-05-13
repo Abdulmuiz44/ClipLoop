@@ -5,14 +5,44 @@ export async function POST(request: Request) {
   const rawBody = await request.text();
 
   try {
-    verifyLemonSqueezyWebhook(rawBody, request.headers.get("x-signature"));
-    const payload = JSON.parse(rawBody);
-    const result = await syncLemonSqueezySubscription(payload);
-    return NextResponse.json(result, { status: 200 });
+    // Signature verification - reject if invalid (don't retry)
+    try {
+      verifyLemonSqueezyWebhook(rawBody, request.headers.get("x-signature"));
+    } catch (error) {
+      console.error("[billing] lemonsqueezy_webhook_verification_failed", {
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+      return NextResponse.json(
+        { error: "Signature verification failed" },
+        { status: 401 },
+      );
+    }
+
+    // Parse and sync - errors here should be retried
+    try {
+      const payload = JSON.parse(rawBody);
+      const result = await syncLemonSqueezySubscription(payload);
+      return NextResponse.json(result, { status: 200 });
+    } catch (syncError) {
+      console.error("[billing] lemonsqueezy_webhook_sync_failed", {
+        error: syncError instanceof Error ? syncError.message : "Unknown error",
+        payload: rawBody,
+      });
+      // Return 500 so LemonSqueezy retries
+      return NextResponse.json(
+        { error: "Subscription sync failed. Will retry." },
+        { status: 500 },
+      );
+    }
   } catch (error) {
-    console.error("[billing] lemonsqueezy_webhook_failed", {
+    // Fallback for any unexpected errors
+    console.error("[billing] lemonsqueezy_webhook_unexpected_error", {
       error: error instanceof Error ? error.message : "Unknown error",
     });
-    return NextResponse.json({ error: error instanceof Error ? error.message : "Webhook failed" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
+

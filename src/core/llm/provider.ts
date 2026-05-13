@@ -1,5 +1,3 @@
-export { getChatProvider } from "@/core/llm/provider";
-export type { ChatMessage, ChatProvider } from "@/core/llm/provider";
 import { env } from "@/lib/env";
 
 export type ChatMessage = {
@@ -19,19 +17,6 @@ class MockChatProvider implements ChatProvider {
   async generateText(input: { messages: ChatMessage[] }): Promise<string> {
     const prompt = input.messages.map((m) => `${m.role}:${m.content}`).join("\n");
     return `Mock response for prompt length ${prompt.length}`;
-  }
-}
-
-
-class OpenAIChatProvider implements ChatProvider {
-  async generateText(input: { messages: ChatMessage[]; temperature?: number; maxTokens?: number }): Promise<string> {
-    if (!env.OPENAI_API_KEY) throw new Error("OPENAI_API_KEY is required when LLM_PROVIDER=openai.");
-    const response = await fetch(env.OPENAI_BASE_URL ?? "https://api.openai.com/v1/chat/completions", {method:"POST",headers:{"Content-Type":"application/json",Authorization:`Bearer ${env.OPENAI_API_KEY}`},body:JSON.stringify({model:env.OPENAI_MODEL,messages:input.messages,temperature:input.temperature ?? 0.2,max_tokens:input.maxTokens ?? 1000,response_format:{type:"json_object"}})});
-    if (!response.ok) throw new Error(`OpenAI request failed (${response.status})`);
-    const json = await response.json() as any;
-    const content = json?.choices?.[0]?.message?.content;
-    if (typeof content !== "string" || !content.trim()) throw new Error("OpenAI returned empty response.");
-    return content;
   }
 }
 
@@ -115,9 +100,6 @@ function resolveMistralMessageContent(
 }
 
 export function getChatProvider(): ChatProvider {
-  if (env.LLM_PROVIDER === "openai") {
-    return new OpenAIChatProvider();
-  }
   if (env.LLM_PROVIDER === "mistral") {
     return new MistralChatProvider();
   }
@@ -126,3 +108,4 @@ export function getChatProvider(): ChatProvider {
   }
   throw new Error(`Unsupported LLM provider: ${env.LLM_PROVIDER}`);
 }
+

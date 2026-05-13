@@ -266,3 +266,112 @@ test("generate-next charges once and retries respect existing ledger reference",
     await cleanupFixture(fixture);
   }
 });
+
+test("chargeGenerateVideoCredits atomic transaction prevents partial charges", async (t) => {
+  if (!(await isEnvironmentReady())) {
+    t.skip("Postgres or required migrated tables are unavailable for billing integration tests.");
+    return;
+  }
+  const fixture = await createFixture("video-atomic");
+  try {
+    // Import the function to test
+    const { chargeGenerateVideoCredits } = await import("../domains/credits/service");
+
+    // First call should succeed
+    const chatJobId1 = randomUUID();
+    const result1 = await chargeGenerateVideoCredits({
+      userId: fixture.userId,
+      chatJobId: chatJobId1,
+    });
+    assert.ok(result1.generation);
+    assert.ok(result1.render);
+
+    // Verify both ledger entries were created
+    const ledgerGen1 = await getLedgerEntriesByReference(
+      fixture.userId,
+      "chat_job",
+      `${chatJobId1}:video:generation`,
+    );
+    const ledgerRen1 = await getLedgerEntriesByReference(
+      fixture.userId,
+      "chat_job",
+      `${chatJobId1}:video:render`,
+    );
+    assert.equal(ledgerGen1.length, 1);
+    assert.equal(ledgerRen1.length, 1);
+
+    // Second call with same chatJobId should return idempotent result
+    const result2 = await chargeGenerateVideoCredits({
+      userId: fixture.userId,
+      chatJobId: chatJobId1,
+    });
+    assert.equal(result2.generation.id, result1.generation.id);
+    assert.equal(result2.render.id, result1.render.id);
+
+    // Verify no duplicate ledger entries were created
+    const ledgerGen2 = await getLedgerEntriesByReference(
+      fixture.userId,
+      "chat_job",
+      `${chatJobId1}:video:generation`,
+    );
+    const ledgerRen2 = await getLedgerEntriesByReference(
+      fixture.userId,
+      "chat_job",
+      `${chatJobId1}:video:render`,
+    );
+    assert.equal(ledgerGen2.length, 1, "Should still have exactly 1 generation entry");
+    assert.equal(ledgerRen2.length, 1, "Should still have exactly 1 render entry");
+  } finally {
+    await cleanupFixture(fixture);
+  }
+});
+
+test("chargeCredits moved idempotency check inside transaction prevents race condition", async (t) => {
+  if (!(await isEnvironmentReady())) {
+    t.skip("Postgres or required migrated tables are unavailable for billing integration tests.");
+    return;
+  }
+  const fixture = await createFixture("charge-idempotency");
+  try {
+    const referenceId = randomUUID();
+
+    // First charge should succeed
+    const result1 = await chargeCredits({
+      userId: fixture.userId,
+      bucket: "generation",
+      amount: 1,
+      reason: "action_generate_copy",
+      referenceType: "test_concurrent",
+      referenceId,
+      metadata: { test: "concurrent-race" },
+    });
+
+    // Verify ledger entry was created
+    const ledger1 = await getLedgerEntriesByReference(fixture.userId, "test_concurrent", referenceId);
+    assert.equal(ledger1.length, 1);
+    const balance1 = ledger1[0].balanceAfter;
+
+    // Second charge with same reference should return idempotent result (not charge again)
+    const result2 = await chargeCredits({
+      userId: fixture.userId,
+      bucket: "generation",
+      amount: 1,
+      reason: "action_generate_copy",
+      referenceType: "test_concurrent",
+      referenceId,
+      metadata: { test: "concurrent-race" },
+    });
+
+    // Should return same entry, not a new one
+    assert.equal(result2.id, result1.id);
+
+    // Verify no duplicate ledger entries
+    const ledger2 = await getLedgerEntriesByReference(fixture.userId, "test_concurrent", referenceId);
+    assert.equal(ledger2.length, 1, "Should still have exactly 1 ledger entry");
+
+    // Verify balance did not double-debit
+    assert.equal(ledger2[0].balanceAfter, balance1, "Balance should not have changed on retry");
+  } finally {
+    await cleanupFixture(fixture);
+  }
+});

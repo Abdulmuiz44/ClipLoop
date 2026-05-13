@@ -160,23 +160,25 @@ export async function chargeCredits(input: ChargeInput) {
   if (input.amount <= 0) throw new Error("Charge amount must be positive.");
 
   const hasReference = Boolean(input.referenceType && input.referenceId);
-  if (hasReference) {
-    const existing = await db.query.creditLedgerEntries.findFirst({
-      where: and(
-        eq(schema.creditLedgerEntries.userId, input.userId),
-        eq(schema.creditLedgerEntries.referenceType, input.referenceType!),
-        eq(schema.creditLedgerEntries.referenceId, input.referenceId!),
-      ),
-    });
-    if (existing) {
-      return existing;
-    }
-  }
 
   await applyMonthlyGrantIfNeeded(input.userId);
   const account = await getOrCreateCreditAccount(input.userId);
 
   return db.transaction(async (tx) => {
+    // Move idempotency check INSIDE transaction to prevent race conditions
+    if (hasReference) {
+      const existing = await tx.query.creditLedgerEntries.findFirst({
+        where: and(
+          eq(schema.creditLedgerEntries.userId, input.userId),
+          eq(schema.creditLedgerEntries.referenceType, input.referenceType!),
+          eq(schema.creditLedgerEntries.referenceId, input.referenceId!),
+        ),
+      });
+      if (existing) {
+        return existing;
+      }
+    }
+
     const current = await tx.query.creditAccounts.findFirst({
       where: eq(schema.creditAccounts.id, account.id),
     });
@@ -336,6 +338,55 @@ export async function chargeGenerateVideoCredits(input: {
     const nextRender = current.renderBalance - renderPolicy.amount;
     const metadata = { chatJobId: input.chatJobId, contentItemId: input.contentItemId, action: "generate_video" };
 
+    // Pre-flight check: verify both entries don't already exist (idempotency check inside transaction)
+    const existingBoth = await tx
+      .select()
+      .from(schema.creditLedgerEntries)
+      .where(
+        and(
+          eq(schema.creditLedgerEntries.userId, input.userId),
+          eq(schema.creditLedgerEntries.referenceType, "chat_job"),
+        ),
+      )
+      .limit(50);
+
+    const alreadyGenerationExists = generationReferenceId
+      ? existingBoth.some((entry) => entry.referenceId === generationReferenceId)
+      : false;
+    const alreadyRenderExists = renderReferenceId
+      ? existingBoth.some((entry) => entry.referenceId === renderReferenceId)
+      : false;
+
+    // If EITHER entry already exists, return the idempotent response (both must exist or neither)
+    if (alreadyGenerationExists || alreadyRenderExists) {
+      if (!alreadyGenerationExists || !alreadyRenderExists) {
+        throw new Error("Detected partial video charge state in idempotency check. Cannot proceed.");
+      }
+      const [generation] = await tx
+        .select()
+        .from(schema.creditLedgerEntries)
+        .where(
+          and(
+            eq(schema.creditLedgerEntries.userId, input.userId),
+            eq(schema.creditLedgerEntries.referenceType, "chat_job"),
+            eq(schema.creditLedgerEntries.referenceId, generationReferenceId),
+          ),
+        )
+        .limit(1);
+      const [render] = await tx
+        .select()
+        .from(schema.creditLedgerEntries)
+        .where(
+          and(
+            eq(schema.creditLedgerEntries.userId, input.userId),
+            eq(schema.creditLedgerEntries.referenceType, "chat_job"),
+            eq(schema.creditLedgerEntries.referenceId, renderReferenceId),
+          ),
+        )
+        .limit(1);
+      return { generation, render };
+    }
+
     const [insertedGeneration] = await tx
       .insert(schema.creditLedgerEntries)
       .values({
@@ -374,53 +425,29 @@ export async function chargeGenerateVideoCredits(input: {
       })
       .returning();
 
-    const [existingGeneration] =
-      !insertedGeneration && generationReferenceId
-        ? await tx
-            .select()
-            .from(schema.creditLedgerEntries)
-            .where(
-              and(
-                eq(schema.creditLedgerEntries.userId, input.userId),
-                eq(schema.creditLedgerEntries.referenceType, "chat_job"),
-                eq(schema.creditLedgerEntries.referenceId, generationReferenceId),
-              ),
-            )
-            .limit(1)
-        : [];
-    const [existingRender] =
-      !insertedRender && renderReferenceId
-        ? await tx
-            .select()
-            .from(schema.creditLedgerEntries)
-            .where(
-              and(
-                eq(schema.creditLedgerEntries.userId, input.userId),
-                eq(schema.creditLedgerEntries.referenceType, "chat_job"),
-                eq(schema.creditLedgerEntries.referenceId, renderReferenceId),
-              ),
-            )
-            .limit(1)
-        : [];
-    const generation = insertedGeneration ?? existingGeneration;
-    const render = insertedRender ?? existingRender;
+    // Both must succeed together - if one failed due to unique constraint,
+    // the entire transaction should be rolled back
+    if ((!insertedGeneration && generationReferenceId) || (!insertedRender && renderReferenceId)) {
+      throw new Error(
+        "Detected partial video charge state: one credit type succeeded while the other was blocked. Transaction will be rolled back. Please retry.",
+      );
+    }
+
+    const generation = insertedGeneration;
+    const render = insertedRender;
 
     if (!generation || !render) {
       throw new Error("Could not persist video charge ledger entries.");
     }
 
-    if (insertedGeneration && insertedRender) {
-      await tx
-        .update(schema.creditAccounts)
-        .set({
-          generationBalance: nextGeneration,
-          renderBalance: nextRender,
-          updatedAt: new Date(),
-        })
-        .where(eq(schema.creditAccounts.id, current.id));
-    } else if (insertedGeneration || insertedRender) {
-      throw new Error("Detected partial video charge state. Please retry the request.");
-    }
+    await tx
+      .update(schema.creditAccounts)
+      .set({
+        generationBalance: nextGeneration,
+        renderBalance: nextRender,
+        updatedAt: new Date(),
+      })
+      .where(eq(schema.creditAccounts.id, current.id));
 
     return { generation, render };
   });

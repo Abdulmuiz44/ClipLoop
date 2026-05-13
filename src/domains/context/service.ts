@@ -6,6 +6,7 @@ import { refreshProjectMemory } from "@/domains/memory/service";
 import type { OnboardingInput } from "@/lib/validation/chat";
 import { env } from "@/lib/env";
 import { OFFLINE_DEMO_USER_ID } from "@/lib/auth";
+import { toContextDocumentShape } from "@/core/context/contracts";
 
 function isDatabaseUnavailableError(error: unknown) {
   const message = error instanceof Error ? error.message : String(error);
@@ -42,6 +43,7 @@ export async function ingestWebsiteIntoProjectContext(projectId: string, website
   const pages = await crawlWebsiteContext({ websiteUrl, maxPages: 3, maxCharsPerPage: 12000 });
 
   for (const page of pages) {
+    const shaped = toContextDocumentShape(page, hashContent(page.text));
     const existing = await db.query.projectContextDocuments.findFirst({
       where: and(
         eq(schema.projectContextDocuments.projectId, projectId),
@@ -53,10 +55,10 @@ export async function ingestWebsiteIntoProjectContext(projectId: string, website
       await db
         .update(schema.projectContextDocuments)
         .set({
-          title: page.title,
-          contentText: page.text,
-          contentHash: hashContent(page.text),
-          metadataJson: page.metadata,
+          title: shaped.title,
+          contentText: shaped.contentText,
+          contentHash: shaped.contentHash,
+          metadataJson: shaped.metadataJson,
         })
         .where(eq(schema.projectContextDocuments.id, existing.id));
       continue;
@@ -64,11 +66,11 @@ export async function ingestWebsiteIntoProjectContext(projectId: string, website
 
     await db.insert(schema.projectContextDocuments).values({
       projectId,
-      sourceUrl: page.url,
-      title: page.title,
-      contentText: page.text,
-      contentHash: hashContent(page.text),
-      metadataJson: page.metadata,
+      sourceUrl: shaped.sourceUrl,
+      title: shaped.title,
+      contentText: shaped.contentText,
+      contentHash: shaped.contentHash,
+      metadataJson: shaped.metadataJson,
     });
   }
 
