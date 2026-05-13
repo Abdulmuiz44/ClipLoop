@@ -8,6 +8,7 @@ import {
 } from "@/lib/validation/projects";
 import { assertProjectCreationAllowed } from "@/domains/usage/service";
 import { normalizeProjectChannels } from "@/lib/utils/channels";
+import { refreshProjectMemory } from "@/domains/memory/service";
 
 export async function createProject(userId: string, rawInput: unknown) {
   const input = createProjectInputSchema.parse(rawInput);
@@ -114,6 +115,8 @@ export async function updateProjectSettings(projectId: string, userId: string, r
     })
     .where(eq(schema.projects.id, project.id))
     .returning();
+
+  await refreshProjectMemory(project.id, "settings_update");
 
   return updated;
 }

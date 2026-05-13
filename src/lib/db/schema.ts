@@ -633,6 +633,44 @@ export const iterationExperiments = pgTable(
   }),
 );
 
+export const projectMemorySnapshots = pgTable(
+  "project_memory_snapshots",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    projectId: uuid("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    version: integer("version").notNull().default(1),
+    snapshotJson: jsonb("snapshot_json").notNull().default(sql`'{}'::jsonb`),
+    source: text("source").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => ({
+    projectIdx: index("pms_project_id_idx").on(table.projectId),
+    projectVersionIdx: index("pms_project_version_idx").on(table.projectId, table.version),
+  }),
+);
+export const businessProfiles = pgTable("business_profiles", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").references(() => users.id, { onDelete: "set null" }),
+  websiteUrl: text("website_url").notNull(),
+  businessName: text("business_name"), industry: text("industry"), targetAudience: text("target_audience"), mainOffer: text("main_offer"),
+  productsOrServices: jsonb("products_or_services").notNull().default(sql`'[]'::jsonb`),
+  keyBenefits: jsonb("key_benefits").notNull().default(sql`'[]'::jsonb`),
+  painPointsSolved: jsonb("pain_points_solved").notNull().default(sql`'[]'::jsonb`),
+  brandTone: text("brand_tone"), contentAngles: jsonb("content_angles").notNull().default(sql`'[]'::jsonb`),
+  ctaIdeas: jsonb("cta_ideas").notNull().default(sql`'[]'::jsonb`), oneLineSummary: text("one_line_summary"), longSummary: text("long_summary"),
+  rawExtractedText: text("raw_extracted_text"), createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(), updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+}, (table)=>({ userIdx:index("business_profiles_user_id_idx").on(table.userId)}));
+
+export const promoPacks = pgTable("promo_packs", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  businessProfileId: uuid("business_profile_id").notNull().references(() => businessProfiles.id, { onDelete: "cascade" }),
+  userId: uuid("user_id").references(() => users.id, { onDelete: "set null" }),
+  campaignTitle: text("campaign_title"), positioningAngle: text("positioning_angle"), content: jsonb("content").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+},(table)=>({profileIdx:index("promo_packs_business_profile_id_idx").on(table.businessProfileId)}));
+
 export const usersRelations = relations(users, ({ many }) => ({
   projects: many(projects),
   subscriptions: many(subscriptions),
@@ -648,6 +686,11 @@ export const projectsRelations = relations(projects, ({ one, many }) => ({
   connectedChannels: many(connectedChannels),
   contextDocuments: many(projectContextDocuments),
   conversations: many(conversations),
+  memorySnapshots: many(projectMemorySnapshots),
+}));
+
+export const projectMemorySnapshotsRelations = relations(projectMemorySnapshots, ({ one }) => ({
+  project: one(projects, { fields: [projectMemorySnapshots.projectId], references: [projects.id] }),
 }));
 
 export const subscriptionsRelations = relations(subscriptions, ({ one }) => ({

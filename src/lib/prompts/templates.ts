@@ -3,6 +3,14 @@ import type { GeneratedPost } from "@/lib/validation/content";
 import type { z } from "zod";
 import type { iterationAnalysisSchema } from "@/lib/validation/iteration";
 
+export type { ProjectPromptContext };
+
+export interface WebsiteDocSnippet {
+  source: string;
+  title: string | null;
+  snippet: string;
+}
+
 export type ProjectPromptContext = {
   name: string;
   productName: string;
@@ -54,7 +62,7 @@ function channelsInstruction(channels: ProjectPromptContext["preferredChannels"]
   return { normalized, notes };
 }
 
-export function weeklyStrategyPrompt(project: ProjectPromptContext) {
+export function weeklyStrategyPrompt(project: ProjectPromptContext, websiteContext: WebsiteDocSnippet[] = []) {
   const primaryAudience = project.targetAudience ?? project.audience;
   const primaryOffer = project.primaryOffer ?? project.offer;
   const profileName = project.businessName ?? project.productName;
@@ -62,7 +70,7 @@ export function weeklyStrategyPrompt(project: ProjectPromptContext) {
   const location = [project.city, project.state].filter(Boolean).join(", ");
   const channels = channelsInstruction(project.preferredChannels);
 
-  return [
+  const lines = [
     "Generate one weekly strategy JSON with exactly 5 angles.",
     "Focus on short-form promo content for brands, businesses, and creators.",
     "Bias angles toward offer-led hooks, practical urgency/scarcity when appropriate, social proof style proof points, and clear CTAs.",
@@ -81,18 +89,28 @@ export function weeklyStrategyPrompt(project: ProjectPromptContext) {
     `Website: ${project.websiteUrl ?? "n/a"}`,
     `CTA URL: ${project.ctaUrl}`,
     `Description: ${project.businessDescription ?? project.description}`,
-    "Output valid JSON only.",
-  ].join("\n");
+  ];
+
+  if (websiteContext.length > 0) {
+    lines.push("");
+    lines.push("Ingested website pages for additional context:");
+    for (const doc of websiteContext) {
+      lines.push(`- ${doc.title ?? doc.source}: ${doc.snippet.slice(0, 800)}`);
+    }
+  }
+
+  lines.push("Output valid JSON only.");
+  return lines.join("\n");
 }
 
-export function postGenerationPrompt(project: ProjectPromptContext, strategy: WeeklyStrategyOutput) {
+export function postGenerationPrompt(project: ProjectPromptContext, strategy: WeeklyStrategyOutput, websiteContext: WebsiteDocSnippet[] = []) {
   const primaryAudience = project.targetAudience ?? project.audience;
   const primaryOffer = project.primaryOffer ?? project.offer;
   const profileName = project.businessName ?? project.productName;
   const cta = project.callToAction ?? "Send us a DM now";
   const channels = channelsInstruction(project.preferredChannels);
 
-  return [
+  const lines = [
     "Generate exactly 5 short-form post drafts in JSON.",
     "Posts must feel practical, grounded, and business-aware.",
     "Rules:",
@@ -115,9 +133,19 @@ export function postGenerationPrompt(project: ProjectPromptContext, strategy: We
     `Instagram handle: ${project.instagramHandle ?? "not provided"}`,
     `WhatsApp: ${project.whatsappNumber ?? "not provided"}`,
     `Fallback destination URL: ${project.ctaUrl}`,
-    `Strategy JSON: ${JSON.stringify(strategy)}`,
-    "Output valid JSON only.",
-  ].join("\n");
+  ];
+
+  if (websiteContext.length > 0) {
+    lines.push("");
+    lines.push("Ingested website pages for additional context:");
+    for (const doc of websiteContext) {
+      lines.push(`- ${doc.title ?? doc.source}: ${doc.snippet.slice(0, 600)}`);
+    }
+  }
+
+  lines.push(`Strategy JSON: ${JSON.stringify(strategy)}`);
+  lines.push("Output valid JSON only.");
+  return lines.join("\n");
 }
 
 export function regeneratePostPrompt(post: GeneratedPost, reason?: string) {
