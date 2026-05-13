@@ -521,6 +521,16 @@ Publish guardrails:
 
 ClipLoop is designed as a paid product using open-source/self-hostable building blocks wherever practical.
 
+## Open core + hosted gateway architecture split (Pass 1)
+
+ClipLoop now has explicit internal layer boundaries to support long-term platformization without breaking the current app:
+
+- `src/app` + `src/components`: first-party product UX and route orchestration
+- `src/core`: reusable open-core engine contracts/primitives (LLM, render, billing policy, context ingestion contracts)
+- `src/gateway`: hosted-gateway boundaries (API-key auth, orchestration, provider access, render execution, credit guard) with local adapters for now
+
+In this pass, compatibility wrappers keep existing imports and behavior stable while moving reusable seams into `src/core` and hosted seams into `src/gateway`.
+
 Current local/open-source-first subsystems:
 - FFmpeg legacy renderer
 - HyperFrames renderer adapter (local CLI path)
