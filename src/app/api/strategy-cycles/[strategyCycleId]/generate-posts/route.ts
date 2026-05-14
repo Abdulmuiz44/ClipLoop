@@ -2,9 +2,9 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { db, schema } from "@/lib/db";
 import { eq } from "drizzle-orm";
-import { generatePostsForStrategyCycle } from "@/domains/content-items/service";
 import { requireProductAccess } from "@/domains/account/service";
 import { toErrorResponse } from "@/lib/http/errors";
+import { getGatewayOrchestrator } from "@/gateway";
 
 export async function POST(_request: Request, context: { params: Promise<{ strategyCycleId: string }> }) {
   try {
@@ -18,7 +18,10 @@ export async function POST(_request: Request, context: { params: Promise<{ strat
     const project = await db.query.projects.findFirst({ where: eq(schema.projects.id, cycle.projectId) });
     if (!project || project.userId !== user.id) return NextResponse.json({ error: "Project not found" }, { status: 404 });
 
-    const posts = await generatePostsForStrategyCycle(strategyCycleId);
+    const { posts } = await getGatewayOrchestrator().generatePosts({
+      userId: user.id,
+      strategyCycleId,
+    });
     return NextResponse.json({ posts }, { status: 200 });
   } catch (error) {
     return toErrorResponse(error);
