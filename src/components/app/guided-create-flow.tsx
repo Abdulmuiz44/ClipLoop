@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, ReactNode, useMemo, useState } from "react";
 
 type Brief = {
   targetChannel: "instagram" | "tiktok" | "whatsapp";
@@ -70,7 +70,7 @@ export function GuidedCreateFlow({ hasLowCredits }: { hasLowCredits: boolean }) 
       if (!conversationRes.ok) throw new Error(conversationJson.error ?? "Could not start create session.");
 
       const content = [
-        `Create a premium short-form promo video.`,
+        "Create a premium short-form promo video.",
         `Original prompt: ${brief.prompt}`,
         `Target channel: ${brief.targetChannel}`,
         `Tone/style: ${brief.tone}`,
@@ -112,23 +112,27 @@ export function GuidedCreateFlow({ hasLowCredits }: { hasLowCredits: boolean }) 
   return (
     <div className="space-y-5">
       <section className="cl-card p-5 md:p-6">
-        <p className="text-sm font-medium text-slate-700">Step 1 · Rough prompt</p>
+        <p className="cl-kicker">Step 1</p>
+        <h2 className="mt-1 text-lg font-semibold text-slate-900">Describe the promo concept</h2>
         <textarea
-          className="mt-2 min-h-24 w-full rounded-xl border p-3 text-sm outline-none cl-divider"
+          className="cl-textarea mt-3"
           placeholder="Example: Create a 15s TikTok promo for our new spring skincare bundle for busy professionals."
           value={roughPrompt}
           onChange={(event) => setRoughPrompt(event.target.value)}
         />
-        <button onClick={upgradePrompt} className="mt-3 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white">
-          Upgrade to structured brief
+        <button onClick={upgradePrompt} className="mt-3 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-500">
+          Build brief
         </button>
       </section>
 
       {brief ? (
         <form className="cl-card p-5 md:p-6" onSubmit={generate}>
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="text-sm font-medium text-slate-700">Step 2 · Edit brief</p>
-            <p className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">Final generation cost: {VIDEO_CREDIT_COST} credits</p>
+            <div>
+              <p className="cl-kicker">Step 2</p>
+              <h2 className="mt-1 text-lg font-semibold text-slate-900">Refine the brief</h2>
+            </div>
+            <p className="rounded-full border border-slate-300 bg-white px-3 py-1 text-xs text-slate-700">{VIDEO_CREDIT_COST} credits per render</p>
           </div>
 
           <div className="mt-4 grid gap-3 md:grid-cols-2">
@@ -139,11 +143,21 @@ export function GuidedCreateFlow({ hasLowCredits }: { hasLowCredits: boolean }) 
                 <option value="whatsapp">WhatsApp</option>
               </select>
             </Field>
-            <Field label="Duration"><input className="cl-input" value={brief.duration} onChange={(e) => setBrief({ ...brief, duration: e.target.value })} /></Field>
-            <Field label="Tone / style"><input className="cl-input" value={brief.tone} onChange={(e) => setBrief({ ...brief, tone: e.target.value })} /></Field>
-            <Field label="Style preset"><input className="cl-input" value={brief.stylePreset} onChange={(e) => setBrief({ ...brief, stylePreset: e.target.value })} /></Field>
-            <Field label="CTA"><input className="cl-input" value={brief.cta} onChange={(e) => setBrief({ ...brief, cta: e.target.value })} /></Field>
-            <Field label="Caption hint"><input className="cl-input" value={brief.captionHint} onChange={(e) => setBrief({ ...brief, captionHint: e.target.value })} /></Field>
+            <Field label="Duration">
+              <input className="cl-input" value={brief.duration} onChange={(e) => setBrief({ ...brief, duration: e.target.value })} />
+            </Field>
+            <Field label="Tone / style">
+              <input className="cl-input" value={brief.tone} onChange={(e) => setBrief({ ...brief, tone: e.target.value })} />
+            </Field>
+            <Field label="Style preset">
+              <input className="cl-input" value={brief.stylePreset} onChange={(e) => setBrief({ ...brief, stylePreset: e.target.value })} />
+            </Field>
+            <Field label="CTA">
+              <input className="cl-input" value={brief.cta} onChange={(e) => setBrief({ ...brief, cta: e.target.value })} />
+            </Field>
+            <Field label="Caption hint">
+              <input className="cl-input" value={brief.captionHint} onChange={(e) => setBrief({ ...brief, captionHint: e.target.value })} />
+            </Field>
           </div>
 
           <Field label="Prompt context" className="mt-3">
@@ -151,30 +165,31 @@ export function GuidedCreateFlow({ hasLowCredits }: { hasLowCredits: boolean }) 
           </Field>
 
           {hasLowCredits ? (
-            <div className="mt-4 rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
-              Your balance is low. If generation fails due to insufficient credits, use <Link href="/pricing" className="underline">Buy Credits / Upgrade</Link>.
+            <div className="mt-4 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800">
+              Credit balance is low. If generation fails, open <Link href="/pricing" className="underline">pricing</Link> to upgrade.
             </div>
           ) : null}
-          {error ? <p className="mt-3 text-sm text-rose-600">{error}</p> : null}
+          {error ? <p className="mt-3 text-sm text-rose-700">{error}</p> : null}
 
-          <button disabled={busy || !canGenerate} className="mt-4 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50">
-            {busy ? "Generating..." : "Generate final video"}
+          <button disabled={busy || !canGenerate} className="mt-4 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">
+            {busy ? "Generating..." : "Generate video"}
           </button>
         </form>
       ) : null}
 
       {result ? (
         <section className="cl-card p-5 md:p-6">
-          <p className="text-sm font-medium text-slate-700">Step 3 · Result</p>
+          <p className="cl-kicker">Step 3</p>
+          <h2 className="mt-1 text-lg font-semibold text-slate-900">Output</h2>
           <div className="mt-3 space-y-3">
-            {result.videoUrl ? <video src={result.videoUrl} controls className="w-full rounded-xl border bg-black cl-divider" /> : <p className="text-sm text-slate-500">No preview returned.</p>}
+            {result.videoUrl ? <video src={result.videoUrl} controls className="w-full rounded-lg border border-slate-300 bg-black" /> : <p className="text-sm text-slate-600">No preview returned.</p>}
             <div className="grid gap-2 text-sm text-slate-700">
-              <p><strong>Channel:</strong> {result.targetChannel}</p>
-              <p><strong>Caption:</strong> {result.caption || "n/a"}</p>
-              <p><strong>CTA:</strong> {result.ctaText || "n/a"}</p>
-              <p><strong>Credits used:</strong> {result.creditsConsumed ?? VIDEO_CREDIT_COST}</p>
+              <p><strong className="text-slate-900">Channel:</strong> {result.targetChannel}</p>
+              <p><strong className="text-slate-900">Caption:</strong> {result.caption || "n/a"}</p>
+              <p><strong className="text-slate-900">CTA:</strong> {result.ctaText || "n/a"}</p>
+              <p><strong className="text-slate-900">Credits used:</strong> {result.creditsConsumed ?? VIDEO_CREDIT_COST}</p>
             </div>
-            {result.downloadUrl ? <a href={result.downloadUrl} className="inline-flex rounded-lg border px-3 py-2 text-sm">Download video</a> : null}
+            {result.downloadUrl ? <a href={result.downloadUrl} className="inline-flex rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700 hover:border-slate-400">Download video</a> : null}
           </div>
         </section>
       ) : null}
@@ -182,7 +197,7 @@ export function GuidedCreateFlow({ hasLowCredits }: { hasLowCredits: boolean }) 
   );
 }
 
-function Field({ label, className, children }: { label: string; children: React.ReactNode; className?: string }) {
+function Field({ label, className, children }: { label: string; children: ReactNode; className?: string }) {
   return (
     <label className={className}>
       <span className="mb-1 block text-sm font-medium text-slate-700">{label}</span>

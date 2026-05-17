@@ -147,10 +147,11 @@ export async function generateProjectMemorySnapshot(
 export async function getLatestProjectMemory(
   projectId: string,
 ): Promise<typeof schema.projectMemorySnapshots.$inferSelect | null> {
-  return db.query.projectMemorySnapshots.findFirst({
+  const row = await db.query.projectMemorySnapshots.findFirst({
     where: eq(schema.projectMemorySnapshots.projectId, projectId),
     orderBy: [desc(schema.projectMemorySnapshots.version)],
   });
+  return row ?? null;
 }
 
 export async function refreshProjectMemory(

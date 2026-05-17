@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 function Feature({ children }: { children: React.ReactNode }) {
   return (
     <li className="flex gap-2 leading-6 text-slate-700">
-      <span className="mt-1 h-2 w-2 rounded-full bg-slate-900" />
+      <span className="mt-2 h-1.5 w-1.5 rounded-full bg-blue-600" />
       {children}
     </li>
   );
@@ -22,7 +22,7 @@ export default function PricingPage() {
     <div className="space-y-6 md:space-y-8">
       <section className="cl-card p-6 md:p-8">
         <p className="cl-kicker">Pricing</p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950 md:text-4xl">Free chat. Pay for generation and render capacity.</h1>
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900 md:text-4xl">Free chat. Pay for generation and render capacity.</h1>
         <p className="mt-3 max-w-3xl text-base leading-7 text-slate-600">
           ClipLoop chat stays free. Credits are consumed when you run promo copy generation and video rendering operations.
         </p>
@@ -31,7 +31,7 @@ export default function PricingPage() {
       <section className="grid gap-5 md:grid-cols-2">
         <article className="cl-card p-6">
           <p className="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">Free</p>
-          <h2 className="mt-2 text-3xl font-bold text-slate-950">
+          <h2 className="mt-2 text-3xl font-semibold text-slate-900">
             $0<span className="text-base font-medium text-slate-500">/month</span>
           </h2>
           <p className="mt-4 text-sm text-slate-600">Best for testing ClipLoop with one business profile and light monthly output.</p>
@@ -43,21 +43,21 @@ export default function PricingPage() {
             <Feature>Manual queue and export workflow included</Feature>
           </ul>
           <div className="mt-6">
-            <Link href="/app" className="inline-flex rounded-xl border border-slate-200 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
+            <Link href="/app" className="inline-flex rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:border-slate-400">
               Start in workspace
             </Link>
           </div>
         </article>
 
-        <article className="rounded-3xl border border-slate-900 bg-white p-6">
+        <article className="rounded-xl border border-blue-200 bg-white p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">Pro</p>
-              <h2 className="mt-2 text-3xl font-bold text-slate-950">
+              <h2 className="mt-2 text-3xl font-semibold text-slate-900">
                 $5<span className="text-base font-medium text-slate-500">/month</span>
               </h2>
             </div>
-            <span className="rounded-full border border-slate-900 bg-slate-900 px-3 py-1 text-xs font-medium text-white">Best value</span>
+            <span className="rounded-full bg-blue-600 px-3 py-1 text-xs font-medium text-white">Best value</span>
           </div>
 
           <p className="mt-4 text-sm text-slate-600">For operators who need higher generation/render throughput and multiple active projects.</p>

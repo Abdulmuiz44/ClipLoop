@@ -1,4 +1,4 @@
-import { and, desc, eq, inArray } from "drizzle-orm";
+import { and, asc, desc, eq, inArray } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
 import { generateStructuredObject } from "@/lib/llm";
 import { postGenerationPrompt, regeneratePostPrompt, type WebsiteDocSnippet } from "@/lib/prompts/templates";

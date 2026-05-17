@@ -4,13 +4,25 @@
 
 :root {
   color-scheme: light;
-  --cl-bg: #f6f6f5;
-  --cl-surface: #ffffff;
-  --cl-text: #101114;
-  --cl-muted: #5a626f;
-  --cl-border: #e3e5e8;
-  --cl-border-strong: #d5d9df;
-  --cl-soft: #f2f3f5;
+  --background: 210 30% 98%;
+  --foreground: 224 24% 14%;
+  --card: 0 0% 100%;
+  --card-foreground: 224 24% 14%;
+  --muted: 210 26% 95%;
+  --muted-foreground: 220 14% 42%;
+  --border: 214 20% 88%;
+  --input: 214 20% 88%;
+  --primary: 218 88% 54%;
+  --primary-foreground: 0 0% 100%;
+  --ring: 218 88% 54%;
+
+  --cl-bg: hsl(var(--background));
+  --cl-surface: hsl(var(--card));
+  --cl-text: hsl(var(--foreground));
+  --cl-muted: hsl(var(--muted-foreground));
+  --cl-border: hsl(var(--border));
+  --cl-border-strong: hsl(var(--border));
+  --cl-soft: hsl(var(--muted));
 }
 
 body {
@@ -20,36 +32,38 @@ body {
 }
 
 a {
-  @apply text-slate-800 hover:text-slate-950;
+  @apply text-slate-700 hover:text-slate-950;
 }
 
 ::selection {
-  @apply bg-slate-900 text-white;
+  @apply bg-blue-600 text-white;
 }
 
 @layer components {
   .cl-card {
-    @apply rounded-2xl border bg-white;
+    @apply rounded-xl border;
     border-color: var(--cl-border);
+    background: var(--cl-surface);
   }
 
   .cl-card-soft {
-    @apply rounded-2xl border;
+    @apply rounded-xl border;
     border-color: var(--cl-border);
     background: var(--cl-soft);
   }
 
   .cl-shell {
-    @apply rounded-3xl border bg-white;
+    @apply rounded-xl border;
     border-color: var(--cl-border);
+    background: var(--cl-surface);
   }
 
   .cl-kicker {
-    @apply text-[11px] font-medium uppercase tracking-[0.18em] text-slate-500;
+    @apply text-[11px] font-medium uppercase tracking-[0.18em] text-slate-400;
   }
 
   .cl-section-title {
-    @apply text-3xl font-semibold tracking-tight text-slate-950;
+    @apply text-3xl font-semibold tracking-tight text-slate-100;
   }
 
   .cl-divider {
@@ -57,11 +71,11 @@ a {
   }
 
   .cl-nav-item {
-    @apply block rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-100 hover:text-slate-900;
+    @apply block rounded-lg px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-100 hover:text-slate-950;
   }
 
   .cl-nav-item-active {
-    @apply bg-slate-900 text-white hover:bg-slate-900 hover:text-white;
+    @apply bg-blue-600 text-white hover:bg-blue-600 hover:text-white;
   }
 
   .cl-chip {
@@ -70,13 +84,13 @@ a {
   }
 
   .cl-muted-box {
-    @apply rounded-2xl border p-4;
+    @apply rounded-xl border p-4;
     border-color: var(--cl-border);
     background: var(--cl-soft);
   }
 
   .cl-title {
-    @apply text-2xl font-semibold tracking-tight text-slate-950;
+    @apply text-2xl font-semibold tracking-tight text-slate-100;
   }
 
   .cl-subtitle {
@@ -84,17 +98,17 @@ a {
   }
 
   .cl-input {
-    @apply w-full rounded-xl border bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-slate-500;
+    @apply w-full rounded-lg border bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-blue-500;
     border-color: var(--cl-border);
   }
 
   .cl-textarea {
-    @apply min-h-24 w-full rounded-xl border bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-slate-500;
+    @apply min-h-24 w-full rounded-lg border bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-blue-500;
     border-color: var(--cl-border);
   }
 
   .cl-select {
-    @apply w-full rounded-xl border bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-slate-500;
+    @apply w-full rounded-lg border bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-blue-500;
     border-color: var(--cl-border);
   }
 

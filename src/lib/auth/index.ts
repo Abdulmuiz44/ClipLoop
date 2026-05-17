@@ -1,8 +1,15 @@
 import { eq } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
 import { env } from "@/lib/env";
+import { auth } from "@/auth";
 
 export const OFFLINE_DEMO_USER_ID = "00000000-0000-0000-0000-000000000001";
+
+export class AuthRequiredError extends Error {
+  constructor() {
+    super("Authentication required.");
+  }
+}
 
 function isDatabaseUnavailableError(error: unknown) {
   const message = error instanceof Error ? error.message : String(error);
@@ -55,5 +62,36 @@ export async function getCurrentUser() {
     return getOrCreateDemoUser();
   }
 
-  throw new Error("Real auth is not configured. Enable MOCK_MODE=true for local development.");
+  const session = await auth();
+  const email = session?.user?.email;
+
+  if (!email) {
+    throw new AuthRequiredError();
+  }
+
+  const existing = await db.query.users.findFirst({ where: eq(schema.users.email, email) });
+  if (existing) {
+    const nextName = session.user?.name ?? existing.fullName;
+    if (nextName !== existing.fullName) {
+      const [updated] = await db
+        .update(schema.users)
+        .set({ fullName: nextName, updatedAt: new Date() })
+        .where(eq(schema.users.id, existing.id))
+        .returning();
+      return updated;
+    }
+    return existing;
+  }
+
+  const [created] = await db
+    .insert(schema.users)
+    .values({
+      email,
+      fullName: session.user?.name ?? null,
+      plan: "free",
+      billingStatus: "authenticated",
+    })
+    .returning();
+
+  return created;
 }
