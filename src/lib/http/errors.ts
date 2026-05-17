@@ -4,6 +4,7 @@ import { ProductAccessError } from "@/domains/account/service";
 import { BillingConfigurationError, BillingPortalError } from "@/domains/billing/service";
 import { UsageLimitError } from "@/domains/usage/service";
 import { InsufficientCreditsError } from "@/domains/credits/service";
+import { AuthRequiredError } from "@/lib/auth";
 
 export function toErrorResponse(error: unknown) {
   if (error instanceof ZodError) {
@@ -12,6 +13,10 @@ export function toErrorResponse(error: unknown) {
 
   if (error instanceof ProductAccessError) {
     return NextResponse.json({ error: error.message, code: "PRODUCT_ACCESS_DENIED" }, { status: 403 });
+  }
+
+  if (error instanceof AuthRequiredError) {
+    return NextResponse.json({ error: error.message, code: "AUTH_REQUIRED" }, { status: 401 });
   }
 
   if (error instanceof BillingConfigurationError) {

@@ -3,8 +3,6 @@ import type { GeneratedPost } from "@/lib/validation/content";
 import type { z } from "zod";
 import type { iterationAnalysisSchema } from "@/lib/validation/iteration";
 
-export type { ProjectPromptContext };
-
 export interface WebsiteDocSnippet {
   source: string;
   title: string | null;

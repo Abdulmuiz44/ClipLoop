@@ -31,15 +31,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
-        <header className="sticky top-0 z-40 border-b cl-divider bg-white/95 backdrop-blur-sm">
+        <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur-sm">
           <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5 md:py-4">
             <ClipLoopLogo href="/" />
             <div className="flex items-center gap-1 text-sm text-slate-700">
-              <Link href="/app" className="rounded-lg px-3 py-1.5 transition hover:bg-slate-100">
+              <Link href="/app" className="rounded-md px-3 py-1.5 transition hover:bg-slate-100 hover:text-slate-950">
                 Open App
               </Link>
-              <Link href="/pricing" className="rounded-lg px-3 py-1.5 transition hover:bg-slate-100">
+              <Link href="/pricing" className="rounded-md px-3 py-1.5 transition hover:bg-slate-100 hover:text-slate-950">
                 Pricing
+              </Link>
+              <Link href="/signin" className="rounded-md bg-blue-600 px-3 py-1.5 font-medium text-white transition hover:bg-blue-500">
+                Sign in
               </Link>
             </div>
           </nav>

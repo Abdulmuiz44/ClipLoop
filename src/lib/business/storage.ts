@@ -1,4 +1,4 @@
-import { and, desc, eq, isNull, or } from "drizzle-orm";
+import { and, desc, eq, isNull } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
 import type { BusinessProfile, PromoPack } from "./schemas";
 
@@ -9,7 +9,10 @@ function userScope(userId: string | null) {
 }
 
 export async function saveBusinessProfile(userId: string | null, profile: BusinessProfile, rawExtractedText?: string) {
-  const [row] = await db.insert(businessProfiles).values({ userId, ...profile, rawExtractedText: rawExtractedText ?? null }).returning();
+  const [row] = await db
+    .insert(businessProfiles)
+    .values({ userId, ...profile, rawExtractedText: rawExtractedText ?? null })
+    .returning();
   return row;
 }
 
@@ -18,7 +21,11 @@ export async function listBusinessProfiles(userId: string | null) {
 }
 
 export async function getBusinessProfileForUser(id: string, userId: string | null) {
-  const [row] = await db.select().from(businessProfiles).where(and(eq(businessProfiles.id, id), userScope(userId))).limit(1);
+  const [row] = await db
+    .select()
+    .from(businessProfiles)
+    .where(and(eq(businessProfiles.id, id), userScope(userId)))
+    .limit(1);
   return row ?? null;
 }
 
@@ -32,7 +39,10 @@ export async function updateBusinessProfile(id: string, userId: string | null, p
 }
 
 export async function deleteBusinessProfile(id: string, userId: string | null) {
-  const [row] = await db.delete(businessProfiles).where(and(eq(businessProfiles.id, id), userScope(userId))).returning({ id: businessProfiles.id });
+  const [row] = await db
+    .delete(businessProfiles)
+    .where(and(eq(businessProfiles.id, id), userScope(userId)))
+    .returning({ id: businessProfiles.id });
   return row ?? null;
 }
 
@@ -75,7 +85,3 @@ export async function getBusinessProfileWithPacksForUser(id: string, userId: str
   const packs = await listPromoPacksForBusiness(id, userId);
   return { profile, packs };
 }
-import { db, schema } from "@/lib/db";import { eq } from "drizzle-orm";import type { BusinessProfile, PromoPack } from "./schemas";
-export async function saveBusinessProfile(userId:string|null, profile:BusinessProfile, rawExtractedText?:string){const result:any = await db.insert((schema as any).businessProfiles).values({userId,websiteUrl:profile.websiteUrl,businessName:profile.businessName,industry:profile.industry,targetAudience:profile.targetAudience,mainOffer:profile.mainOffer,productsOrServices:profile.productsOrServices,keyBenefits:profile.keyBenefits,painPointsSolved:profile.painPointsSolved,brandTone:profile.brandTone,contentAngles:profile.contentAngles,ctaIdeas:profile.ctaIdeas,oneLineSummary:profile.oneLineSummary,longSummary:profile.longSummary,rawExtractedText:rawExtractedText??null}).returning();return Array.isArray(result) ? result[0] : result.rows?.[0];}
-export async function savePromoPack(userId:string|null,businessProfileId:string,pack:PromoPack){const result:any = await db.insert((schema as any).promoPacks).values({userId,businessProfileId,campaignTitle:pack.campaignTitle,positioningAngle:pack.positioningAngle,content:pack}).returning();return Array.isArray(result) ? result[0] : result.rows?.[0];}
-export async function getBusinessProfileById(id:string){return db.query.businessProfiles.findFirst({where:eq((schema as any).businessProfiles.id,id)} as any);}

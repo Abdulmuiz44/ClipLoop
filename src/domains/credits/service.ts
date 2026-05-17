@@ -369,7 +369,7 @@ export async function chargeGenerateVideoCredits(input: {
           and(
             eq(schema.creditLedgerEntries.userId, input.userId),
             eq(schema.creditLedgerEntries.referenceType, "chat_job"),
-            eq(schema.creditLedgerEntries.referenceId, generationReferenceId),
+            eq(schema.creditLedgerEntries.referenceId, generationReferenceId!),
           ),
         )
         .limit(1);
@@ -380,7 +380,7 @@ export async function chargeGenerateVideoCredits(input: {
           and(
             eq(schema.creditLedgerEntries.userId, input.userId),
             eq(schema.creditLedgerEntries.referenceType, "chat_job"),
-            eq(schema.creditLedgerEntries.referenceId, renderReferenceId),
+            eq(schema.creditLedgerEntries.referenceId, renderReferenceId!),
           ),
         )
         .limit(1);

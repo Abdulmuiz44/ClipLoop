@@ -3,6 +3,9 @@ import { generateThumbnail } from "@/lib/render/ffmpeg";
 import type { RenderAdapter, RenderAdapterResult } from "@/lib/render/adapters/types";
 import { assertHyperframesAvailable, renderWithHyperframesCli } from "@/lib/render/hyperframes/cli";
 import { buildHyperframesComposition } from "@/lib/render/hyperframes/composition";
+import { getRenderTemplate } from "@/lib/render/templates";
+import type { CreativeBrief } from "@/lib/prompts/types";
+import { generateScenePlan } from "@/lib/prompts/scenePlanner";
 
 export class HyperframesDisabledError extends Error {
   constructor() {
@@ -19,6 +22,21 @@ export const hyperframesRenderAdapter: RenderAdapter = {
 
     assertHyperframesAvailable();
 
+    const renderTemplate = getRenderTemplate(input.templateId);
+    const brief: CreativeBrief = {
+      concept: input.hook,
+      objective: "Promote the offer with a short-form conversion-oriented video.",
+      targetChannel: input.targetChannel,
+      stylePreset: renderTemplate.id,
+      recommendedTemplateFamily: renderTemplate.id,
+      cta: input.ctaText,
+      tone: "energetic",
+      durationSec: Math.max(8, Math.round((input.slides.length || 4) * renderTemplate.slideDurationSec)),
+      sceneOutline: input.slides.join("\n"),
+      visualDirectionNotes: `Template: ${renderTemplate.displayName}`,
+    };
+    const scenePlan = generateScenePlan(brief);
+
     const composition = await buildHyperframesComposition({
       input: {
         contentItemId: input.contentItemId,
@@ -29,7 +47,14 @@ export const hyperframesRenderAdapter: RenderAdapter = {
         targetChannel: input.targetChannel,
         logoUrl: input.logoUrl,
         backgroundUrl: input.backgroundUrl,
+        stylePreset: brief.stylePreset,
+        templateFamily: brief.recommendedTemplateFamily,
+        durationSec: brief.durationSec,
+        tone: brief.tone,
+        visualNotes: brief.visualDirectionNotes,
+        scenePlan,
       },
+      renderTemplate,
       runDir: input.output.runDir,
     });
 

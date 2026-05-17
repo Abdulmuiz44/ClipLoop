@@ -1,6 +1,8 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import type { HyperframesCompositionInput, HyperframesCompositionPackage } from "@/lib/render/hyperframes/types";
+// Import RenderTemplate to access styling properties
+import type { RenderTemplate } from "@/lib/render/templates";
 
 function escapeHtml(text: string) {
   return text
@@ -19,43 +21,94 @@ function withOptionalImage(
   alt: string,
 ) {
   if (!url) return templateHtml.replace(placeholder, "");
+  // Basic image tag, could be enhanced with more attributes based on style/plan
   return templateHtml.replace(placeholder, `<img src="${escapeHtml(url)}" class="${className}" alt="${escapeHtml(alt)}" />`);
 }
 
-export async function buildHyperframesComposition(params: {
-  input: HyperframesCompositionInput;
-  runDir: string;
-}): Promise<HyperframesCompositionPackage> {
+// Helper to apply styles based on a RenderTemplate object and potentially other planning inputs
+function applyStylesAndStructure(
+  templateHtml: string,
+  renderTemplate: RenderTemplate,
+  input: HyperframesCompositionInput // Pass the full input for tone, visualNotes, scenePlan
+): string {
+  let modifiedHtml = templateHtml;
+
+  // Injecting style preset properties into the template.
+  // This assumes placeholders like {{BG_COLOR}}, {{TEXT_COLOR}}, {{FONT_SIZE}}, {{FOOTER_COLOR}}, {{BOX_COLOR}} exist in the template.
+  // If not, these would need to be added to promo-social.html or handled differently.
+  modifiedHtml = modifiedHtml.replaceAll("{{BG_COLOR}}", renderTemplate.bgColor);
+  modifiedHtml = modifiedHtml.replaceAll("{{TEXT_COLOR}}", renderTemplate.textColor);
+  modifiedHtml = modifiedHtml.replaceAll("{{FONT_SIZE}}", renderTemplate.fontSize.toString());
+  modifiedHtml = modifiedHtml.replaceAll("{{FOOTER_COLOR}}", renderTemplate.footerColor);
+  modifiedHtml = modifiedHtml.replaceAll("{{BOX_COLOR}}", renderTemplate.boxColor);
+  
+  // Apply dynamic duration via a placeholder if the template supports it.
+  // Example: <!-- DURATION_MS --> or similar. For now, we'll use the durationSec directly.
+  // The actual HTML structure for duration control might vary.
+  
+  // Basic integration of tone and visual notes might involve adding them as data attributes or comments,
+  // or influencing other parts of the generation if the template is more dynamic.
+  // For now, let's assume they are logged or used in more complex logic not shown here.
+
+  // TODO: Integrate scenePlan into HTML generation. This is complex and may require dynamic element creation or a different templating approach.
+  // A simplified approach could involve injecting placeholders for scene content if the template is structured for it.
+  // For example, if the template has <!-- SCENE_BLOCKS -->, we could generate HTML for each scene block here.
+  // For this pass, we focus on passing the data and setting up dynamic durations/dimensions.
+
+  return modifiedHtml;
+}
+
+
+export async function buildHyperframesComposition(
+  params: {
+    input: HyperframesCompositionInput;
+    renderTemplate: RenderTemplate; // Pass the selected RenderTemplate
+    runDir: string;
+  }
+): Promise<HyperframesCompositionPackage> {
+  const { input, renderTemplate, runDir } = params;
+
   const templatePath = path.join(process.cwd(), "templates", "hyperframes", "promo-social.html");
   const templateHtml = await fs.readFile(templatePath, "utf8");
 
-  const jobDir = path.join(params.runDir, "hyperframes");
-  await fs.mkdir(jobDir, { recursive: true });
-
   let html = templateHtml
-    .replaceAll("{{BUSINESS_NAME}}", escapeHtml(params.input.businessName))
-    .replaceAll("{{HOOK}}", escapeHtml(params.input.hook))
-    .replaceAll("{{CHANNEL_CAPTION}}", escapeHtml(params.input.channelCaption))
-    .replaceAll("{{CHANNEL_CTA}}", escapeHtml(params.input.channelCta))
-    .replaceAll("{{TARGET_CHANNEL}}", escapeHtml(params.input.targetChannel));
+    .replaceAll("{{BUSINESS_NAME}}", escapeHtml(input.businessName))
+    .replaceAll("{{HOOK}}", escapeHtml(input.hook))
+    .replaceAll("{{CHANNEL_CAPTION}}", escapeHtml(input.channelCaption))
+    .replaceAll("{{CHANNEL_CTA}}", escapeHtml(input.channelCta))
+    .replaceAll("{{TARGET_CHANNEL}}", escapeHtml(input.targetChannel));
+    
+  // Apply styles and other dynamic content based on render template and input
+  html = applyStylesAndStructure(html, renderTemplate, input);
 
-  html = withOptionalImage(html, "<!-- OPTIONAL_LOGO -->", params.input.logoUrl, "logo", "Business logo");
-  html = withOptionalImage(html, "<!-- OPTIONAL_BACKGROUND -->", params.input.backgroundUrl, "bg", "Background media");
+  html = withOptionalImage(html, "<!-- OPTIONAL_LOGO -->", input.logoUrl, "logo", "Business logo");
+  html = withOptionalImage(html, "<!-- OPTIONAL_BACKGROUND -->", input.backgroundUrl, "bg", "Background media");
+
+  const jobDir = path.join(runDir, "hyperframes");
+  await fs.mkdir(jobDir, { recursive: true });
 
   const compositionHtmlPath = path.join(jobDir, "composition.html");
   const metadataPath = path.join(jobDir, "composition.json");
 
   const metadata = {
-    contentItemId: params.input.contentItemId,
-    businessName: params.input.businessName,
-    targetChannel: params.input.targetChannel,
-    templateId: "hf_promo_v1",
-    dimensions: { width: 1080, height: 1920 },
-    fps: 30,
-    durationSec: 8,
+    contentItemId: input.contentItemId,
+    businessName: input.businessName,
+    targetChannel: input.targetChannel,
+    templateId: renderTemplate.id, // Use the templateId from the selected RenderTemplate
+    stylePreset: input.stylePreset, // Include style preset in metadata
+    templateFamily: input.templateFamily, // Include template family in metadata
+    dimensions: { width: renderTemplate.width, height: renderTemplate.height },
+    fps: renderTemplate.fps,
+    // Use dynamic duration from input, falling back to renderTemplate's slideDurationSec
+    durationSec: input.durationSec || renderTemplate.slideDurationSec, 
+    tone: input.tone,
+    visualNotes: input.visualNotes,
+    // The scenePlan is not directly serialized into metadata here but is available in the input.
+    // If needed, it could be serialized or used to construct metadata about scenes.
+    scenePlan: input.scenePlan, // Include scenePlan in metadata for debugging/reference
     assets: {
-      logoUrl: params.input.logoUrl ?? null,
-      backgroundUrl: params.input.backgroundUrl ?? null,
+      logoUrl: input.logoUrl ?? null,
+      backgroundUrl: input.backgroundUrl ?? null,
     },
   };
 
@@ -66,10 +119,10 @@ export async function buildHyperframesComposition(params: {
     compositionHtmlPath,
     metadataPath,
     jobDir,
-    width: 1080,
-    height: 1920,
-    fps: 30,
-    durationSec: 8,
-    templateId: "hf_promo_v1",
+    width: renderTemplate.width,
+    height: renderTemplate.height,
+    fps: renderTemplate.fps,
+    durationSec: input.durationSec || renderTemplate.slideDurationSec,
+    templateId: renderTemplate.id, 
   };
 }

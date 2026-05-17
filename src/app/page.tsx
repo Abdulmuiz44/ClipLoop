@@ -6,192 +6,105 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
-const weeklyPack = [
+const pillars = [
   {
-    title: "Post 1",
-    hook: "Still creating promo content from a blank page every week?",
-    slides: ["Call out the pain", "Frame the solution", "Show the offer", "Direct CTA"],
-    caption: "ClipLoop turns your brand context into a sharp weekly short-form pack.",
-    metrics: "42 clicks · 7 signups · $49 revenue",
+    title: "Plan with context",
+    body: "ClipLoop ingests your website and business profile, then assembles reusable project context for each cycle.",
   },
   {
-    title: "Post 2",
-    hook: "Most growth experiments fail because the content loop is inconsistent.",
-    slides: ["Why consistency breaks", "What gets generated", "Where tracking fits", "What to test next"],
-    caption: "Generate, package, post, track, learn, repeat.",
-    metrics: "31 clicks · 4 signups · winner",
+    title: "Generate with control",
+    body: "Chat-first creation with structured strategy, copy generation, and render controls under one operator surface.",
   },
+  {
+    title: "Ship and learn",
+    body: "Approve assets, push to queue, and iterate from tracked performance data and credit-backed workflows.",
+  },
+];
+
+const steps = [
+  "Capture business context and website signals",
+  "Generate strategy and content items for the week",
+  "Render short-form assets and review outputs",
+  "Export or publish and measure conversions",
 ];
 
 export default function HomePage() {
   return (
-    <div className="space-y-12">
-      <section className="grid gap-8 rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm md:grid-cols-[1.15fr_0.85fr] md:p-10">
-        <div className="space-y-6">
-          <div className="space-y-3">
-            <p className="text-sm font-medium uppercase tracking-[0.24em] text-slate-500">Invite-only beta</p>
-            <h1 className="max-w-3xl text-4xl font-bold tracking-tight text-slate-950 md:text-6xl">
-              Building a simpler way to create short form promo content faster.
-            </h1>
-            <p className="max-w-2xl text-base leading-7 text-slate-600 md:text-lg">
-              ClipLoop gives you one weekly growth loop: set up your brand, generate the week, render and approve the posts, schedule the pack, track what converts, then iterate.
+    <div className="space-y-8">
+      <section className="cl-card relative overflow-hidden p-8 md:p-10">
+        <div className="absolute -right-12 -top-12 h-56 w-56 rounded-full bg-blue-200/50 blur-3xl" />
+        <div className="absolute -bottom-20 left-0 h-56 w-56 rounded-full bg-emerald-200/40 blur-3xl" />
+        <div className="relative grid gap-8 md:grid-cols-[1.1fr_0.9fr]">
+          <div className="space-y-5">
+            <p className="cl-kicker">ClipLoop Platform</p>
+            <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-slate-900 md:text-5xl">Build weekly growth assets without rebuilding your workflow every week.</h1>
+            <p className="max-w-2xl text-base leading-7 text-slate-600">
+              ClipLoop is a creative video operating system for businesses and creators: context assembly, planning, generation, rendering, and delivery in one controlled loop.
             </p>
+            <div className="flex flex-wrap gap-3">
+              <Link href="/app" className="inline-flex rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-500">
+                Open workspace
+              </Link>
+              <Link href="/pricing" className="inline-flex rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-700 transition hover:border-slate-400">
+                View pricing
+              </Link>
+            </div>
           </div>
 
-          <div className="flex flex-wrap gap-3">
-            <Link href="/request-access" className="inline-flex rounded-xl bg-slate-900 px-4 py-2.5 text-sm text-white hover:bg-slate-700">
-              Request beta access
-            </Link>
-            <Link href="/pricing" className="inline-flex rounded-xl border border-slate-300 px-4 py-2.5 text-sm text-slate-700">
-              View pricing
-            </Link>
-          </div>
-
-          <div className="grid gap-3 md:grid-cols-3">
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm">
-              <p className="font-medium text-slate-950">Intentionally narrow</p>
-              <p className="mt-2 leading-6 text-slate-600">Free strategy chat + paid credits for one clear weekly promo loop.</p>
-            </div>
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm">
-              <p className="font-medium text-slate-950">Grounded workflow</p>
-              <p className="mt-2 leading-6 text-slate-600">Generated posts, rendering, scheduling, and conversion tracking that actually works.</p>
-            </div>
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm">
-              <p className="font-medium text-slate-950">Invite-only</p>
-              <p className="mt-2 leading-6 text-slate-600">Beta access is reviewed manually to ensure high quality for every onboarded brand.</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="rounded-[1.5rem] border border-slate-200 bg-slate-950 p-5 text-slate-100 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-slate-400">Weekly pack preview</p>
-              <h2 className="mt-1 text-2xl font-semibold">What users actually get</h2>
-            </div>
-            <span className="rounded-full bg-white/10 px-3 py-1 text-xs text-slate-200">5 posts / week</span>
-          </div>
-          <div className="mt-5 space-y-4">
-            {weeklyPack.map((item) => (
-              <article key={item.title} className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                <p className="text-xs uppercase tracking-[0.2em] text-slate-400">{item.title}</p>
-                <p className="mt-2 text-base font-semibold">{item.hook}</p>
-                <ul className="mt-3 space-y-1 text-sm text-slate-300">
-                  {item.slides.map((slide) => (
-                    <li key={slide}>• {slide}</li>
-                  ))}
-                </ul>
-                <p className="mt-3 text-sm text-slate-300">{item.caption}</p>
-                <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
-                  <span className="rounded-full bg-emerald-500/15 px-2 py-1 text-emerald-300">Tracked link</span>
-                  <span className="rounded-full bg-blue-500/15 px-2 py-1 text-blue-300">{item.metrics}</span>
+          <div className="cl-card-soft p-5">
+            <p className="text-sm font-semibold text-slate-900">Weekly operator cycle</p>
+            <div className="mt-4 space-y-3">
+              {steps.map((step, index) => (
+                <div key={step} className="flex items-start gap-3 rounded-lg border border-slate-200 bg-white p-3">
+                  <span className="inline-flex h-6 w-6 flex-none items-center justify-center rounded-full bg-blue-600 text-xs font-semibold text-white">
+                    {index + 1}
+                  </span>
+                  <p className="text-sm text-slate-600">{step}</p>
                 </div>
-              </article>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-5">
-        {[
-          ["1. Connect your brand", "Store brand context, audience, and core offers once."],
-          ["2. Generate strategy", "Create a weekly strategy cycle and a batch of 5 short-form post drafts."],
-          ["3. Render preview", "Turn drafts into simple vertical slideshow videos, then approve your pack."],
-          ["4. Post content", "Use direct publishing or manual export to ship your pack with tracked links."],
-          ["5. Track & Iterate", "Roll up clicks and conversions, then generate the next cycle from what worked."],
-        ].map(([title, body]) => (
-          <div key={title} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <h2 className="text-base font-semibold text-slate-950">{title}</h2>
-            <p className="mt-2 text-sm leading-6 text-slate-600">{body}</p>
-          </div>
+      <section className="grid gap-4 md:grid-cols-3">
+        {pillars.map((pillar) => (
+          <article key={pillar.title} className="cl-card p-5">
+            <h2 className="text-base font-semibold text-slate-900">{pillar.title}</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-600">{pillar.body}</p>
+          </article>
         ))}
       </section>
 
-      <section className="grid gap-6 md:grid-cols-[1fr_1fr]">
-        <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm">
-          <p className="text-sm font-medium uppercase tracking-[0.22em] text-slate-500">What you get each week</p>
-          <ul className="mt-5 space-y-3 text-sm leading-6 text-slate-700">
-            <li>5 short-form promo posts built from your brand context</li>
-            <li>Hooks, slides, captions, CTAs, and tracked destination links</li>
-            <li>Rendered previews and batch approval before delivery</li>
-            <li>Direct conversion tracking for clicks and revenue</li>
-            <li>Next-cycle generation informed by performance results</li>
-          </ul>
-        </div>
-
-        <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm">
-          <p className="text-sm font-medium uppercase tracking-[0.22em] text-slate-500">Why ClipLoop</p>
-          <ul className="mt-5 space-y-3 text-sm leading-6 text-slate-700">
-            <li>It is outcome-driven. One workspace, one weekly pack, one simple loop.</li>
-            <li>It is affordable by design. Pro is built for active brands, not enterprise budgets.</li>
-            <li>It focuses on consistency. Generate, package, post, learn, repeat.</li>
-            <li>It is a focused operator, not a bloated social media suite.</li>
-          </ul>
-        </div>
-      </section>
-
-      <section className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm">
-        <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
-          <div className="max-w-3xl">
-            <p className="text-sm font-medium uppercase tracking-[0.22em] text-slate-500">Built for</p>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950">Brands, businesses, and creators</h2>
-            <p className="mt-4 text-base leading-7 text-slate-600">
-              ClipLoop is for growing brands and creators who want distribution without manually planning, writing, rendering, and testing content every week.
+      <section className="cl-card p-6 md:p-8">
+        <div className="grid gap-6 md:grid-cols-[0.9fr_1.1fr]">
+          <div>
+            <p className="cl-kicker">Open Core Direction</p>
+            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">First-party app now, open engine plus hosted gateway next.</h2>
+            <p className="mt-3 text-sm leading-6 text-slate-600">
+              ClipLoop is being split into app UX, reusable engine logic, and managed hosted execution for production reliability and credits.
             </p>
           </div>
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-700">
-            <p className="font-medium text-slate-950">Not a fit</p>
-            <ul className="mt-3 space-y-2 leading-6">
-              <li>Agencies managing dozens of brands</li>
-              <li>Enterprise teams with heavy approval layers</li>
-              <li>Anyone expecting generic AI hype over practical workflow</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      <section className="grid gap-6 rounded-3xl border border-slate-200 bg-slate-950 p-8 text-white shadow-sm md:grid-cols-[0.8fr_1.2fr]">
-        <div>
-          <p className="text-sm font-medium uppercase tracking-[0.22em] text-slate-400">Pro pricing</p>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight">$5/month</h2>
-          <p className="mt-4 text-sm leading-7 text-slate-300">
-            Free strategy chat is open to everyone. Pro unlocks high-volume generation and video renders for your brands.
-          </p>
-          <div className="mt-5 flex flex-wrap gap-3">
-            <Link href="/pricing" className="inline-flex rounded-xl bg-white px-4 py-2.5 text-sm text-slate-950 hover:bg-slate-200">
-              See pricing details
-            </Link>
-            <Link href="/request-access" className="inline-flex rounded-xl border border-white/20 px-4 py-2.5 text-sm text-white hover:bg-white/10">
-              Request access
-            </Link>
-          </div>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-            <p className="text-sm font-medium">What happens after approval</p>
-            <ul className="mt-3 space-y-2 text-sm leading-6 text-slate-300">
-              <li>Set up your brand profile</li>
-              <li>Generate your first weekly strategy</li>
-              <li>Review the 5-post content pack</li>
-              <li>Render, approve, and track conversions</li>
-            </ul>
-          </div>
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-            <p className="text-sm font-medium">What improves over time</p>
-            <ul className="mt-3 space-y-2 text-sm leading-6 text-slate-300">
-              <li>Winners and losers get classified</li>
-              <li>Hooks and angles get refined</li>
-              <li>Next week is generated from real results</li>
-              <li>Your content loop gets faster and sharper</li>
-            </ul>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="cl-card-soft p-4">
+              <p className="text-sm font-medium text-slate-900">First-party app</p>
+              <p className="mt-2 text-xs leading-5 text-slate-600">Dashboard, create flow, chat workspace, onboarding, manual queue.</p>
+            </div>
+            <div className="cl-card-soft p-4">
+              <p className="text-sm font-medium text-slate-900">Open core</p>
+              <p className="mt-2 text-xs leading-5 text-slate-600">Context assembly, provider interfaces, render contracts, planning modules.</p>
+            </div>
+            <div className="cl-card-soft p-4 sm:col-span-2">
+              <p className="text-sm font-medium text-slate-900">Hosted gateway</p>
+              <p className="mt-2 text-xs leading-5 text-slate-600">Managed API keys, orchestration, provider access, render workers, and credit enforcement.</p>
+            </div>
           </div>
         </div>
       </section>
 
       <AccessRequestForm
-        title="Join the invite-only beta"
-        description="If your product fits the current ClipLoop shape, request access here. We review manually and prioritize clear, narrow use cases over broad marketing wishlists."
+        title="Request Access"
+        description="ClipLoop is still invite-only for production operators. Share your product use case and we will review for fit."
       />
     </div>
   );

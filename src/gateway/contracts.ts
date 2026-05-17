@@ -40,12 +40,14 @@ export interface GatewayRenderExecutor {
     contentItemId: string;
     renderer?: RenderBackend;
     targetChannel?: CoreChannel;
-  }): Promise<{ status: "completed" | "failed"; error?: string }>;
+  }): Promise<{ status: "completed" | "failed"; error?: string; result?: unknown }>;
 }
 
 export interface GatewayOrchestrator {
+  generateStrategy(input: { userId: string; projectId: string }): Promise<{ cycle: unknown }>;
+  generatePosts(input: { userId: string; strategyCycleId: string }): Promise<{ posts: unknown[] }>;
   generateCopy(input: { userId: string; prompt: string; projectId?: string }): Promise<{ text: string }>;
   generateVideo(input: { userId: string; contentItemId: string }): Promise<{ status: "queued" | "completed" }>;
+  schedulePublish(input: { userId: string; contentItemId: string; scheduledFor: Date }): Promise<unknown>;
   publish(input: { userId: string; contentItemId: string; scheduledFor?: Date }): Promise<{ status: "scheduled" | "published" }>;
 }
-

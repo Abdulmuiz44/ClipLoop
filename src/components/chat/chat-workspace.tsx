@@ -26,24 +26,16 @@ type ChatMode = "chat" | "generate_copy" | "generate_video";
 function friendlyApiError(payload: Record<string, unknown>) {
   const code = typeof payload.code === "string" ? payload.code : "";
   const suggestion = typeof payload.suggestion === "string" ? payload.suggestion : "";
-  if (code === "PROJECT_LIMIT_REACHED") {
-    return "You reached your project limit. Upgrade to Pro to create more projects.";
-  }
-  if (code.includes("POSTS_")) {
-    return "You are out of generation credits for this period. Upgrade to Pro for more.";
-  }
-  if (code.includes("RENDER_")) {
-    return "You are out of render credits for this period. Upgrade to Pro for more.";
-  }
+  if (code === "PROJECT_LIMIT_REACHED") return "You reached your project limit. Upgrade to Pro to create more projects.";
+  if (code.includes("POSTS_")) return "You are out of generation credits for this period. Upgrade to Pro for more.";
+  if (code.includes("RENDER_")) return "You are out of render credits for this period. Upgrade to Pro for more.";
   if (code === "CREDITS_INSUFFICIENT") {
     const bucket = typeof payload.bucket === "string" ? payload.bucket : "generation";
     const available = typeof payload.available === "number" ? payload.available : 0;
     const required = typeof payload.required === "number" ? payload.required : 1;
     return `You need ${required} ${bucket} credits but only have ${available}. Upgrade to Pro to continue.`;
   }
-  if (code === "PRODUCT_ACCESS_DENIED") {
-    return "Access is currently limited for this account. Open pricing or request access to continue.";
-  }
+  if (code === "PRODUCT_ACCESS_DENIED") return "Access is currently limited for this account. Open pricing or request access to continue.";
   const base = (typeof payload.error === "string" && payload.error) || "Request failed.";
   return suggestion ? `${base} ${suggestion}` : base;
 }
@@ -168,15 +160,8 @@ export function ChatWorkspace(props: {
   const embedded = props.embedded ?? false;
 
   return (
-    <div className={`relative flex min-h-[calc(100vh-5rem)] bg-slate-50 ${embedded ? "rounded-2xl border cl-divider" : "-mx-4 md:mx-0 md:overflow-hidden md:rounded-3xl md:border md:cl-divider"}`}>
-      {sidebarOpen ? (
-        <button
-          type="button"
-          className="absolute inset-0 z-20 bg-slate-900/20 md:hidden"
-          aria-label="Close navigation drawer"
-          onClick={() => setSidebarOpen(false)}
-        />
-      ) : null}
+    <div className={`relative flex min-h-[calc(100vh-5rem)] ${embedded ? "rounded-xl border cl-divider" : "-mx-4 md:mx-0 md:overflow-hidden md:rounded-xl md:border md:cl-divider"}`}>
+      {sidebarOpen ? <button type="button" className="absolute inset-0 z-20 bg-slate-900/20 md:hidden" aria-label="Close navigation drawer" onClick={() => setSidebarOpen(false)} /> : null}
       <aside
         className={`absolute inset-y-0 left-0 z-30 w-[18.5rem] border-r bg-white p-4 transition-transform cl-divider md:static md:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
@@ -184,11 +169,7 @@ export function ChatWorkspace(props: {
       >
         <div className="flex items-center justify-between gap-2 border-b pb-4 cl-divider">
           <ClipLoopLogo compact={false} />
-          <button
-            className="rounded-lg border px-2.5 py-1.5 text-xs text-slate-700 transition cl-divider md:hidden"
-            onClick={() => setSidebarOpen(false)}
-            type="button"
-          >
+          <button className="rounded-md border border-slate-300 px-2.5 py-1.5 text-xs text-slate-700 transition md:hidden" onClick={() => setSidebarOpen(false)} type="button">
             Close
           </button>
         </div>
@@ -198,7 +179,6 @@ export function ChatWorkspace(props: {
           <NavLink href="/dashboard/settings" label="Settings" />
           <NavLink href="/pricing" label="Pricing" />
           <NavLink href="/dashboard/manual-queue" label="Manual queue" />
-          <NavLink href="/request-access" label="Request access" />
         </nav>
 
         <div className="mt-6 cl-muted-box text-xs">
@@ -223,10 +203,10 @@ export function ChatWorkspace(props: {
             <button
               key={conversation.id}
               type="button"
-              className={`w-full rounded-xl border p-3 text-left text-sm transition ${
+              className={`w-full rounded-lg border p-3 text-left text-sm transition ${
                 conversation.id === activeConversationId
-                  ? "border-slate-900 bg-slate-900 text-white"
-                  : "bg-white text-slate-700 hover:bg-slate-50"
+                  ? "border-blue-500 bg-blue-500 text-slate-950"
+                  : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
               }`}
               onClick={() => selectConversation(conversation.id)}
             >
@@ -238,22 +218,18 @@ export function ChatWorkspace(props: {
 
       <div className="flex min-w-0 flex-1 flex-col">
         {embedded ? null : (
-        <header className="flex items-center justify-between border-b bg-white px-4 py-3.5 cl-divider md:px-6">
-          <button
-            type="button"
-            className="rounded-lg border px-3 py-1.5 text-sm text-slate-700 transition cl-divider md:hidden"
-            onClick={() => setSidebarOpen(true)}
-          >
-            Menu
-          </button>
-          <div className="min-w-0">
-            <p className="cl-kicker">ClipLoop Operator</p>
-            <h1 className="truncate text-base font-semibold tracking-tight">{activeConversation?.title ?? "Chat workspace"}</h1>
-          </div>
-          <Link href="/pricing" className="rounded-lg border px-3 py-1.5 text-xs font-medium text-slate-700 transition cl-divider hover:bg-slate-50">
-            Upgrade to Pro
-          </Link>
-        </header>
+          <header className="flex items-center justify-between border-b bg-white px-4 py-3.5 cl-divider md:px-6">
+            <button type="button" className="rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-700 transition md:hidden" onClick={() => setSidebarOpen(true)}>
+              Menu
+            </button>
+            <div className="min-w-0">
+              <p className="cl-kicker">ClipLoop Operator</p>
+              <h1 className="truncate text-base font-semibold tracking-tight text-slate-900">{activeConversation?.title ?? "Chat workspace"}</h1>
+            </div>
+            <Link href="/pricing" className="rounded-md border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:border-slate-400 hover:text-slate-900">
+              Upgrade
+            </Link>
+          </header>
         )}
 
         <main className="flex-1 overflow-y-auto px-4 py-6 pb-44 md:px-8">
@@ -262,58 +238,41 @@ export function ChatWorkspace(props: {
               <div className="cl-card space-y-6 p-6 text-sm text-slate-700 md:p-8">
                 <div className="space-y-2 text-center">
                   <p className="cl-kicker">New conversation</p>
-                  <h2 className="text-xl font-semibold tracking-tight text-slate-950">How can ClipLoop help today?</h2>
-                  <p className="mx-auto max-w-lg text-slate-600">
-                    ClipLoop uses your saved business profile to generate content that fits your brand voice and target audience.
-                  </p>
+                  <h2 className="text-xl font-semibold tracking-tight text-slate-900">How can ClipLoop help today?</h2>
+                  <p className="mx-auto max-w-lg text-slate-600">Ask strategy questions, generate copy, or render a short-form promo video from your saved business context.</p>
                 </div>
 
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <div className="rounded-2xl border p-4 transition-all cl-divider hover:border-slate-400">
-                    <p className="font-semibold text-slate-950">Ask strategy</p>
-                    <p className="mt-1 text-xs leading-5 text-slate-500">Free conversation about your weekly promo angles or hooks.</p>
-                    <p className="mt-3 text-xs italic text-slate-600">What are some hooks for our new winter sale?</p>
-                  </div>
-                  <div className="rounded-2xl border p-4 transition-all cl-divider hover:border-slate-400">
-                    <p className="font-semibold text-slate-950">Generate copy</p>
-                    <p className="mt-1 text-xs leading-5 text-slate-500">Create polished promo scripts, captions, and CTAs (1 credit).</p>
-                    <p className="mt-3 text-xs italic text-slate-600">Generate an Instagram promo for our early-bird offer.</p>
-                  </div>
-                  <div className="rounded-2xl border p-4 transition-all cl-divider hover:border-slate-400">
-                    <p className="font-semibold text-slate-950">Render video</p>
-                    <p className="mt-1 text-xs leading-5 text-slate-500">Generate copy and render a vertical promo video (2 credits).</p>
-                    <p className="mt-3 text-xs italic text-slate-600">Create a TikTok promo video for our app feature.</p>
-                  </div>
-                  <div className="rounded-2xl border p-4 transition-all cl-divider hover:border-slate-400">
-                    <p className="font-semibold text-slate-950">Quick draft</p>
-                    <p className="mt-1 text-xs leading-5 text-slate-500">Draft short form copy for multiple channels at once (1 credit).</p>
-                    <p className="mt-3 text-xs italic text-slate-600">Draft a WhatsApp and Instagram promo for our event.</p>
-                  </div>
+                  <HintCard title="Ask strategy" body="Free conversation about your weekly promo angles and hooks." sample="What are hooks for our new winter sale?" />
+                  <HintCard title="Generate copy" body="Create scripts, captions, and CTAs (1 credit)." sample="Generate an Instagram promo for our early-bird offer." />
+                  <HintCard title="Render video" body="Generate copy and render a vertical promo video (2 credits)." sample="Create a TikTok promo video for our app feature." />
+                  <HintCard title="Draft channels" body="Draft copy for multiple channels at once (1 credit)." sample="Draft WhatsApp and Instagram promo for our event." />
                 </div>
               </div>
             ) : null}
+
             {messages.map((message) => (
               <div
                 key={message.id}
-                className={`rounded-2xl border px-4 py-3.5 text-sm ${
+                className={`rounded-lg border px-4 py-3.5 text-sm ${
                   message.role === "user"
-                    ? "ml-6 border-slate-900 bg-slate-900 text-white"
+                    ? "ml-6 border-blue-600 bg-blue-600 text-white"
                     : message.kind === "status"
-                      ? "mr-6 bg-slate-50 text-slate-700"
-                      : "mr-6 bg-white text-slate-800"
+                      ? "mr-6 border-slate-200 bg-slate-50 text-slate-700"
+                      : "mr-6 border-slate-200 bg-white text-slate-800"
                 }`}
               >
-                <p className={`mb-1.5 text-[11px] uppercase tracking-[0.14em] ${message.role === "user" ? "text-slate-300" : "text-slate-500"}`}>
+                <p className={`mb-1.5 text-[11px] uppercase tracking-[0.14em] ${message.role === "user" ? "text-blue-100" : "text-slate-500"}`}>
                   {message.role === "user" ? "You" : message.kind === "status" ? "Status" : "ClipLoop"}
                 </p>
-                <p className="leading-6">{message.content}</p>
+                <p className="whitespace-pre-wrap leading-6">{message.content}</p>
                 {message.kind === "result" ? <ResultCard metadata={message.metadataJson ?? {}} /> : null}
               </div>
             ))}
           </div>
         </main>
 
-        <div className={`z-20 border-t bg-white/97 p-3 backdrop-blur cl-divider md:static md:border-t md:bg-white md:p-4 ${embedded ? "sticky bottom-0" : "fixed inset-x-0 bottom-0"}`}>
+        <div className={`z-20 border-t bg-white/95 p-3 backdrop-blur cl-divider md:static md:border-t md:bg-white md:p-4 ${embedded ? "sticky bottom-0" : "fixed inset-x-0 bottom-0"}`}>
           <div className="mx-auto w-full max-w-3xl space-y-2.5">
             <div className="flex flex-wrap gap-1.5">
               <ModePill active={mode === "chat"} onClick={() => setMode("chat")} label="Chat (Free)" />
@@ -322,7 +281,7 @@ export function ChatWorkspace(props: {
             </div>
             <div className="flex items-end gap-2">
               <textarea
-                className="max-h-40 min-h-12 flex-1 rounded-2xl border bg-white p-3 text-sm text-slate-900 outline-none transition focus:border-slate-500 cl-divider"
+                className="max-h-40 min-h-12 flex-1 rounded-lg border border-slate-300 bg-white p-3 text-sm text-slate-900 outline-none transition focus:border-blue-500"
                 placeholder={
                   mode === "chat"
                     ? "Ask strategy or refine ideas..."
@@ -344,6 +303,16 @@ export function ChatWorkspace(props: {
   );
 }
 
+function HintCard({ title, body, sample }: { title: string; body: string; sample: string }) {
+  return (
+    <div className="rounded-lg border border-slate-200 bg-white p-4 transition hover:border-slate-300">
+      <p className="font-semibold text-slate-900">{title}</p>
+      <p className="mt-1 text-xs leading-5 text-slate-600">{body}</p>
+      <p className="mt-3 text-xs italic text-slate-700">{sample}</p>
+    </div>
+  );
+}
+
 function findWalletFromMessages(messages: Message[]) {
   for (let i = messages.length - 1; i >= 0; i -= 1) {
     const metadata = messages[i]?.metadataJson;
@@ -352,9 +321,7 @@ function findWalletFromMessages(messages: Message[]) {
     if (!walletAfter || typeof walletAfter !== "object") continue;
     const generation = (walletAfter as Record<string, unknown>).generation;
     const render = (walletAfter as Record<string, unknown>).render;
-    if (typeof generation === "number" && typeof render === "number") {
-      return { generation, render };
-    }
+    if (typeof generation === "number" && typeof render === "number") return { generation, render };
   }
   return null;
 }
@@ -365,7 +332,7 @@ function ModePill({ active, onClick, label }: { active: boolean; onClick: () => 
       type="button"
       onClick={onClick}
       className={`rounded-full border px-3 py-1.5 text-xs transition ${
-        active ? "border-slate-900 bg-slate-900 text-white" : "bg-white text-slate-700 hover:bg-slate-50"
+        active ? "border-blue-600 bg-blue-600 text-white" : "border-slate-300 bg-white text-slate-700 hover:border-slate-400"
       }`}
     >
       {label}
@@ -375,9 +342,9 @@ function ModePill({ active, onClick, label }: { active: boolean; onClick: () => 
 
 function NavLink({ href, label, active = false }: { href: string; label: string; active?: boolean }) {
   return (
-    <a href={href} className={`cl-nav-item ${active ? "cl-nav-item-active" : ""}`}>
+    <Link href={href} className={`cl-nav-item ${active ? "cl-nav-item-active" : ""}`}>
       {label}
-    </a>
+    </Link>
   );
 }
 
@@ -417,32 +384,20 @@ function ResultCard({ metadata }: { metadata: Record<string, unknown> }) {
   }>;
 
   return (
-    <div className="mt-3 space-y-2 rounded-xl border p-3 text-slate-800 cl-divider" style={{ background: "var(--cl-soft)" }}>
+    <div className="mt-3 space-y-2 rounded-lg border border-slate-200 bg-slate-50 p-3 text-slate-800">
       {videoUrl ? (
-        <video src={videoUrl} controls className="w-full rounded-lg border bg-black cl-divider" />
+        <video src={videoUrl} controls className="w-full rounded-lg border border-slate-300 bg-black" />
       ) : (
-        <div className="rounded-lg border bg-white p-2 text-xs text-slate-500 cl-divider">Copy generated. No render preview for this action.</div>
+        <div className="rounded-lg border border-slate-200 bg-white p-2 text-xs text-slate-500">Copy generated. No render preview for this action.</div>
       )}
       <div className="grid gap-1 text-xs text-slate-700">
-        <p>
-          <strong>Channel:</strong> {targetChannel || "n/a"}
-        </p>
-        <p>
-          <strong>Caption:</strong> {caption || "n/a"}
-        </p>
-        <p>
-          <strong>CTA:</strong> {ctaText || "n/a"}
-        </p>
-        {creditsConsumed ? (
-          <p>
-            <strong>Credits used:</strong> {creditsConsumed}
-          </p>
-        ) : null}
+        <p><strong className="text-slate-900">Channel:</strong> {targetChannel || "n/a"}</p>
+        <p><strong className="text-slate-900">Caption:</strong> {caption || "n/a"}</p>
+        <p><strong className="text-slate-900">CTA:</strong> {ctaText || "n/a"}</p>
+        {creditsConsumed ? <p><strong className="text-slate-900">Credits used:</strong> {creditsConsumed}</p> : null}
         {parsedReceipts.length > 0 ? (
           <div>
-            <p>
-              <strong>Charge receipts:</strong>
-            </p>
+            <p><strong className="text-slate-900">Charge receipts:</strong></p>
             {parsedReceipts.map((receipt) => (
               <p key={receipt.transactionId} className="mt-0.5 text-slate-700">
                 {receipt.amount} {receipt.bucket} credit{receipt.amount === 1 ? "" : "s"} at {receipt.time} ({receipt.reason})
@@ -452,13 +407,13 @@ function ResultCard({ metadata }: { metadata: Record<string, unknown> }) {
         ) : null}
       </div>
       {downloadUrl ? (
-        <a href={downloadUrl} className="inline-flex rounded-lg border bg-white px-2.5 py-1 text-xs font-medium transition cl-divider hover:bg-slate-50">
+        <a href={downloadUrl} className="inline-flex rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 transition hover:border-slate-400">
           Download video
         </a>
       ) : null}
-      <a href="/dashboard/settings" className="inline-flex rounded-lg border bg-white px-2.5 py-1 text-xs font-medium transition cl-divider hover:bg-slate-50">
+      <Link href="/dashboard/settings" className="inline-flex rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 transition hover:border-slate-400">
         View credit history
-      </a>
+      </Link>
     </div>
   );
 }
