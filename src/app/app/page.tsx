@@ -65,10 +65,11 @@ export default async function StudioDashboardPage() {
   const publishesUsed = usage.usage.publishesPerMonth;
 
   const quickActions = [
-    { href: "/app/create", title: "Create Video", detail: "Guided workflow for short-form renders" },
-    { href: "/app/chats", title: "Open Chats", detail: "Strategy and generation chat workspace" },
-    { href: "/app/projects", title: "Projects", detail: "Manage business and creator projects" },
-    { href: "/dashboard/manual-queue", title: "Manual Queue", detail: "Review and deliver queued content" },
+    { href: "/app/weekly-promo", title: "Create weekly promo video", detail: "Turn a product update into a short promo video.", cta: "Start promo" },
+    { href: "/app/create", title: "Create Video", detail: "Guided workflow for short-form renders", cta: "Start create" },
+    { href: "/app/chats", title: "Open Chats", detail: "Strategy and generation chat workspace", cta: "Open chats" },
+    { href: "/app/projects", title: "Projects", detail: "Manage business and creator projects", cta: "View projects" },
+    { href: "/dashboard/manual-queue", title: "Manual Queue", detail: "Review and deliver queued content", cta: "Open queue" },
   ];
 
   return (
@@ -85,6 +86,7 @@ export default async function StudioDashboardPage() {
               <Link key={action.href} href={action.href} className="cl-card p-4 transition hover:border-blue-400">
                 <p className="text-sm font-semibold text-slate-900">{action.title}</p>
                 <p className="mt-1 text-xs text-slate-600">{action.detail}</p>
+                <p className="mt-3 text-xs font-semibold text-blue-600">{action.cta} →</p>
               </Link>
             ))}
           </div>

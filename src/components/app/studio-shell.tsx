@@ -13,6 +13,7 @@ const primaryNav: NavItem[] = [
   { href: "/app/projects", label: "Projects" },
   { href: "/app/chats", label: "Chats" },
   { href: "/app/create", label: "Create" },
+  { href: "/app/weekly-promo", label: "Weekly Promo" },
   { href: "/dashboard/business", label: "Business" },
   { href: "/dashboard/manual-queue", label: "Queue" },
   { href: "/dashboard/settings", label: "Settings" },

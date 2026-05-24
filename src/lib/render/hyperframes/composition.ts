@@ -25,6 +25,58 @@ function withOptionalImage(
   return templateHtml.replace(placeholder, `<img src="${escapeHtml(url)}" class="${className}" alt="${escapeHtml(alt)}" />`);
 }
 
+function normalizeTemplateColor(value: string): string {
+  const trimmed = value.trim();
+  if (trimmed.startsWith("0x")) {
+    return `#${trimmed.slice(2)}`;
+  }
+
+  const alphaMatch = /^([a-zA-Z]+)@(0(?:\.\d+)?|1(?:\.0+)?)$/.exec(trimmed);
+  if (alphaMatch) {
+    const [, base, alpha] = alphaMatch;
+    const normalizedBase = base.toLowerCase();
+    if (normalizedBase === "white") return `rgba(255, 255, 255, ${alpha})`;
+    if (normalizedBase === "black") return `rgba(0, 0, 0, ${alpha})`;
+  }
+
+  return trimmed;
+}
+
+function buildScenePlanSummary(input: HyperframesCompositionInput): string {
+  const scenes = input.scenePlan
+    .slice(0, 3)
+    .map((scene, index) => {
+      const text = scene.primaryText?.trim() || scene.purpose.trim();
+      return `${index + 1}. ${text}`;
+    });
+
+  if (scenes.length === 0) return input.channelCaption;
+
+  return scenes.join(" • ");
+}
+
+function buildSceneBlocksMarkup(input: HyperframesCompositionInput): string {
+  if (input.scenePlan.length === 0) {
+    return `<div class="scene-block is-static"><div class="scene-primary">${escapeHtml(input.channelCaption)}</div></div>`;
+  }
+
+  return input.scenePlan
+    .map((scene, index) => {
+      const primary = scene.primaryText?.trim() || scene.purpose.trim();
+      const secondary = scene.secondaryText?.trim() || "";
+      const cta = scene.cta?.trim() || "";
+
+      const chunks = [
+        `<div class="scene-primary">${escapeHtml(primary)}</div>`,
+        secondary ? `<div class="scene-secondary">${escapeHtml(secondary)}</div>` : "",
+        cta ? `<div class="scene-cta">${escapeHtml(cta)}</div>` : "",
+      ].filter(Boolean);
+
+      return `<div class="scene-block" style="--scene-start-ms:${scene.timing.startMs};--scene-duration-ms:${scene.timing.durationMs};" data-scene-index="${index}">${chunks.join("")}</div>`;
+    })
+    .join("\n");
+}
+
 // Helper to apply styles based on a RenderTemplate object and potentially other planning inputs
 function applyStylesAndStructure(
   templateHtml: string,
@@ -36,11 +88,14 @@ function applyStylesAndStructure(
   // Injecting style preset properties into the template.
   // This assumes placeholders like {{BG_COLOR}}, {{TEXT_COLOR}}, {{FONT_SIZE}}, {{FOOTER_COLOR}}, {{BOX_COLOR}} exist in the template.
   // If not, these would need to be added to promo-social.html or handled differently.
-  modifiedHtml = modifiedHtml.replaceAll("{{BG_COLOR}}", renderTemplate.bgColor);
-  modifiedHtml = modifiedHtml.replaceAll("{{TEXT_COLOR}}", renderTemplate.textColor);
+  modifiedHtml = modifiedHtml.replaceAll("{{BG_COLOR}}", normalizeTemplateColor(renderTemplate.bgColor));
+  modifiedHtml = modifiedHtml.replaceAll("{{TEXT_COLOR}}", normalizeTemplateColor(renderTemplate.textColor));
   modifiedHtml = modifiedHtml.replaceAll("{{FONT_SIZE}}", renderTemplate.fontSize.toString());
-  modifiedHtml = modifiedHtml.replaceAll("{{FOOTER_COLOR}}", renderTemplate.footerColor);
-  modifiedHtml = modifiedHtml.replaceAll("{{BOX_COLOR}}", renderTemplate.boxColor);
+  modifiedHtml = modifiedHtml.replaceAll("{{FOOTER_COLOR}}", normalizeTemplateColor(renderTemplate.footerColor));
+  modifiedHtml = modifiedHtml.replaceAll("{{BOX_COLOR}}", normalizeTemplateColor(renderTemplate.boxColor));
+  modifiedHtml = modifiedHtml.replaceAll("{{HOOK_BOX_BG}}", normalizeTemplateColor(renderTemplate.boxColor));
+  modifiedHtml = modifiedHtml.replaceAll("{{SHADE_COLOR}}", normalizeTemplateColor(renderTemplate.bgColor));
+  modifiedHtml = modifiedHtml.replaceAll("{{DURATION_SEC}}", String(input.durationSec || renderTemplate.slideDurationSec));
   
   // Apply dynamic duration via a placeholder if the template supports it.
   // Example: <!-- DURATION_MS --> or similar. For now, we'll use the durationSec directly.
@@ -50,10 +105,9 @@ function applyStylesAndStructure(
   // or influencing other parts of the generation if the template is more dynamic.
   // For now, let's assume they are logged or used in more complex logic not shown here.
 
-  // TODO: Integrate scenePlan into HTML generation. This is complex and may require dynamic element creation or a different templating approach.
-  // A simplified approach could involve injecting placeholders for scene content if the template is structured for it.
-  // For example, if the template has <!-- SCENE_BLOCKS -->, we could generate HTML for each scene block here.
-  // For this pass, we focus on passing the data and setting up dynamic durations/dimensions.
+  const scenePlanSummary = buildScenePlanSummary(input);
+  modifiedHtml = modifiedHtml.replaceAll("{{SCENE_PLAN_SUMMARY}}", escapeHtml(scenePlanSummary));
+  modifiedHtml = modifiedHtml.replaceAll("{{SCENE_BLOCKS}}", buildSceneBlocksMarkup(input));
 
   return modifiedHtml;
 }
@@ -71,10 +125,12 @@ export async function buildHyperframesComposition(
   const templatePath = path.join(process.cwd(), "templates", "hyperframes", "promo-social.html");
   const templateHtml = await fs.readFile(templatePath, "utf8");
 
+  const effectiveCaption = input.scenePlan.length > 0 ? buildScenePlanSummary(input) : input.channelCaption;
+
   let html = templateHtml
     .replaceAll("{{BUSINESS_NAME}}", escapeHtml(input.businessName))
     .replaceAll("{{HOOK}}", escapeHtml(input.hook))
-    .replaceAll("{{CHANNEL_CAPTION}}", escapeHtml(input.channelCaption))
+    .replaceAll("{{CHANNEL_CAPTION}}", escapeHtml(effectiveCaption))
     .replaceAll("{{CHANNEL_CTA}}", escapeHtml(input.channelCta))
     .replaceAll("{{TARGET_CHANNEL}}", escapeHtml(input.targetChannel));
     

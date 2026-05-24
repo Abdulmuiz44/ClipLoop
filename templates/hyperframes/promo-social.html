@@ -17,8 +17,8 @@
         height: 1920px;
         position: relative;
         overflow: hidden;
-        background: linear-gradient(180deg, #0f172a 0%, #111827 100%);
-        color: #f8fafc;
+        background: linear-gradient(180deg, {{BG_COLOR}} 0%, {{SHADE_COLOR}} 100%);
+        color: {{TEXT_COLOR}};
         padding: 80px 64px 110px;
       }
       .bg {
@@ -31,7 +31,7 @@
       .shade {
         position: absolute;
         inset: 0;
-        background: linear-gradient(180deg, rgba(2, 6, 23, 0.1), rgba(2, 6, 23, 0.85));
+        background: linear-gradient(180deg, rgba(2, 6, 23, 0.1), {{BOX_COLOR}});
         z-index: 1;
       }
       .content {
@@ -58,15 +58,59 @@
       .hook {
         margin-top: 40px;
         font-weight: 800;
-        font-size: 68px;
+        font-size: {{FONT_SIZE}}px;
         line-height: 1.05;
         letter-spacing: -0.02em;
+        background: {{HOOK_BOX_BG}};
+        border-radius: 24px;
+        padding: 20px 24px;
       }
       .caption {
         margin-top: 30px;
         font-size: 40px;
         line-height: 1.24;
-        color: #e2e8f0;
+        color: {{FOOTER_COLOR}};
+      }
+      .scene-timeline {
+        margin-top: 20px;
+        position: relative;
+        min-height: 220px;
+      }
+      .scene-block {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        transform: translateY(10px);
+        padding: 20px 24px;
+        border-radius: 18px;
+        background: {{BOX_COLOR}};
+        animation-name: scene-show;
+        animation-duration: {{DURATION_SEC}}s;
+        animation-iteration-count: infinite;
+        animation-fill-mode: both;
+        animation-timing-function: linear;
+        animation-delay: calc((var(--scene-start-ms, 0) * -1ms));
+      }
+      .scene-block.is-static {
+        position: relative;
+        opacity: 1;
+        transform: none;
+        animation: none;
+      }
+      .scene-primary {
+        font-size: 44px;
+        font-weight: 700;
+        line-height: 1.15;
+      }
+      .scene-secondary {
+        margin-top: 12px;
+        font-size: 32px;
+        color: {{FOOTER_COLOR}};
+      }
+      .scene-cta {
+        margin-top: 14px;
+        font-size: 28px;
+        font-weight: 700;
       }
       .cta {
         margin-top: auto;
@@ -83,7 +127,13 @@
       .channel {
         margin-top: 14px;
         font-size: 26px;
-        color: #94a3b8;
+        color: {{FOOTER_COLOR}};
+      }
+      @keyframes scene-show {
+        0% { opacity: 0; transform: translateY(10px); }
+        6% { opacity: 1; transform: translateY(0); }
+        82% { opacity: 1; transform: translateY(0); }
+        100% { opacity: 0; transform: translateY(-10px); }
       }
     </style>
   </head>
@@ -98,6 +148,10 @@
         </div>
         <div class="hook">{{HOOK}}</div>
         <div class="caption">{{CHANNEL_CAPTION}}</div>
+        <div class="scene-timeline">
+          {{SCENE_BLOCKS}}
+        </div>
+        <div class="channel">Scene flow: {{SCENE_PLAN_SUMMARY}}</div>
         <div class="cta">{{CHANNEL_CTA}}</div>
         <div class="channel">Optimized for {{TARGET_CHANNEL}}</div>
       </div>
