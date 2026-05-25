@@ -2,7 +2,17 @@ import { z } from "zod";
 
 const envSchema = z.object({
   DATABASE_URL: z.string().min(1).default("postgres://postgres:postgres@localhost:5432/cliploop"),
-  MOCK_MODE: z.coerce.boolean().default(true),
+  // NOTE: z.coerce.boolean() treats any non-empty string (including "false") as true.
+  // We need explicit string parsing for env vars.
+  MOCK_MODE: z
+    .preprocess((v) => {
+      if (typeof v !== "string") return v;
+      const s = v.trim().toLowerCase();
+      if (s === "true") return true;
+      if (s === "false") return false;
+      return v;
+    }, z.boolean())
+    .default(true),
   DEMO_USER_EMAIL: z.string().email().default("cliploopapp@gmail.com"),
   MOCK_LLM: z.coerce.boolean().default(false),
   INVITE_ONLY_MODE: z.coerce.boolean().default(true),
