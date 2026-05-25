@@ -74,6 +74,8 @@ export const creditReasonEnum = pgEnum("credit_reason", [
   "manual_adjustment",
 ]);
 
+export const apiKeyStatusEnum = pgEnum("api_key_status", ["active", "revoked"]);
+
 export const users = pgTable(
   "users",
   {
@@ -409,6 +411,32 @@ export const creditLedgerEntries = pgTable(
       table.referenceType,
       table.referenceId,
     ),
+  }),
+);
+
+export const apiKeys = pgTable(
+  "api_keys",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    projectId: uuid("project_id").references(() => projects.id, { onDelete: "cascade" }),
+    label: text("label").notNull(),
+    keyPrefix: varchar("key_prefix", { length: 16 }).notNull(),
+    keyHash: text("key_hash").notNull(),
+    scopesJson: jsonb("scopes_json").notNull().default(sql`'[]'::jsonb`),
+    status: apiKeyStatusEnum("status").notNull().default("active"),
+    revokedAt: timestamp("revoked_at", { withTimezone: true }),
+    lastUsedAt: timestamp("last_used_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => ({
+    userStatusIdx: index("api_keys_user_status_idx").on(table.userId, table.status),
+    projectIdx: index("api_keys_project_id_idx").on(table.projectId),
+    prefixIdx: index("api_keys_key_prefix_idx").on(table.keyPrefix),
+    userHashUnique: uniqueIndex("api_keys_user_hash_unique").on(table.userId, table.keyHash),
   }),
 );
 
