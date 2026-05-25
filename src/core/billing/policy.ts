@@ -10,7 +10,8 @@ export type BillingActionId =
   | "export_bundle"
   | "direct_instagram_publish"
   | "manual_mark_posted"
-  | "manual_queue_ops";
+  | "manual_queue_ops"
+  | "api_weekly_promo_generate";
 
 type BillablePolicy = {
   billable: true;
@@ -41,6 +42,7 @@ export const BILLING_POLICY: Record<BillingActionId, BillingPolicyEntry> = {
   direct_instagram_publish: { billable: false },
   manual_mark_posted: { billable: false },
   manual_queue_ops: { billable: false },
+  api_weekly_promo_generate: { billable: true, bucket: "generation", amount: 5, reason: "action_generate_copy" },
 };
 
 export function getBillingPolicy(action: BillingActionId): BillingPolicyEntry {

@@ -76,6 +76,8 @@ export const creditReasonEnum = pgEnum("credit_reason", [
 
 export const apiKeyStatusEnum = pgEnum("api_key_status", ["active", "revoked"]);
 
+export const idempotencyStatusEnum = pgEnum("idempotency_status", ["in_progress", "completed", "failed"]);
+
 export const users = pgTable(
   "users",
   {
@@ -437,6 +439,34 @@ export const apiKeys = pgTable(
     projectIdx: index("api_keys_project_id_idx").on(table.projectId),
     prefixIdx: index("api_keys_key_prefix_idx").on(table.keyPrefix),
     userHashUnique: uniqueIndex("api_keys_user_hash_unique").on(table.userId, table.keyHash),
+  }),
+);
+
+export const idempotencyKeys = pgTable(
+  "idempotency_keys",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    apiKeyId: uuid("api_key_id").references(() => apiKeys.id, { onDelete: "set null" }),
+    key: text("key").notNull(),
+    requestHash: text("request_hash").notNull(),
+    method: text("method").notNull(),
+    path: text("path").notNull(),
+    status: idempotencyStatusEnum("status").notNull().default("in_progress"),
+    responseStatus: integer("response_status"),
+    responseJson: jsonb("response_json"),
+    referenceType: text("reference_type").notNull().default("idempotency"),
+    referenceId: text("reference_id").notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => ({
+    userPathKeyUnique: uniqueIndex("idempotency_keys_user_path_key_unique").on(table.userId, table.path, table.key),
+    expiresAtIdx: index("idempotency_keys_expires_at_idx").on(table.expiresAt),
+    apiKeyCreatedIdx: index("idempotency_keys_api_key_id_created_at_idx").on(table.apiKeyId, table.createdAt),
   }),
 );
 
