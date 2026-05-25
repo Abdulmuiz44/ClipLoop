@@ -3,8 +3,10 @@ import Link from "next/link";
 import "./globals.css";
 import { ClipLoopLogo } from "@/components/ui/cliploop-logo";
 
+import { env } from "@/lib/env";
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://cliploop.app"),
+  metadataBase: new URL(env.NEXT_PUBLIC_APP_URL),
   title: {
     default: "ClipLoop | Short form promo content for brands, businesses, and creators",
     template: "%s | ClipLoop",
