@@ -1,5 +1,5 @@
 import NextAuth from "next-auth";
-import Twitter from "next-auth/providers/twitter";
+import Google from "next-auth/providers/google";
 import { env } from "@/lib/env";
 
 export const {
@@ -13,10 +13,9 @@ export const {
   secret: env.AUTH_SECRET,
   session: { strategy: "jwt" },
   providers: [
-    Twitter({
-      clientId: env.AUTH_TWITTER_ID ?? "",
-      clientSecret: env.AUTH_TWITTER_SECRET ?? "",
-      ...( { version: "2.0" } as Record<string, unknown>),
+    Google({
+      clientId: env.GOOGLE_CLIENT_ID ?? "",
+      clientSecret: env.GOOGLE_CLIENT_SECRET ?? "",
     }),
   ],
   pages: {

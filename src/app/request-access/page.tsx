@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AccessRequestForm } from "@/components/marketing/access-request-form";
+import { ClipLoopLogo } from "@/components/ui/cliploop-logo";
 
 export const metadata: Metadata = {
   title: "Request Beta Access | ClipLoop",
@@ -22,6 +23,7 @@ export default function RequestAccessPage() {
   return (
     <div className="mx-auto max-w-4xl space-y-6 md:space-y-8">
       <section className="cl-card p-6 md:p-8">
+        <ClipLoopLogo href="/" />
         <p className="cl-kicker">Access requests</p>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900 md:text-4xl">Request access to ClipLoop</h1>
         <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600">

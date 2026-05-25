@@ -180,7 +180,7 @@ export function WeeklyPromoFlow({ recentPromos = [] }: { recentPromos?: RecentWe
           </div>
         ) : null}
 
-        <button disabled={!canSubmit} className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">
+        <button disabled={!canSubmit} className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">
           {busy ? "Generating..." : "Generate weekly promo"}
         </button>
       </form>
@@ -240,7 +240,7 @@ export function WeeklyPromoFlow({ recentPromos = [] }: { recentPromos?: RecentWe
                   <button
                     type="button"
                     onClick={() => reuseInputs(promo)}
-                    className="inline-flex rounded-md border border-blue-300 px-2.5 py-1.5 text-xs font-medium text-blue-700 hover:border-blue-400"
+                    className="inline-flex rounded-md border border-emerald-300 px-2.5 py-1.5 text-xs font-medium text-emerald-700 hover:border-emerald-400"
                   >
                     Reuse inputs
                   </button>

@@ -205,7 +205,7 @@ export function ChatWorkspace(props: {
               type="button"
               className={`w-full rounded-lg border p-3 text-left text-sm transition ${
                 conversation.id === activeConversationId
-                  ? "border-blue-500 bg-blue-500 text-slate-950"
+                  ? "border-emerald-500 bg-emerald-500 text-slate-950"
                   : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
               }`}
               onClick={() => selectConversation(conversation.id)}
@@ -256,13 +256,13 @@ export function ChatWorkspace(props: {
                 key={message.id}
                 className={`rounded-lg border px-4 py-3.5 text-sm ${
                   message.role === "user"
-                    ? "ml-6 border-blue-600 bg-blue-600 text-white"
+                    ? "ml-6 border-blue-600 bg-emerald-600 text-white"
                     : message.kind === "status"
                       ? "mr-6 border-slate-200 bg-slate-50 text-slate-700"
                       : "mr-6 border-slate-200 bg-white text-slate-800"
                 }`}
               >
-                <p className={`mb-1.5 text-[11px] uppercase tracking-[0.14em] ${message.role === "user" ? "text-blue-100" : "text-slate-500"}`}>
+                <p className={`mb-1.5 text-[11px] uppercase tracking-[0.14em] ${message.role === "user" ? "text-emerald-100" : "text-slate-500"}`}>
                   {message.role === "user" ? "You" : message.kind === "status" ? "Status" : "ClipLoop"}
                 </p>
                 <p className="whitespace-pre-wrap leading-6">{message.content}</p>
@@ -281,7 +281,7 @@ export function ChatWorkspace(props: {
             </div>
             <div className="flex items-end gap-2">
               <textarea
-                className="max-h-40 min-h-12 flex-1 rounded-lg border border-slate-300 bg-white p-3 text-sm text-slate-900 outline-none transition focus:border-blue-500"
+                className="max-h-40 min-h-12 flex-1 rounded-lg border border-slate-300 bg-white p-3 text-sm text-slate-900 outline-none transition focus:border-emerald-500"
                 placeholder={
                   mode === "chat"
                     ? "Ask strategy or refine ideas..."
@@ -332,7 +332,7 @@ function ModePill({ active, onClick, label }: { active: boolean; onClick: () => 
       type="button"
       onClick={onClick}
       className={`rounded-full border px-3 py-1.5 text-xs transition ${
-        active ? "border-blue-600 bg-blue-600 text-white" : "border-slate-300 bg-white text-slate-700 hover:border-slate-400"
+        active ? "border-blue-600 bg-emerald-600 text-white" : "border-slate-300 bg-white text-slate-700 hover:border-slate-400"
       }`}
     >
       {label}

@@ -30,7 +30,7 @@ function renderBadge(status: string) {
 function publishBadge(status: string) {
   if (status === "published") return <span className="rounded bg-emerald-100 px-2 py-1 text-xs text-emerald-700">Published</span>;
   if (status === "publishing") return <span className="rounded bg-indigo-100 px-2 py-1 text-xs text-indigo-700">Publishing</span>;
-  if (status === "scheduled") return <span className="rounded bg-blue-100 px-2 py-1 text-xs text-blue-700">Scheduled</span>;
+  if (status === "scheduled") return <span className="rounded bg-emerald-100 px-2 py-1 text-xs text-emerald-700">Scheduled</span>;
   if (status === "approved") return <span className="rounded bg-purple-100 px-2 py-1 text-xs text-purple-700">Approved</span>;
   if (status === "failed") return <span className="rounded bg-red-100 px-2 py-1 text-xs text-red-700">Publish Failed</span>;
   return <span className="rounded bg-slate-100 px-2 py-1 text-xs text-slate-700">Draft</span>;
@@ -181,13 +181,13 @@ export default async function WeekPage({
               </div>
 
               <div>
-                <h3 className="text-[11px] font-bold uppercase tracking-widest text-blue-600 mb-3">Refinements</h3>
+                <h3 className="text-[11px] font-bold uppercase tracking-widest text-emerald-600 mb-3">Refinements</h3>
                 <ul className="space-y-3">
                   {hookExperiments.length === 0 ? (
                     <li className="text-xs text-slate-400 italic">None identified yet</li>
                   ) : (
                     hookExperiments.map((exp) => (
-                      <li key={exp.id} className="text-xs leading-relaxed text-slate-700 bg-blue-50/50 p-2 rounded-lg border border-blue-100">
+                      <li key={exp.id} className="text-xs leading-relaxed text-slate-700 bg-emerald-50/50 p-2 rounded-lg border border-blue-100">
                         {exp.inputSummary}
                       </li>
                     ))
@@ -316,7 +316,7 @@ export default async function WeekPage({
                           <div>
                             <p className="text-[11px] font-bold uppercase tracking-widest text-slate-500 mb-1.5">Tracking Link</p>
                             <div className="flex items-center gap-2 text-xs">
-                              <code className="truncate rounded bg-slate-100 px-2 py-1 text-blue-700">{trackingLink}</code>
+                              <code className="truncate rounded bg-slate-100 px-2 py-1 text-emerald-700">{trackingLink}</code>
                               <CopyButton text={trackingLink} />
                             </div>
                           </div>
@@ -334,7 +334,7 @@ export default async function WeekPage({
                       </div>
 
                       {!canDirectPublish ? (
-                        <div className="rounded-xl border border-blue-100 bg-blue-50/50 p-4 text-xs leading-relaxed text-blue-800">
+                        <div className="rounded-xl border border-blue-100 bg-emerald-50/50 p-4 text-xs leading-relaxed text-emerald-800">
                           <p className="font-bold uppercase tracking-widest mb-1">Manual Export required</p>
                           This item is set for manual delivery. Render the post, download the bundle, and upload it manually to {targetChannel} using the preview caption and CTA provided.
                         </div>

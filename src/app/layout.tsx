@@ -41,13 +41,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Link href="/pricing" className="rounded-md px-3 py-1.5 transition hover:bg-slate-100 hover:text-slate-950">
                 Pricing
               </Link>
-              <Link href="/signin" className="rounded-md bg-blue-600 px-3 py-1.5 font-medium text-white transition hover:bg-blue-500">
+              <Link href="/signin" className="rounded-md bg-emerald-600 px-3 py-1.5 font-medium text-white transition hover:bg-emerald-500">
                 Sign in
               </Link>
             </div>
           </nav>
         </header>
         <main className="mx-auto max-w-7xl px-4 py-6 md:py-8">{children}</main>
+        <footer className="mx-auto mt-4 flex w-full max-w-7xl flex-wrap items-center justify-between gap-3 border-t border-slate-200 px-4 py-4 text-xs text-slate-500">
+          <ClipLoopLogo href="/" compact />
+          <div className="flex items-center gap-4">
+            <Link href="/pricing">Pricing</Link>
+            <Link href="/terms">Terms</Link>
+            <Link href="/privacy">Privacy</Link>
+            <Link href="/support">Support</Link>
+          </div>
+        </footer>
       </body>
     </html>
   );

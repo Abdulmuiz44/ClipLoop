@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ClipLoopLogo } from "@/components/ui/cliploop-logo";
 
 export const metadata: Metadata = {
   title: "Pro Checkout Cancelled | ClipLoop",
@@ -11,6 +12,7 @@ export default function BillingCancelPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <section className="cl-card p-6 md:p-8">
+        <ClipLoopLogo href="/" />
         <p className="cl-kicker">Checkout cancelled</p>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950 md:text-4xl">No charge was completed.</h1>
         <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600">

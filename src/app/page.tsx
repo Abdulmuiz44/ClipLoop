@@ -42,7 +42,7 @@ export default function HomePage() {
               ClipLoop is a creative video operating system for businesses and creators: context assembly, planning, generation, rendering, and delivery in one controlled loop.
             </p>
             <div className="flex flex-wrap gap-3">
-              <Link href="/app" className="inline-flex rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-500">
+              <Link href="/app" className="inline-flex rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-500">
                 Open workspace
               </Link>
               <Link href="/pricing" className="inline-flex rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-700 transition hover:border-slate-400">
@@ -56,7 +56,7 @@ export default function HomePage() {
             <div className="mt-4 space-y-3">
               {steps.map((step, index) => (
                 <div key={step} className="flex items-start gap-3 rounded-lg border border-slate-200 bg-white p-3">
-                  <span className="inline-flex h-6 w-6 flex-none items-center justify-center rounded-full bg-blue-600 text-xs font-semibold text-white">
+                  <span className="inline-flex h-6 w-6 flex-none items-center justify-center rounded-full bg-emerald-600 text-xs font-semibold text-white">
                     {index + 1}
                   </span>
                   <p className="text-sm text-slate-600">{step}</p>

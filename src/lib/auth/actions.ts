@@ -6,6 +6,6 @@ export async function signOutUser() {
   await signOut({ redirectTo: "/" });
 }
 
-export async function signInWithX() {
-  await signIn("twitter", { redirectTo: "/app" });
+export async function signInWithGoogle() {
+  await signIn("google", { redirectTo: "/app" });
 }

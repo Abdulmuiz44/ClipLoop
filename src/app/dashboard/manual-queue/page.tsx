@@ -90,7 +90,7 @@ export default async function ManualQueuePage({ searchParams }: { searchParams: 
                 </div>
                 <div className="flex flex-wrap gap-2 text-[11px] font-medium uppercase tracking-wider">
                   <span className="cl-badge bg-slate-100 text-slate-600">{item.targetChannel}</span>
-                  <span className="cl-badge bg-blue-50 text-blue-700">{item.manualPublishStatus.replace(/_/g, " ")}</span>
+                  <span className="cl-badge bg-emerald-50 text-emerald-700">{item.manualPublishStatus.replace(/_/g, " ")}</span>
                   <span className={`rounded-full px-2 py-1 ${item.isRendered ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-600"}`}>
                     {item.isRendered ? "Rendered" : "Needs render"}
                   </span>

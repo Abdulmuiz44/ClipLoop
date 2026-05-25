@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { StarterCheckoutForm } from "@/components/marketing/starter-checkout-form";
+import { ClipLoopLogo } from "@/components/ui/cliploop-logo";
 
 export const metadata: Metadata = {
   title: "Pricing | ClipLoop",
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
 function Feature({ children }: { children: React.ReactNode }) {
   return (
     <li className="flex gap-2 leading-6 text-slate-700">
-      <span className="mt-2 h-1.5 w-1.5 rounded-full bg-blue-600" />
+      <span className="mt-2 h-1.5 w-1.5 rounded-full bg-emerald-600" />
       {children}
     </li>
   );
@@ -21,6 +22,7 @@ export default function PricingPage() {
   return (
     <div className="space-y-6 md:space-y-8">
       <section className="cl-card p-6 md:p-8">
+        <ClipLoopLogo href="/" />
         <p className="cl-kicker">Pricing</p>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900 md:text-4xl">Free chat. Pay for generation and render capacity.</h1>
         <p className="mt-3 max-w-3xl text-base leading-7 text-slate-600">
@@ -49,7 +51,7 @@ export default function PricingPage() {
           </div>
         </article>
 
-        <article className="rounded-xl border border-blue-200 bg-white p-6">
+        <article className="cl-card p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">Pro</p>
@@ -57,7 +59,7 @@ export default function PricingPage() {
                 $5<span className="text-base font-medium text-slate-500">/month</span>
               </h2>
             </div>
-            <span className="rounded-full bg-blue-600 px-3 py-1 text-xs font-medium text-white">Best value</span>
+            <span className="rounded-full bg-emerald-600 px-3 py-1 text-xs font-medium text-white">Best value</span>
           </div>
 
           <p className="mt-4 text-sm text-slate-600">For operators who need higher generation/render throughput and multiple active projects.</p>

@@ -4,17 +4,17 @@
 
 :root {
   color-scheme: light;
-  --background: 210 30% 98%;
-  --foreground: 224 24% 14%;
+  --background: 210 20% 97%;
+  --foreground: 222 47% 8%;
   --card: 0 0% 100%;
-  --card-foreground: 224 24% 14%;
-  --muted: 210 26% 95%;
-  --muted-foreground: 220 14% 42%;
-  --border: 214 20% 88%;
-  --input: 214 20% 88%;
-  --primary: 218 88% 54%;
+  --card-foreground: 222 47% 8%;
+  --muted: 210 22% 94%;
+  --muted-foreground: 220 9% 40%;
+  --border: 220 14% 90%;
+  --input: 220 14% 90%;
+  --primary: 142 72% 45%;
   --primary-foreground: 0 0% 100%;
-  --ring: 218 88% 54%;
+  --ring: 142 72% 45%;
 
   --cl-bg: hsl(var(--background));
   --cl-surface: hsl(var(--card));
@@ -23,6 +23,47 @@
   --cl-border: hsl(var(--border));
   --cl-border-strong: hsl(var(--border));
   --cl-soft: hsl(var(--muted));
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --background: 222 35% 6%;
+    --foreground: 210 20% 96%;
+    --card: 222 28% 10%;
+    --card-foreground: 210 20% 96%;
+    --muted: 223 16% 14%;
+    --muted-foreground: 215 12% 72%;
+    --border: 222 14% 20%;
+    --input: 222 14% 20%;
+    --primary: 142 72% 45%;
+    --primary-foreground: 0 0% 100%;
+    --ring: 142 72% 45%;
+  }
+
+  .bg-white {
+    background-color: hsl(var(--card)) !important;
+  }
+
+  .bg-slate-50 {
+    background-color: hsl(var(--background)) !important;
+  }
+
+  .border-slate-200,
+  .border-slate-300 {
+    border-color: hsl(var(--border)) !important;
+  }
+
+  .text-slate-900,
+  .text-slate-700,
+  .text-slate-600,
+  .text-slate-500 {
+    color: hsl(var(--foreground)) !important;
+  }
+
+  .hover\\:bg-slate-100:hover {
+    background-color: hsl(var(--muted)) !important;
+  }
 }
 
 body {
@@ -75,7 +116,7 @@ a {
   }
 
   .cl-nav-item-active {
-    @apply bg-blue-600 text-white hover:bg-blue-600 hover:text-white;
+    @apply bg-emerald-500 text-white hover:bg-emerald-500 hover:text-white;
   }
 
   .cl-chip {
@@ -98,17 +139,17 @@ a {
   }
 
   .cl-input {
-    @apply w-full rounded-lg border bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-blue-500;
+    @apply w-full rounded-lg border bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-emerald-500;
     border-color: var(--cl-border);
   }
 
   .cl-textarea {
-    @apply min-h-24 w-full rounded-lg border bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-blue-500;
+    @apply min-h-24 w-full rounded-lg border bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-emerald-500;
     border-color: var(--cl-border);
   }
 
   .cl-select {
-    @apply w-full rounded-lg border bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-blue-500;
+    @apply w-full rounded-lg border bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-emerald-500;
     border-color: var(--cl-border);
   }
 

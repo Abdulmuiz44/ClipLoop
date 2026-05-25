@@ -135,7 +135,7 @@ export default function BusinessPage() {
       <section className="cl-card p-5">
         <div className="flex items-center justify-between">
           <h2 className="text-base font-semibold text-slate-100">Saved businesses</h2>
-          <Link href="/dashboard/business/profiles" className="text-xs text-blue-400 hover:text-blue-300">
+          <Link href="/dashboard/business/profiles" className="text-xs text-emerald-400 hover:text-emerald-300">
             View all
           </Link>
         </div>
@@ -207,7 +207,7 @@ export default function BusinessPage() {
 
 function StepBadge({ title, step, active }: { title: string; step: number; active: boolean }) {
   return (
-    <div className={`rounded-lg border px-4 py-3 ${active ? "border-blue-500/40 bg-blue-500/10" : "border-slate-800 bg-slate-900"}`}>
+    <div className={`rounded-lg border px-4 py-3 ${active ? "border-emerald-500/40 bg-emerald-500/10" : "border-slate-800 bg-slate-900"}`}>
       <p className="text-xs uppercase tracking-[0.16em] text-slate-400">Step {step}</p>
       <p className="mt-1 text-sm font-medium text-slate-100">{title}</p>
     </div>

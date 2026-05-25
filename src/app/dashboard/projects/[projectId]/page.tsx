@@ -74,7 +74,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ projec
           <div className="flex flex-wrap gap-2 text-[11px] font-semibold uppercase tracking-wider">
             <span className="cl-badge bg-slate-100 text-slate-600">Goal: {project.goalType}</span>
             {project.projectType ? <span className="cl-badge bg-slate-100 text-slate-600">Type: {project.projectType}</span> : null}
-            <span className="cl-badge bg-blue-50 text-blue-700">Readiness: {readiness.score}</span>
+            <span className="cl-badge bg-emerald-50 text-emerald-700">Readiness: {readiness.score}</span>
             {latestCycle ? <span className="cl-badge bg-slate-100 text-slate-600">Week: {latestCycle.weekStart.toISOString().slice(0, 10)}</span> : null}
           </div>
         </div>
