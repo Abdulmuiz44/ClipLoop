@@ -81,6 +81,7 @@ const primaryNav: NavItem[] = [
   { href: "/app/weekly-promo", label: "Templates", icon: <NavIcon>{icons.layout}</NavIcon> },
   { href: "/app/chats", label: "Inspiration", icon: <NavIcon>{icons.bulb}</NavIcon> },
   { href: "/dashboard/settings", label: "Settings", icon: <NavIcon>{icons.settings}</NavIcon> },
+  { href: "/app/settings/api-keys", label: "API Keys", icon: <NavIcon>{icons.settings}</NavIcon> },
 ];
 
 export function StudioShell({
