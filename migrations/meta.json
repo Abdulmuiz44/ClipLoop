@@ -115,6 +115,12 @@
       "version": "0019",
       "tag": "0019_idempotency_keys",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "0020",
+      "tag": "0020_usage_events",
+      "breakpoints": true
     }
   ]
 }

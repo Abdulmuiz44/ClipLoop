@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { getBillingPolicy } from "@/core/billing/policy";
 import { assertCanAffordAction, chargeCredits } from "@/domains/credits/service";
+import { recordUsageEvent } from "@/domains/usage-events/service";
 import { runWeeklyPromoMvp } from "@/domains/weekly-promo/service";
 import { ApiKeyAuthError } from "@/domains/api-keys/service";
 import { toErrorResponse } from "@/lib/http/errors";
@@ -65,6 +66,19 @@ export async function POST(request: Request) {
         action: "api_weekly_promo_generate",
         apiKeyId: identity.apiKeyId,
       },
+    });
+
+    await recordUsageEvent({
+      userId: identity.userId,
+      projectId: identity.projectId,
+      apiKeyId: identity.apiKeyId,
+      source: "public_api",
+      action: "api_weekly_promo_generate",
+      creditsBucket: policy.bucket,
+      creditsAmount: policy.amount,
+      referenceType: "idempotency",
+      referenceId: idem.referenceId,
+      metadata: { idempotencyKey: idempotencyKey.trim() },
     });
 
     const responseJson = { result };

@@ -4,13 +4,18 @@ import { UsageSummary } from "@/components/dashboard/usage-summary";
 import { ManageBillingButton } from "@/components/dashboard/manage-billing-button";
 import { StarterCheckoutForm } from "@/components/marketing/starter-checkout-form";
 import { formatCreditReason, getCreditWalletWithRecentTransactions } from "@/domains/credits/service";
+import { listRecentUsageEvents } from "@/domains/usage-events/service";
 
 export const dynamic = "force-dynamic";
 
 export default async function SettingsPage() {
   const user = await getCurrentUser();
   const state = await getUserPlanState(user.id);
-  const [usage, ledger] = await Promise.all([getCurrentUsageSummary(user.id), getCreditWalletWithRecentTransactions(user.id)]);
+  const [usage, ledger, recentUsageEvents] = await Promise.all([
+    getCurrentUsageSummary(user.id),
+    getCreditWalletWithRecentTransactions(user.id),
+    listRecentUsageEvents(user.id, 10),
+  ]);
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
@@ -119,6 +124,43 @@ export default async function SettingsPage() {
         title="Credit usage"
         subtitle={`Current usage windows: Weekly (${usage.periods.week.start} to ${usage.periods.week.end}) and Monthly (${usage.periods.month.start} to ${usage.periods.month.end}).`}
       />
+
+      <section className="cl-card p-6 text-sm">
+        <div className="flex flex-wrap items-end justify-between gap-4 border-b pb-4 cl-divider">
+          <div>
+            <h2 className="text-lg font-semibold tracking-tight text-slate-950">Recent API usage</h2>
+            <p className="mt-1 text-slate-600">Latest public API actions charged to your credits.</p>
+          </div>
+        </div>
+
+        <div className="mt-6 overflow-x-auto">
+          <table className="min-w-full text-left text-xs">
+            <thead className="text-[11px] font-bold uppercase tracking-widest text-slate-500">
+              <tr className="border-b cl-divider">
+                <th className="pb-3 pr-3">Time</th>
+                <th className="pb-3 pr-3">Action</th>
+                <th className="pb-3 pr-3">Source</th>
+                <th className="pb-3 pr-3">Credits</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y cl-divider">
+              {recentUsageEvents.map((evt) => (
+                <tr key={evt.id}>
+                  <td className="py-3 pr-3 text-slate-500">{evt.createdAt.toISOString().replace("T", " ").slice(0, 16)}</td>
+                  <td className="py-3 pr-3 font-medium text-slate-900">{evt.action}</td>
+                  <td className="py-3 pr-3 uppercase text-[10px] font-bold text-slate-500">{evt.source}</td>
+                  <td className="py-3 pr-3 font-bold text-rose-600">{evt.creditsAmount ? `-${evt.creditsAmount}` : "-"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {recentUsageEvents.length === 0 ? (
+            <div className="py-12 text-center">
+              <p className="text-xs text-slate-400 italic">No API usage recorded yet.</p>
+            </div>
+          ) : null}
+        </div>
+      </section>
 
       <section className="cl-card p-6 text-sm">
         <div className="flex flex-wrap items-end justify-between gap-4 border-b pb-4 cl-divider">
