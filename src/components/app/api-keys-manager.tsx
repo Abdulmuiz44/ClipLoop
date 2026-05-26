@@ -29,16 +29,34 @@ function formatDate(value: string | null) {
   return d.toISOString().replace("T", " ").slice(0, 16);
 }
 
-export function ApiKeysManager() {
+type ProjectOption = { id: string; name: string };
+
+const AVAILABLE_SCOPES = [
+  { id: "weekly_promo:generate", label: "Weekly promo generation" },
+  // Future scopes can be added here
+] as const;
+
+type ScopeId = (typeof AVAILABLE_SCOPES)[number]["id"];
+
+export function ApiKeysManager({ projects }: { projects: ProjectOption[] }) {
   const [keys, setKeys] = useState<ApiKeyRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const [label, setLabel] = useState("");
+  const [projectId, setProjectId] = useState<string>("");
+  const [scopes, setScopes] = useState<ScopeId[]>(["weekly_promo:generate"]);
   const [creating, setCreating] = useState(false);
   const [revealedKey, setRevealedKey] = useState<string | null>(null);
 
   const canCreate = useMemo(() => label.trim().length >= 3, [label]);
+
+  function toggleScope(scopeId: ScopeId) {
+    setScopes((prev) => {
+      if (prev.includes(scopeId)) return prev.filter((s) => s !== scopeId);
+      return [...prev, scopeId];
+    });
+  }
 
   async function load() {
     setLoading(true);
@@ -61,6 +79,10 @@ export function ApiKeysManager() {
 
   async function onCreate() {
     if (!canCreate) return;
+    if (scopes.length === 0) {
+      setError("Select at least one scope.");
+      return;
+    }
     setCreating(true);
     setError(null);
     setRevealedKey(null);
@@ -68,7 +90,11 @@ export function ApiKeysManager() {
       const res = await fetch("/api/me/api-keys", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ label: label.trim() }),
+        body: JSON.stringify({
+          label: label.trim(),
+          projectId: projectId || null,
+          scopes,
+        }),
       });
       const data = (await res.json().catch(() => ({}))) as Partial<CreateResponse> & { error?: string };
       if (!res.ok) throw new Error(data?.error || `Failed to create API key (${res.status}).`);
@@ -129,7 +155,42 @@ export function ApiKeysManager() {
               placeholder="e.g. TradiaAI server"
               className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-emerald-500"
             />
-            <p className="mt-2 text-[11px] text-slate-500">Default scope: weekly_promo:generate</p>
+
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <div>
+                <label className="block text-xs font-semibold text-slate-600">Project</label>
+                <select
+                  value={projectId}
+                  onChange={(e) => setProjectId(e.target.value)}
+                  className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-emerald-500"
+                >
+                  <option value="">All projects</option>
+                  {projects.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+                <p className="mt-2 text-[11px] text-slate-500">Optional. Scope the key to one project.</p>
+              </div>
+
+              <div>
+                <p className="block text-xs font-semibold text-slate-600">Scopes</p>
+                <div className="mt-2 space-y-2">
+                  {AVAILABLE_SCOPES.map((s) => {
+                    const checked = scopes.includes(s.id);
+                    return (
+                      <label key={s.id} className="flex items-center gap-2 text-sm text-slate-700">
+                        <input type="checkbox" checked={checked} onChange={() => toggleScope(s.id)} />
+                        <span>{s.label}</span>
+                        <span className="ml-auto font-mono text-[11px] text-slate-400">{s.id}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+                <p className="mt-2 text-[11px] text-slate-500">Tip: keep scopes minimal.</p>
+              </div>
+            </div>
           </div>
           <button
             onClick={() => void onCreate()}
