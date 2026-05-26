@@ -1,3 +1,9 @@
+DO $$ BEGIN
+ CREATE TYPE "idempotency_status" AS ENUM('in_progress', 'completed', 'failed');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+
 CREATE TABLE IF NOT EXISTS "idempotency_keys" (
   "id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
   "user_id" uuid NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
@@ -6,7 +12,7 @@ CREATE TABLE IF NOT EXISTS "idempotency_keys" (
   "request_hash" text NOT NULL,
   "method" text NOT NULL,
   "path" text NOT NULL,
-  "status" text NOT NULL DEFAULT 'in_progress',
+  "status" "idempotency_status" NOT NULL DEFAULT 'in_progress',
   "response_status" integer,
   "response_json" jsonb,
   "reference_type" text NOT NULL DEFAULT 'idempotency',
