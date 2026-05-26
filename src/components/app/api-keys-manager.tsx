@@ -33,7 +33,9 @@ type ProjectOption = { id: string; name: string };
 
 const AVAILABLE_SCOPES = [
   { id: "weekly_promo:generate", label: "Weekly promo generation" },
-  // Future scopes can be added here
+  { id: "usage:read", label: "Usage read (API analytics)" },
+  { id: "credits:read", label: "Credits read (balance + ledger summary)" },
+  { id: "projects:read", label: "Projects read (list your projects)" },
 ] as const;
 
 type ScopeId = (typeof AVAILABLE_SCOPES)[number]["id"];

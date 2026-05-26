@@ -1,6 +1,7 @@
 import { and, desc, eq } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
 import { generateApiKey, hashApiKey } from "@/lib/security/api-keys";
+import { normalizeRequestedScopes } from "@/lib/public-api/scopes";
 
 export class ApiKeyAuthError extends Error {
   constructor(message = "Invalid API key.") {
@@ -15,7 +16,11 @@ export async function createApiKey(input: {
   scopes?: string[];
 }) {
   const { apiKey, keyPrefix, keyHash } = generateApiKey();
-  const scopes = input.scopes ?? ["weekly_promo:generate"];
+  const requested = input.scopes ?? ["weekly_promo:generate"];
+  const scopes = normalizeRequestedScopes(requested);
+  if (scopes.length === 0) {
+    throw new Error("At least one valid scope is required.");
+  }
 
   const [row] = await db
     .insert(schema.apiKeys)
