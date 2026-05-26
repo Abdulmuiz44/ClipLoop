@@ -8,6 +8,7 @@ import { runWeeklyPromoMvp } from "@/domains/weekly-promo/service";
 import { ApiKeyAuthError } from "@/domains/api-keys/service";
 import { toErrorResponse } from "@/lib/http/errors";
 import { requireApiKeyIdentity } from "@/lib/public-api/auth";
+import { consumeRateLimit, RateLimitExceededError } from "@/lib/public-api/rate-limit";
 import {
   beginIdempotentRequest,
   completeIdempotentRequest,
@@ -22,6 +23,14 @@ const requestSchema = z.unknown();
 export async function POST(request: Request) {
   try {
     const identity = await requireApiKeyIdentity(request);
+
+    await consumeRateLimit({
+      apiKeyId: identity.apiKeyId,
+      key: "public_weekly_promo",
+      limit: 3,
+      windowSec: 60,
+    });
+
     if (!identity.scopes.includes("weekly_promo:generate")) {
       return NextResponse.json({ error: "Insufficient scope.", code: "SCOPE_DENIED" }, { status: 403 });
     }
@@ -96,6 +105,12 @@ export async function POST(request: Request) {
     // Public API auth + idempotency errors
     if (error instanceof ApiKeyAuthError) {
       return NextResponse.json({ error: error.message, code: "API_KEY_INVALID" }, { status: 401 });
+    }
+    if (error instanceof RateLimitExceededError) {
+      return NextResponse.json(
+        { error: error.message, code: "RATE_LIMIT_EXCEEDED", retryAfterSec: error.retryAfterSec },
+        { status: 429, headers: { "Retry-After": String(error.retryAfterSec) } },
+      );
     }
     if (error instanceof IdempotencyKeyRequiredError) {
       return NextResponse.json({ error: error.message, code: "IDEMPOTENCY_KEY_REQUIRED" }, { status: 400 });

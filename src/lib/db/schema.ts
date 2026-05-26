@@ -80,6 +80,29 @@ export const idempotencyStatusEnum = pgEnum("idempotency_status", ["in_progress"
 
 export const usageEventSourceEnum = pgEnum("usage_event_source", ["web", "public_api"]);
 
+export const rateLimitCounters = pgTable(
+  "rate_limit_counters",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    apiKeyId: uuid("api_key_id")
+      .notNull()
+      .references(() => apiKeys.id, { onDelete: "cascade" }),
+    key: text("key").notNull(),
+    windowStart: timestamp("window_start", { withTimezone: true }).notNull(),
+    count: integer("count").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => ({
+    apiKeyWindowUnique: uniqueIndex("rate_limit_counters_api_key_window_unique").on(
+      table.apiKeyId,
+      table.key,
+      table.windowStart,
+    ),
+    apiKeyCreatedIdx: index("rate_limit_counters_api_key_created_at_idx").on(table.apiKeyId, table.createdAt),
+  }),
+);
+
 export const users = pgTable(
   "users",
   {
