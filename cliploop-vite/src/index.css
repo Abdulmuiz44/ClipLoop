@@ -1,0 +1,121 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --cl-bg: #050505;
+  --cl-surface: #0E0E0E;
+  --cl-text: #f1f5f9;
+  --cl-muted: #8B8B8B;
+  --cl-border: #1F1F1F;
+  --cl-soft: #111111;
+  --cl-primary: #22c55e;
+}
+
+body {
+  background: var(--cl-bg);
+  color: var(--cl-text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background-color: #22c55e;
+  color: black;
+}
+
+@layer components {
+  .cl-card {
+    @apply rounded-xl border;
+    border-color: var(--cl-border);
+    background: var(--cl-surface);
+  }
+
+  .cl-card-soft {
+    @apply rounded-xl border;
+    border-color: var(--cl-border);
+    background: var(--cl-soft);
+  }
+
+  .cl-kicker {
+    @apply text-[11px] font-medium uppercase tracking-[0.18em];
+    color: var(--cl-muted);
+  }
+
+  .cl-nav-item {
+    @apply block rounded-lg px-3 py-2 text-sm transition;
+    color: var(--cl-muted);
+  }
+
+  .cl-nav-item:hover {
+    background: var(--cl-soft);
+    color: var(--cl-text);
+  }
+
+  .cl-chip {
+    @apply inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium;
+    border-color: var(--cl-border);
+    background: var(--cl-surface);
+    color: var(--cl-muted);
+  }
+
+  .cl-input {
+    @apply w-full rounded-lg border px-3 py-2.5 text-sm outline-none transition;
+    border-color: var(--cl-border);
+    background: var(--cl-surface);
+    color: var(--cl-text);
+  }
+
+  .cl-input:focus {
+    border-color: var(--cl-primary);
+  }
+
+  .cl-btn-primary {
+    @apply inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium text-white transition;
+    background: var(--cl-primary);
+  }
+
+  .cl-btn-primary:hover {
+    opacity: 0.9;
+  }
+
+  .cl-btn-ghost {
+    @apply inline-flex items-center justify-center rounded-lg border px-4 py-2.5 text-sm transition;
+    border-color: var(--cl-border);
+    color: var(--cl-muted);
+    background: var(--cl-surface);
+  }
+
+  .cl-btn-ghost:hover {
+    border-color: #333333;
+  }
+}
+
+/* Animated gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glow effects */
+.glow-green {
+  box-shadow: 0 0 30px rgba(5, 150, 105, 0.15), 0 0 60px rgba(5, 150, 105, 0.05);
+}
+
+.glow-green-sm {
+  box-shadow: 0 0 15px rgba(5, 150, 105, 0.1);
+}
+
+/* Scrollbar hiding */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}

@@ -9,3 +9,9 @@ tsconfig.tsbuildinfo
 
 # Local Netlify folder
 .netlify
+
+# Vite frontend
+cliploop-vite/node_modules
+cliploop-vite/dist
+cliploop-vite/.env
+cliploop-vite/tsconfig.tsbuildinfo
