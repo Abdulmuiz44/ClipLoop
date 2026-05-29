@@ -3,13 +3,13 @@ import { z } from "zod";
 export const weeklyPromoChannelSchema = z.enum(["instagram", "tiktok", "whatsapp", "x"]);
 
 export const weeklyPromoInputSchema = z.object({
-  appName: z.string().trim().min(2),
+  appName: z.string().trim().min(2).max(100),
   appWebsiteUrl: z.string().trim().url().optional().or(z.literal("")),
-  weeklyUpdate: z.string().trim().min(8),
-  targetAudience: z.string().trim().optional(),
-  callToAction: z.string().trim().optional(),
+  weeklyUpdate: z.string().trim().min(8).max(500),
+  targetAudience: z.string().trim().min(1).max(200).optional(),
+  callToAction: z.string().trim().min(1).max(200).optional(),
   channel: weeklyPromoChannelSchema,
-  tone: z.string().trim().min(2),
+  tone: z.string().trim().min(2).max(100),
 });
 
 export const productContextSchema = z.object({

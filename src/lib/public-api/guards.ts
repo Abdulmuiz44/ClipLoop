@@ -4,6 +4,7 @@ export type PublicApiIdentity = {
   userId: string;
   projectId: string | null;
   apiKeyId: string;
+  keyPrefix: string;
   scopes: string[];
 };
 

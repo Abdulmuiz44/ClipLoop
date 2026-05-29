@@ -94,6 +94,7 @@ export async function authenticateApiKey(apiKey: string) {
     userId: key.userId,
     projectId: key.projectId ?? null,
     apiKeyId: key.id,
+    keyPrefix: key.keyPrefix,
     scopes: (key.scopesJson as string[]) ?? [],
   };
 }

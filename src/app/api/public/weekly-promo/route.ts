@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { getBillingPolicy } from "@/core/billing/policy";
-import { assertCanAffordAction, chargeCredits } from "@/domains/credits/service";
+import { InsufficientCreditsError, assertCanAffordAction, chargeCredits } from "@/domains/credits/service";
 import { recordUsageEvent } from "@/domains/usage-events/service";
 import { runWeeklyPromoMvp } from "@/domains/weekly-promo/service";
 import { ApiKeyAuthError } from "@/domains/api-keys/service";
@@ -17,13 +17,14 @@ import {
   IdempotencyInProgressError,
   IdempotencyKeyRequiredError,
 } from "@/lib/public-api/idempotency";
-
-const requestSchema = z.unknown();
+import { weeklyPromoInputSchema } from "@/lib/validation/weekly-promo";
 
 export async function POST(request: Request) {
   try {
+    // 1. Authenticate via API key
     const identity = await requireApiKeyIdentity(request);
 
+    // 2. Rate limit
     await consumeRateLimit({
       apiKeyId: identity.apiKeyId,
       key: "public_weekly_promo",
@@ -31,18 +32,28 @@ export async function POST(request: Request) {
       windowSec: 60,
     });
 
+    // 3. Scope check — run BEFORE body parsing to fail fast
     if (!identity.scopes.includes("weekly_promo:generate")) {
       return NextResponse.json({ error: "Insufficient scope.", code: "SCOPE_DENIED" }, { status: 403 });
     }
 
+    // 4. Idempotency key — require before body parsing
     const idempotencyKey = request.headers.get("Idempotency-Key") || request.headers.get("idempotency-key");
-    if (!idempotencyKey || idempotencyKey.trim().length < 8) throw new IdempotencyKeyRequiredError();
+    if (!idempotencyKey || idempotencyKey.trim().length < 8) {
+      throw new IdempotencyKeyRequiredError();
+    }
 
-    const body = await request.json().catch(() => ({}));
-    requestSchema.parse(body);
+    // 5. Parse and validate body EARLY — before idempotency to reject bad payloads fast
+    const body = await request.json().catch(() => {
+      throw new z.ZodError([
+        { code: "custom", message: "Request body must be valid JSON.", path: [] } as any,
+      ]);
+    });
+    const input = weeklyPromoInputSchema.parse(body);
 
+    // 6. Idempotency — begin or replay
     const path = "/api/public/weekly-promo";
-    const requestHash = computeRequestHash({ method: "POST", path, body });
+    const requestHash = computeRequestHash({ method: "POST", path, body: input });
 
     const idem = await beginIdempotentRequest({
       userId: identity.userId,
@@ -57,13 +68,20 @@ export async function POST(request: Request) {
       return NextResponse.json(idem.responseJson, { status: idem.responseStatus });
     }
 
+    // 7. Check billing policy
     const policy = getBillingPolicy("api_weekly_promo_generate");
-    if (!policy || policy.billable !== true) throw new Error("Billing policy missing for api_weekly_promo_generate");
+    if (!policy || policy.billable !== true) {
+      throw new Error("Billing policy missing for api_weekly_promo_generate");
+    }
+    const creditsCharged = policy.amount;
 
+    // 8. Assert sufficient credits (early fail)
     await assertCanAffordAction(identity.userId, [{ bucket: policy.bucket, amount: policy.amount }]);
 
-    const result = await runWeeklyPromoMvp(body);
+    // 9. Run the weekly promo service
+    const result = await runWeeklyPromoMvp(input);
 
+    // 10. Charge credits (after successful generation)
     await chargeCredits({
       userId: identity.userId,
       bucket: policy.bucket,
@@ -73,10 +91,11 @@ export async function POST(request: Request) {
       referenceId: idem.referenceId,
       metadata: {
         action: "api_weekly_promo_generate",
-        apiKeyId: identity.apiKeyId,
+        apiKeyPrefix: identity.keyPrefix,
       },
     });
 
+    // 11. Record usage event with keyPrefix (not full apiKeyId) in metadata
     await recordUsageEvent({
       userId: identity.userId,
       projectId: identity.projectId,
@@ -87,10 +106,24 @@ export async function POST(request: Request) {
       creditsAmount: policy.amount,
       referenceType: "idempotency",
       referenceId: idem.referenceId,
-      metadata: { idempotencyKey: idempotencyKey.trim() },
+      metadata: {
+        idempotencyKey: idempotencyKey.trim(),
+        keyPrefix: identity.keyPrefix,
+      },
     });
 
-    const responseJson = { result };
+    // 12. Shape response with all required fields
+    const responseJson = {
+      artifactId: result.id,
+      previewUrl: result.preview.videoUrl ?? null,
+      downloadUrl: result.preview.downloadUrl ?? null,
+      artifactUrl: result.artifact.artifactUrl ?? null,
+      script: result.script,
+      scenePlan: result.scenePlan,
+      creditsCharged,
+      idempotencyKey: idempotencyKey.trim(),
+    };
+
     await completeIdempotentRequest({
       userId: identity.userId,
       path,
@@ -102,16 +135,18 @@ export async function POST(request: Request) {
 
     return NextResponse.json(responseJson);
   } catch (error) {
-    // Public API auth + idempotency errors
+    // Public API auth errors
     if (error instanceof ApiKeyAuthError) {
       return NextResponse.json({ error: error.message, code: "API_KEY_INVALID" }, { status: 401 });
     }
+    // Rate limit
     if (error instanceof RateLimitExceededError) {
       return NextResponse.json(
         { error: error.message, code: "RATE_LIMIT_EXCEEDED", retryAfterSec: error.retryAfterSec },
         { status: 429, headers: { "Retry-After": String(error.retryAfterSec) } },
       );
     }
+    // Idempotency errors
     if (error instanceof IdempotencyKeyRequiredError) {
       return NextResponse.json({ error: error.message, code: "IDEMPOTENCY_KEY_REQUIRED" }, { status: 400 });
     }
@@ -121,7 +156,23 @@ export async function POST(request: Request) {
     if (error instanceof IdempotencyInProgressError) {
       return NextResponse.json({ error: error.message, code: "IDEMPOTENCY_IN_PROGRESS" }, { status: 409 });
     }
-
+    // Insufficient credits — 402
+    if (error instanceof InsufficientCreditsError) {
+      return NextResponse.json(
+        {
+          error: error.message,
+          code: "CREDITS_INSUFFICIENT",
+          bucket: error.bucket,
+          required: error.required,
+          available: error.available,
+        },
+        { status: 402 },
+      );
+    }
+    // Zod validation errors
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: error.flatten(), code: "VALIDATION_ERROR" }, { status: 400 });
+    }
     return toErrorResponse(error);
   }
 }
