@@ -7,7 +7,7 @@ import { recordUsageEvent } from "@/domains/usage-events/service";
 import { runWeeklyPromoMvp } from "@/domains/weekly-promo/service";
 import { ApiKeyAuthError } from "@/domains/api-keys/service";
 import { toErrorResponse } from "@/lib/http/errors";
-import { requireApiKeyIdentity } from "@/lib/public-api/auth";
+import { requireApiKeyIdentity, PublicApiAuthRequiredError } from "@/lib/public-api/auth";
 import { consumeRateLimit, RateLimitExceededError } from "@/lib/public-api/rate-limit";
 import {
   beginIdempotentRequest,
@@ -136,6 +136,9 @@ export async function POST(request: Request) {
     return NextResponse.json(responseJson);
   } catch (error) {
     // Public API auth errors
+    if (error instanceof PublicApiAuthRequiredError) {
+      return NextResponse.json({ error: error.message, code: "API_KEY_MISSING" }, { status: 401 });
+    }
     if (error instanceof ApiKeyAuthError) {
       return NextResponse.json({ error: error.message, code: "API_KEY_INVALID" }, { status: 401 });
     }
