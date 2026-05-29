@@ -7,7 +7,8 @@ const envSchema = z.object({
   MOCK_MODE: z
     .preprocess((v) => {
       if (typeof v !== "string") return v;
-      const s = v.trim().toLowerCase();
+      // Strip surrounding quotes (Render stores "false" as "\"false\"")
+      const s = v.trim().replace(/^"|"$/g, "").toLowerCase();
       if (s === "true") return true;
       if (s === "false") return false;
       return v;
