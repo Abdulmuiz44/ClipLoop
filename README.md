@@ -2,6 +2,10 @@
 
 ClipLoop is building a simpler way for brands, businesses, and creators to create short form promo content faster.
 
+## Architecture
+
+ClipLoop uses a **two-surface split architecture** — a Vite marketing frontend (`cliploop-vite/`) and a Next.js app/backend (`src/`). See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full breakdown: deployment mapping, styling rules, environment boundaries, and development commands for each surface.
+
 ## MVP slices currently implemented
 
 - Premium studio dashboard at `/app` with:
