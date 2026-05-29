@@ -92,7 +92,7 @@ export async function GET(request: Request) {
 
     // Invalid scopes requested
     if (error && typeof error === "object" && "code" in error && (error as any).code === "INVALID_SCOPE") {
-      return NextResponse.json({ error: (error as Error).message, code: "INVALID_SCOPE" }, { status: 400 });
+      return NextResponse.json({ error: (error as any).message, code: "INVALID_SCOPE" }, { status: 400 });
     }
 
     return toErrorResponse(error);
