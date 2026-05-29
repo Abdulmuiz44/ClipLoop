@@ -58,7 +58,7 @@ export default function SignInPage() {
         >
           <button
             onClick={handleGoogleSignIn}
-            className="flex h-12 w-full items-center justify-center rounded-lg border border-[#1F1F1F] bg-emerald-600 px-4 text-sm font-semibold text-white transition hover:bg-emerald-500/150 disabled:cursor-not-allowed disabled:opacity-70 border-[#1F1F1F]"
+            className="flex h-12 w-full items-center justify-center rounded-lg border border-[#1F1F1F] bg-white px-4 text-sm font-semibold text-black transition hover:bg-neutral-200 disabled:cursor-not-allowed disabled:opacity-70 border-[#1F1F1F]"
           >
             Continue with Google
           </button>

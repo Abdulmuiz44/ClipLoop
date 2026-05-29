@@ -10,7 +10,8 @@
   --cl-muted: #8B8B8B;
   --cl-border: #1F1F1F;
   --cl-soft: #111111;
-  --cl-primary: #22c55e;
+  --cl-primary: #ffffff;
+  --cl-success: #22c55e;
 }
 
 body {
@@ -22,8 +23,8 @@ body {
 }
 
 ::selection {
-  background-color: #22c55e;
-  color: black;
+  background-color: #333333;
+  color: white;
 }
 
 @layer components {
@@ -69,48 +70,40 @@ body {
   }
 
   .cl-input:focus {
-    border-color: var(--cl-primary);
+    border-color: #333333;
   }
 
   .cl-btn-primary {
-    @apply inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium text-white transition;
-    background: var(--cl-primary);
+    @apply inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold text-black transition;
+    background: #ffffff;
   }
 
   .cl-btn-primary:hover {
-    opacity: 0.9;
+    background: #e5e5e5;
   }
 
   .cl-btn-ghost {
-    @apply inline-flex items-center justify-center rounded-lg border px-4 py-2.5 text-sm transition;
+    @apply inline-flex items-center justify-center rounded-lg border px-4 py-2.5 text-sm font-medium transition;
     border-color: var(--cl-border);
     color: var(--cl-muted);
-    background: var(--cl-surface);
+    background: transparent;
   }
 
   .cl-btn-ghost:hover {
     border-color: #333333;
+    color: #ffffff;
   }
 }
 
-/* Animated gradient text */
-.gradient-text {
-  background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+/* Minimal green accent for functional states only */
+.cl-accent-green {
+  color: #22c55e;
 }
 
-/* Glow effects */
-.glow-green {
-  box-shadow: 0 0 30px rgba(5, 150, 105, 0.15), 0 0 60px rgba(5, 150, 105, 0.05);
+.bg-accent-green {
+  background-color: #22c55e;
 }
 
-.glow-green-sm {
-  box-shadow: 0 0 15px rgba(5, 150, 105, 0.1);
-}
-
-/* Scrollbar hiding */
 .scrollbar-none {
   -ms-overflow-style: none;
   scrollbar-width: none;

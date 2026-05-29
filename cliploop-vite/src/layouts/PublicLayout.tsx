@@ -34,7 +34,7 @@ export function PublicLayout() {
             </Link>
             <Link
               to="/signin"
-              className="rounded-md bg-emerald-600 px-3 py-1.5 font-medium text-white transition hover:bg-emerald-500 bg-emerald-600 "
+              className="rounded-md bg-white px-3 py-1.5 font-medium text-black transition hover:bg-neutral-200"
             >
               Sign in
             </Link>

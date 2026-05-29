@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 function Feature({ children }: { children: React.ReactNode }) {
   return (
     <li className="flex gap-2 leading-6 text-slate-300 text-slate-300">
-      <span className="mt-2 h-1.5 w-1.5 rounded-full bg-emerald-600 flex-none" />
+      <span className="mt-2 h-1.5 w-1.5 rounded-full bg-[#333333] flex-none" />
       {children}
     </li>
   );
@@ -93,7 +93,7 @@ export default function PricingPage() {
           <motion.div
             animate={{ opacity: [0, 1, 0] }}
             transition={{ duration: 3, repeat: Infinity }}
-            className="absolute inset-0 bg-gradient-to-br from-emerald-500/[0.03] to-transparent pointer-events-none"
+            className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent pointer-events-none"
           />
           <div className="relative">
             <div className="flex items-start justify-between gap-4">
@@ -111,7 +111,7 @@ export default function PricingPage() {
               <motion.span
                 animate={{ scale: [1, 1.05, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}
-                className="rounded-full bg-emerald-600 px-3 py-1 text-xs font-medium text-white"
+                className="rounded-full border border-[#333333] bg-[#0E0E0E] px-3 py-1 text-xs font-medium text-white"
               >
                 Best value
               </motion.span>
@@ -136,7 +136,7 @@ export default function PricingPage() {
               >
                 <a
                   href="https://app.cliploop.site/signin"
-                  className="inline-flex rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-emerald-500/150 glow-green-sm"
+                  className="inline-flex rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-black shadow-sm transition hover:bg-neutral-200"
                 >
                   Start Pro checkout
                 </a>

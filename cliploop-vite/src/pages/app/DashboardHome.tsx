@@ -2,10 +2,10 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
 const quickActions = [
-  { title: "Generate Video", detail: "Turn your idea into a scroll-stopping video.", color: "from-emerald-500/20 to-emerald-500/5", icon: "🎬" },
-  { title: "Generate Copy", detail: "Create hooks, captions and ad copy.", color: "from-violet-500/20 to-violet-500/5", icon: "✍️" },
-  { title: "New Project", detail: "Create a new project for your brand.", color: "from-sky-500/20 to-sky-500/5", icon: "📁" },
-  { title: "Import Website", detail: "Import your website to learn about your brand.", color: "from-amber-500/20 to-amber-500/5", icon: "🌐" },
+  { title: "Generate Video", detail: "Turn your idea into a scroll-stopping video.", color: "from-white/10 to-white/5", icon: "🎬" },
+  { title: "Generate Copy", detail: "Create hooks, captions and ad copy.", color: "from-white/10 to-white/5", icon: "✍️" },
+  { title: "New Project", detail: "Create a new project for your brand.", color: "from-white/10 to-white/5", icon: "📁" },
+  { title: "Import Website", detail: "Import your website to learn about your brand.", color: "from-white/10 to-white/5", icon: "🌐" },
 ];
 
 const demoProjects = [
@@ -135,7 +135,7 @@ export default function DashboardHome() {
             </div>
             <div className="mt-4 grid gap-4 sm:grid-cols-[160px_1fr] sm:items-center">
               <div className="grid place-items-center">
-                <div className="grid h-36 w-36 place-items-center rounded-full" style={{ background: "conic-gradient(#22c55e 0 70%, #8b5cf6 70% 88%, #facc15 88% 100%)" }}>
+                <div className="grid h-36 w-36 place-items-center rounded-full" style={{ background: "conic-gradient(#A3A3A3 0 70%, #555555 70% 88%, #333333 88% 100%)" }}>
                   <div className="grid place-items-center rounded-full bg-[#0E0E0E] shadow-sm bg-[#0E0E0E]" style={{ width: 104, height: 104 }}>
                     <p className="text-2xl font-semibold text-white text-white">73</p>
                     <p className="text-xs text-[#8B8B8B]">Credits Used</p>
@@ -144,7 +144,7 @@ export default function DashboardHome() {
               </div>
               <div className="space-y-2 text-sm text-[#8B8B8B] text-[#8B8B8B]">
                 {[
-                  { label: "Videos", color: "bg-emerald-500/150", value: "50 credits" },
+                  { label: "Videos", color: "bg-white/20", value: "50 credits" },
                   { label: "Copies", color: "bg-violet-500/150", value: "18 credits" },
                   { label: "Others", color: "bg-amber-400", value: "5 credits" },
                 ].map((item) => (
@@ -182,7 +182,7 @@ export default function DashboardHome() {
             </button>
           </div>
           <div className="mt-3 h-1.5 rounded-full bg-[#1F1F1F] bg-[#1F1F1F]">
-            <div className="h-1.5 w-4/5 rounded-full bg-emerald-500/150" />
+            <div className="h-1.5 w-4/5 rounded-full bg-white/20" />
           </div>
           <p className="mt-2 text-xs text-[#8B8B8B]">You have enough credits to generate 8 more videos.</p>
         </motion.section>
@@ -197,7 +197,7 @@ export default function DashboardHome() {
                 <p className="text-xs text-[#8B8B8B]">Renews on May 12, 2025</p>
               </div>
             </div>
-            <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs font-medium text-emerald-300 bg-emerald-500/150/15 text-emerald-300">
+            <span className="rounded-full border border-[#333333] px-2 py-0.5 text-xs font-medium text-[#A3A3A3]">
               Active
             </span>
           </div>
@@ -219,7 +219,7 @@ export default function DashboardHome() {
                   <p className="truncate text-sm font-medium text-white text-white">{item.name}</p>
                   <p className="text-xs text-[#8B8B8B]">{item.meta}</p>
                 </div>
-                <span className={`rounded-full px-2 py-0.5 text-[11px] ${item.kind === "Video" ? "bg-emerald-500/15 text-emerald-300" : "bg-violet-500/15 text-violet-300"} bg-[#1F1F1F] text-slate-200`}>
+                <span className={`rounded-full px-2 py-0.5 text-[11px] bg-[#1F1F1F] text-slate-200`}>
                   {item.kind}
                 </span>
                 <span className="text-xs text-[#8B8B8B]">{item.when}</span>

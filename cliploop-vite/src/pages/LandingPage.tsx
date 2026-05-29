@@ -5,17 +5,17 @@ const pillars = [
   {
     title: "Plan with context",
     body: "ClipLoop ingests your website and business profile, then assembles reusable project context for each cycle.",
-    gradient: "from-emerald-500/20 to-emerald-500/5",
+    gradient: "from-white/5 to-white/0",
   },
   {
     title: "Generate with control",
     body: "Chat-first creation with structured strategy, copy generation, and render controls under one operator surface.",
-    gradient: "from-violet-500/20 to-violet-500/5",
+    gradient: "from-white/5 to-white/0",
   },
   {
     title: "Ship and learn",
     body: "Approve assets, push to queue, and iterate from tracked performance data and credit-backed workflows.",
-    gradient: "from-sky-500/20 to-sky-500/5",
+    gradient: "from-white/5 to-white/0",
   },
 ];
 
@@ -56,7 +56,7 @@ export default function LandingPage() {
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 30, repeat: Infinity, ease: "linear" as const }}
-          className="absolute -right-12 -top-12 h-56 w-56 rounded-full bg-emerald-200/50 blur-3xl bg-emerald-500/10"
+          className="absolute -right-12 -top-12 h-56 w-56 rounded-full blur-3xl bg-white/[0.03]"
         />
         <motion.div
           animate={{ rotate: -360 }}
@@ -101,7 +101,7 @@ export default function LandingPage() {
             >
               <a
                 href="https://app.cliploop.site/app"
-                className="cl-btn-primary glow-green-sm rounded-lg"
+                className="cl-btn-primary rounded-lg"
               >
                 Open workspace
               </a>
@@ -131,7 +131,7 @@ export default function LandingPage() {
                   whileHover={{ x: 4 }}
                   className="flex items-start gap-3 rounded-lg border border-[#1F1F1F] bg-[#0E0E0E] p-3 border-[#1F1F1F] bg-[#0E0E0E]"
                 >
-                  <span className="inline-flex h-6 w-6 flex-none items-center justify-center rounded-full bg-emerald-600 text-xs font-semibold text-white">
+                  <span className="inline-flex h-6 w-6 flex-none items-center justify-center rounded-full border border-[#333333] bg-[#0E0E0E] text-xs font-semibold text-white">
                     {index + 1}
                   </span>
                   <p className="text-sm text-[#8B8B8B] text-[#8B8B8B]">
@@ -222,7 +222,7 @@ export default function LandingPage() {
         <motion.div
           animate={{ scale: [1, 1.05, 1] }}
           transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" as const }}
-          className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 via-transparent to-emerald-500/5"
+          className="absolute inset-0 bg-gradient-to-r from-white/[0.02] via-transparent to-white/[0.02]"
         />
         <div className="relative">
           <h2 className="text-2xl font-semibold text-white text-white">
@@ -239,7 +239,7 @@ export default function LandingPage() {
           >
             <a
               href="https://app.cliploop.site/app"
-              className="inline-flex rounded-lg bg-emerald-600 px-6 py-3 text-sm font-medium text-white shadow-lg transition hover:bg-emerald-500/150 glow-green"
+              className="inline-flex rounded-lg bg-white px-6 py-3 text-sm font-medium text-black shadow-lg transition hover:bg-neutral-200"
             >
               Get started free
             </a>

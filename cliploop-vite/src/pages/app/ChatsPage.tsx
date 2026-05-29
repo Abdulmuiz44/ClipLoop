@@ -20,7 +20,7 @@ export default function ChatsPage() {
           <p className="mt-3 text-sm text-[#8B8B8B] text-[#8B8B8B]">
             Select a conversation or start a new chat
           </p>
-          <button className="mt-4 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-500/150">
+          <button className="mt-4 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-neutral-200">
             + New Chat
           </button>
         </div>

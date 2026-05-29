@@ -21,7 +21,7 @@ export default function ProjectsPage() {
             Manage your brand projects and content strategy.
           </p>
         </div>
-        <button className="h-10 rounded-xl bg-emerald-600 px-4 text-sm font-semibold text-white hover:bg-emerald-500/150">
+        <button className="h-10 rounded-xl bg-white px-4 text-sm font-semibold text-black hover:bg-neutral-200">
           + New Project
         </button>
       </div>
@@ -38,7 +38,7 @@ export default function ProjectsPage() {
           >
             <div className="flex items-start justify-between">
               <p className="text-sm font-semibold text-white text-white">{project.name}</p>
-              <span className={`rounded-full px-2 py-0.5 text-[11px] ${project.active ? "bg-emerald-500/15 text-emerald-300 bg-emerald-500/150/15 text-emerald-300" : "bg-slate-100 text-[#8B8B8B] bg-[#111111]"}`}>
+              <span className={`rounded-full px-2 py-0.5 text-[11px] ${project.active ? "bg-white/15 text-white" : "bg-[#111111] text-[#8B8B8B]"}`}>
                 {project.active ? "Active" : "Archived"}
               </span>
             </div>

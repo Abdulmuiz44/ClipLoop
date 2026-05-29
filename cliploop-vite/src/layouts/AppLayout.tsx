@@ -62,7 +62,7 @@ export function AppLayout() {
                 to={item.to}
                 className={`flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition ${
                   active
-                    ? "bg-[#0d1423] text-white shadow-[inset_3px_0_0_#22c55e]"
+                    ? "bg-[#0d1423] text-white shadow-[inset_3px_0_0_#ffffff]"
                     : "text-slate-300 hover:bg-white/5 hover:text-white"
                 }`}
                 onClick={() => setSidebarOpen(false)}
@@ -79,13 +79,13 @@ export function AppLayout() {
         <div className="mt-auto space-y-3">
           <Link
             to="/pricing"
-            className="block rounded-2xl border border-slate-800 bg-gradient-to-b from-slate-950 to-slate-900 p-4 text-sm text-slate-300 shadow-sm transition hover:border-emerald-500"
+            className="block rounded-2xl border border-[#1F1F1F] bg-[#0E0E0E] p-4 text-sm text-slate-300 shadow-sm transition hover:border-white"
           >
             <p className="font-semibold text-white">Upgrade to Pro</p>
             <p className="mt-1 text-xs text-[#8B8B8B]">
               Unlock more credits, premium templates & advanced features.
             </p>
-            <p className="mt-3 inline-flex h-9 items-center justify-center rounded-xl bg-emerald-600 px-4 text-xs font-semibold text-white">
+            <p className="mt-3 inline-flex h-9 items-center justify-center rounded-xl bg-white px-4 text-xs font-semibold text-black">
               Upgrade Now
             </p>
           </Link>
@@ -119,7 +119,7 @@ export function AppLayout() {
             <input
               aria-label="Search"
               placeholder="Search projects, content, templates..."
-              className="w-full max-w-[520px] rounded-2xl border border-[#1F1F1F] bg-[#111111] py-2.5 pl-4 pr-4 text-sm text-slate-300 outline-none focus:border-emerald-500 border-[#1F1F1F] bg-[#0E0E0E] text-slate-200"
+              className="w-full max-w-[520px] rounded-2xl border border-[#1F1F1F] bg-[#0E0E0E] py-2.5 pl-4 pr-4 text-sm text-slate-300 outline-none focus:border-white border-[#1F1F1F] bg-[#0E0E0E] text-slate-200"
             />
           </div>
         </header>
