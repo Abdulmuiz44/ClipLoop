@@ -1,8 +1,10 @@
-import { and, eq, sql } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
 import { env } from "@/lib/env";
 import { getLatestSubscriptionForUser, subscriptionConfersStarterAccess } from "@/domains/billing/service";
 import { OFFLINE_DEMO_USER_ID } from "@/lib/auth";
+import { getCreditWalletSummary } from "@/domains/credits/service";
+import { listApiKeys } from "@/domains/api-keys/service";
 
 export type PlanType = "free" | "starter" | "beta";
 
@@ -252,5 +254,162 @@ export async function getCurrentUsageSummary(userId: string): Promise<CurrentUsa
       week: { start: weekStart.toISOString().slice(0, 10), end: weekEnd.toISOString().slice(0, 10) },
       month: { start: monthStart.toISOString().slice(0, 10), end: monthEnd.toISOString().slice(0, 10) },
     },
+  };
+}
+
+export type DashboardUsageData = {
+  credits: {
+    generationBalance: number;
+    renderBalance: number;
+    totalBalance: number;
+    periodKey: string;
+  };
+  usageEvents: Array<{
+    id: string;
+    action: string;
+    source: "web" | "public_api";
+    creditsBucket: string | null;
+    creditsAmount: number | null;
+    createdAt: string;
+    keyPrefix: string | null;
+  }>;
+  breakdownByAction: Record<string, number>;
+  publicApiUsageCount: number;
+  creditsSpentLast7d: number;
+  creditsSpentLast30d: number;
+  apiKeys: Array<{
+    id: string;
+    label: string;
+    keyPrefix: string;
+    status: "active" | "revoked";
+    scopes: string[];
+    createdAt: string;
+    lastUsedAt: string | null;
+  }>;
+};
+
+export async function getDashboardUsageData(userId: string): Promise<DashboardUsageData> {
+  const now = new Date();
+
+  // 1. Credit wallet
+  const wallet = await getCreditWalletSummary(userId);
+  const credits = {
+    generationBalance: wallet.generationBalance,
+    renderBalance: wallet.renderBalance,
+    totalBalance: wallet.generationBalance + wallet.renderBalance,
+    periodKey: wallet.periodKey,
+  };
+
+  // 2. Recent usage events (last 20) with keyPrefix from metadataJson
+  const rawEvents = await db
+    .select({
+      id: schema.usageEvents.id,
+      action: schema.usageEvents.action,
+      source: schema.usageEvents.source,
+      creditsBucket: schema.usageEvents.creditsBucket,
+      creditsAmount: schema.usageEvents.creditsAmount,
+      createdAt: schema.usageEvents.createdAt,
+      metadataJson: schema.usageEvents.metadataJson,
+    })
+    .from(schema.usageEvents)
+    .where(eq(schema.usageEvents.userId, userId))
+    .orderBy(desc(schema.usageEvents.createdAt))
+    .limit(20);
+
+  const usageEvents = rawEvents.map((e) => ({
+    id: e.id,
+    action: e.action,
+    source: (e.source ?? "web") as "web" | "public_api",
+    creditsBucket: e.creditsBucket ?? null,
+    creditsAmount: e.creditsAmount ?? null,
+    createdAt: e.createdAt.toISOString(),
+    keyPrefix: ((e.metadataJson as Record<string, unknown> | null)?.keyPrefix as string) ?? null,
+  }));
+
+  // 3. Usage breakdown by action (last 30 days)
+  const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+  const breakdownRows = await db
+    .select({
+      action: schema.usageEvents.action,
+      count: sql<number>`count(*)::int`,
+    })
+    .from(schema.usageEvents)
+    .where(and(eq(schema.usageEvents.userId, userId), sql`${schema.usageEvents.createdAt} >= ${thirtyDaysAgo}`))
+    .groupBy(schema.usageEvents.action)
+    .orderBy(sql`count(*) desc`);
+
+  const breakdownByAction: Record<string, number> = {};
+  for (const row of breakdownRows) {
+    breakdownByAction[row.action] = row.count;
+  }
+
+  // 4. Public API usage count (last 30 days)
+  const [publicApiRow] = await db
+    .select({
+      count: sql<number>`count(*)::int`,
+    })
+    .from(schema.usageEvents)
+    .where(
+      and(
+        eq(schema.usageEvents.userId, userId),
+        eq(schema.usageEvents.source, "public_api"),
+        sql`${schema.usageEvents.createdAt} >= ${thirtyDaysAgo}`,
+      ),
+    );
+
+  const publicApiUsageCount = publicApiRow?.count ?? 0;
+
+  // 5. Credits spent last 7d and 30d
+  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+  const [spent7dRow, spent30dRow] = await Promise.all([
+    db
+      .select({
+        total: sql<number>`coalesce(sum(abs(${schema.creditLedgerEntries.amountDelta})), 0)::int`,
+      })
+      .from(schema.creditLedgerEntries)
+      .where(
+        and(
+          eq(schema.creditLedgerEntries.userId, userId),
+          eq(schema.creditLedgerEntries.direction, "debit"),
+          sql`${schema.creditLedgerEntries.createdAt} >= ${sevenDaysAgo}`,
+        ),
+      ),
+    db
+      .select({
+        total: sql<number>`coalesce(sum(abs(${schema.creditLedgerEntries.amountDelta})), 0)::int`,
+      })
+      .from(schema.creditLedgerEntries)
+      .where(
+        and(
+          eq(schema.creditLedgerEntries.userId, userId),
+          eq(schema.creditLedgerEntries.direction, "debit"),
+          sql`${schema.creditLedgerEntries.createdAt} >= ${thirtyDaysAgo}`,
+        ),
+      ),
+  ]);
+
+  const creditsSpentLast7d = spent7dRow[0]?.total ?? 0;
+  const creditsSpentLast30d = spent30dRow[0]?.total ?? 0;
+
+  // 6. API keys (prefix only)
+  const apiKeys = (await listApiKeys(userId)).map((k) => ({
+    id: k.id,
+    label: k.label,
+    keyPrefix: k.keyPrefix,
+    status: k.status as "active" | "revoked",
+    scopes: k.scopes,
+    createdAt: k.createdAt.toISOString(),
+    lastUsedAt: k.lastUsedAt?.toISOString() ?? null,
+  }));
+
+  return {
+    credits,
+    usageEvents,
+    breakdownByAction,
+    publicApiUsageCount,
+    creditsSpentLast7d,
+    creditsSpentLast30d,
+    apiKeys,
   };
 }

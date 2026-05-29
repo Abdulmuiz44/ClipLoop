@@ -72,6 +72,40 @@ export const meUsageResponseSchema = z.object({
     month: z.object({ start: z.string(), end: z.string() }),
   }),
   limits: mePlanResponseSchema.shape.limits,
+  dashboard: z.object({
+    credits: z.object({
+      generationBalance: z.number(),
+      renderBalance: z.number(),
+      totalBalance: z.number(),
+      periodKey: z.string(),
+    }),
+    usageEvents: z.array(
+      z.object({
+        id: z.string(),
+        action: z.string(),
+        source: z.enum(["web", "public_api"]),
+        creditsBucket: z.string().nullable(),
+        creditsAmount: z.number().nullable(),
+        createdAt: z.string(),
+        keyPrefix: z.string().nullable(),
+      }),
+    ),
+    breakdownByAction: z.record(z.number()),
+    publicApiUsageCount: z.number(),
+    creditsSpentLast7d: z.number(),
+    creditsSpentLast30d: z.number(),
+    apiKeys: z.array(
+      z.object({
+        id: z.string(),
+        label: z.string(),
+        keyPrefix: z.string(),
+        status: z.enum(["active", "revoked"]),
+        scopes: z.array(z.string()),
+        createdAt: z.string(),
+        lastUsedAt: z.string().nullable(),
+      }),
+    ),
+  }),
 });
 
 export const checkoutStartResponseSchema = z.object({

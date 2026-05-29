@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { meUsageResponseSchema } from "@/lib/validation/billing";
 
 test("dashboard usage data shape matches spec", () => {
   const mockData = {
@@ -178,6 +179,77 @@ test("me/usage route response shape includes dashboard field", () => {
   assert.ok(response.remaining);
   assert.ok(response.periods);
   assert.ok(response.limits);
+});
+
+test("meUsageResponseSchema validates dashboard field", () => {
+  const payload = {
+    usage: {
+      postsPerWeek: 0,
+      postsPerMonth: 0,
+      manualRegenerationsPerWeek: 0,
+      rendersPerMonth: 0,
+      publishesPerMonth: 0,
+    },
+    remaining: {
+      postsPerWeek: 12,
+      postsPerMonth: 80,
+      manualRegenerationsPerWeek: 5,
+      rendersPerMonth: 40,
+      publishesPerMonth: 40,
+    },
+    periods: {
+      week: { start: "2026-05-25", end: "2026-05-31" },
+      month: { start: "2026-05-01", end: "2026-05-31" },
+    },
+    limits: {
+      activeProjects: 5,
+      postsPerWeek: 20,
+      postsPerMonth: 80,
+      manualRegenerationsPerWeek: 10,
+      rendersPerMonth: 40,
+      publishesPerMonth: 40,
+      connectedChannels: 1,
+    },
+    dashboard: {
+      credits: { generationBalance: 85, renderBalance: 42, totalBalance: 127, periodKey: "2026-05" },
+      usageEvents: [
+        {
+          id: "evt-1",
+          action: "api_weekly_promo_generate",
+          source: "public_api" as const,
+          creditsBucket: "generation",
+          creditsAmount: 5,
+          createdAt: new Date().toISOString(),
+          keyPrefix: "clp_abc1234",
+        },
+      ],
+      breakdownByAction: { api_weekly_promo_generate: 1 },
+      publicApiUsageCount: 2,
+      creditsSpentLast7d: 10,
+      creditsSpentLast30d: 35,
+      apiKeys: [
+        {
+          id: "key-1",
+          label: "My Server",
+          keyPrefix: "clp_abc1234",
+          status: "active" as const,
+          scopes: ["weekly_promo:generate"],
+          createdAt: new Date().toISOString(),
+          lastUsedAt: null,
+        },
+      ],
+    },
+  };
+
+  const parsed = meUsageResponseSchema.parse(payload);
+  assert.equal(parsed.dashboard.credits.totalBalance, 127);
+  assert.equal(parsed.dashboard.usageEvents.length, 1);
+  assert.equal(parsed.dashboard.publicApiUsageCount, 2);
+  assert.equal(parsed.dashboard.creditsSpentLast7d, 10);
+  assert.equal(parsed.dashboard.creditsSpentLast30d, 35);
+  assert.equal(parsed.dashboard.apiKeys.length, 1);
+  assert.equal(parsed.dashboard.apiKeys[0].keyPrefix, "clp_abc1234");
+  assert.equal((parsed.dashboard.apiKeys[0] as any).fullKey, undefined);
 });
 
 test("usage event with keyPrefix in metadata only shows prefix not full key", () => {
