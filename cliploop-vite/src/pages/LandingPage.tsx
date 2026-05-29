@@ -99,12 +99,12 @@ export default function LandingPage() {
               transition={{ delay: 0.6, duration: 0.5 }}
               className="flex flex-wrap gap-3"
             >
-              <Link
-                to="/app"
+              <a
+                href="https://app.cliploop.site/app"
                 className="cl-btn-primary glow-green-sm rounded-lg"
               >
                 Open workspace
-              </Link>
+              </a>
               <Link to="/pricing" className="cl-btn-ghost">
                 View pricing
               </Link>
@@ -237,12 +237,12 @@ export default function LandingPage() {
             whileTap={{ scale: 0.98 }}
             className="mt-6"
           >
-            <Link
-              to="/app"
+            <a
+              href="https://app.cliploop.site/app"
               className="inline-flex rounded-lg bg-emerald-600 px-6 py-3 text-sm font-medium text-white shadow-lg transition hover:bg-emerald-500/150 glow-green"
             >
               Get started free
-            </Link>
+            </a>
           </motion.div>
         </div>
       </motion.section>

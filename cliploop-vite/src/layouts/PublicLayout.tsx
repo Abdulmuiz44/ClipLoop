@@ -20,12 +20,12 @@ export function PublicLayout() {
         <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5 md:py-4">
           <ClipLoopLogo href="/" />
           <div className="flex items-center gap-1 text-sm text-slate-300 text-slate-300">
-            <Link
-              to="/app"
+            <a
+              href="https://app.cliploop.site/app"
               className="rounded-md px-3 py-1.5 transition hover:bg-[#1F1F1F] hover:text-white hover:bg-[#1F1F1F] hover:text-white"
             >
               Open App
-            </Link>
+            </a>
             <Link
               to="/pricing"
               className="rounded-md px-3 py-1.5 transition hover:bg-[#1F1F1F] hover:text-white hover:bg-[#1F1F1F] hover:text-white"

@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 // In dev, Vite proxy forwards /api to the Next.js backend.
 // In production, point this to the deployed Next.js API.
-const API_BASE = import.meta.env.DEV ? "/api" : "https://www.cliploop.site/api";
+const API_BASE = import.meta.env.DEV ? "/api" : "https://app.cliploop.site/api";
 
 export default function SignInPage() {
   const [searchParams] = useSearchParams();
@@ -12,10 +12,9 @@ export default function SignInPage() {
 
   const handleGoogleSignIn = () => {
     // Redirect to the Next.js backend for Google OAuth
-    const currentOrigin = window.location.origin;
     const callbackUrl = searchParams.get("callbackUrl") || "/app";
     window.location.href = `${API_BASE}/auth/signin?callbackUrl=${encodeURIComponent(
-      currentOrigin + callbackUrl
+      "https://app.cliploop.site" + callbackUrl
     )}`;
   };
 

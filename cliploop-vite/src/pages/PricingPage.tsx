@@ -78,9 +78,9 @@ export default function PricingPage() {
             <Feature>Manual queue and export workflow included</Feature>
           </ul>
           <div className="mt-6">
-            <Link to="/app" className="cl-btn-ghost inline-flex">
+            <a href="https://app.cliploop.site/app" className="cl-btn-ghost inline-flex">
               Start in workspace
-            </Link>
+            </a>
           </div>
         </motion.article>
 
@@ -134,12 +134,12 @@ export default function PricingPage() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                <Link
-                  to="/signin"
+                <a
+                  href="https://app.cliploop.site/signin"
                   className="inline-flex rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-emerald-500/150 glow-green-sm"
                 >
                   Start Pro checkout
-                </Link>
+                </a>
               </motion.div>
             </div>
           </div>

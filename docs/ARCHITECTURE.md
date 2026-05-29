@@ -77,15 +77,16 @@ The two surfaces share the same GitHub repository (`talocode/cliploop`) but have
 | Domain | Surface | Host | Deployment Method |
 |--------|---------|------|-------------------|
 | `cliploop.site` | Vite marketing frontend | Render (static site) | Auto-deploy from `main` branch, `cliploop-vite/` rootDir |
-| `app.cliploop.site` | Next.js app/backend | Render (web service) | Auto-deploy from `main` branch |
-| `talocode.github.io/cliploop/` | Project showcase | GitHub Pages | Manual / historical (marketing showcase only) |
+| `www.cliploop.site` | Vite marketing frontend (or redirect) | Render (static site) | Same as above — CNAME alias |
+| `app.cliploop.site` | Next.js product app/backend/API | Render (web service) | Auto-deploy from `main` branch |
 
 ### Current live URLs:
-- **Vite frontend:** https://cliploop-app.onrender.com (Render static site, `app.cliploop.site` custom domain pending DNS propagation)
-- **Next.js backend:** https://cliploop.site (Render web service)
+- **Vite frontend (target):** `cliploop.site` / `www.cliploop.site`
+- **Next.js backend (target):** `app.cliploop.site`
+- **Render raw URLs:** `cliploop-app.onrender.com` (Vite static site), `cliploop.site` (Next.js web service)
 
 ### Vite → Next.js proxy:
-In development, `vite.config.ts` proxies `/api/*` requests to `https://www.cliploop.site` (the Next.js production backend). This keeps auth and API calls working during local Vite development without spinning up a local Next.js instance.
+In development, `vite.config.ts` proxies `/api/*` requests to `https://app.cliploop.site` (the Next.js production backend). In production, the Vite frontend's SignInPage also uses this domain for OAuth redirects. This keeps auth and API calls working without the Vite frontend ever handling secrets.
 
 ### SPA routing:
 The Vite frontend uses a `public/_redirects` file (`/* /index.html 200`) so Render serves `index.html` for all non-file routes. This enables direct URL access (e.g., `/pricing`, `/app`) in the SPA without 404 errors.

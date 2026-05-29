@@ -3,7 +3,7 @@ import react from "@vitejs/plugin-react";
 import path from "path";
 
 // The Next.js backend that handles auth + API calls
-const API_BACKEND = "https://www.cliploop.site";
+const API_BACKEND = "https://app.cliploop.site";
 
 export default defineConfig({
   plugins: [react()],
