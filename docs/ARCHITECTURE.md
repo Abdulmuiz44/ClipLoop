@@ -212,3 +212,9 @@ This repo started as a pure Next.js application. The marketing frontend was extr
 4. Reduce cold-start latency on the marketing pages
 
 The Next.js backend at root still serves the same routes (`/`, `/pricing`) alongside the app routes — the Vite frontend replaces it as the primary marketing surface. The existing `ARCHITECTURE.md` at repo root documents the internal domain layer and open-core extraction, which remains accurate for the Next.js backend.
+
+---
+
+## TODO (Dev)
+
+- [ ] Remove `typescript.ignoreBuildErrors: true` from `next.config.ts` after all remaining TypeScript errors are fixed
