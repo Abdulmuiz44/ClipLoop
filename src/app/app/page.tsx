@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { StudioShell } from "@/components/app/studio-shell";
-import { DashboardUsageSection, DashboardBalanceDisplay } from "@/components/app/dashboard-usage-section";
 import { getCurrentUser } from "@/lib/auth";
 
 function ActionIcon({ bg, children }: { bg: string; children: React.ReactNode }) {
@@ -139,8 +138,65 @@ export default async function StudioDashboardPage() {
             </div>
           </div>
 
-          {/* Usage & API section — real data from backend */}
-          <DashboardUsageSection />
+          <div className="grid gap-4 lg:grid-cols-2">
+            <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Recent Activity</h3>
+              <ul className="mt-4 space-y-3">
+                {["Video generated", "Copy generated", "Website imported", "Project created"].map((label, idx) => (
+                  <li key={label} className="flex items-start gap-3 rounded-xl bg-slate-50 p-3 text-sm dark:bg-slate-800">
+                    <span className={`grid h-9 w-9 place-items-center rounded-2xl ${idx === 0 ? "bg-emerald-500/10 text-emerald-600" : idx === 1 ? "bg-violet-500/10 text-violet-600" : idx === 2 ? "bg-amber-500/10 text-amber-600" : "bg-sky-500/10 text-sky-600"}`}>
+🎬
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium text-slate-900 dark:text-white">{label}</p>
+                      <p className="mt-0.5 text-xs text-slate-500">{idx === 0 ? "GlowSkin Launch • 15s Promo" : idx === 1 ? "TaskFlow App • Ad Copy Pack" : idx === 2 ? "urbanstep.com" : "Nutripower Shake"}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs text-slate-500">{idx === 0 ? "2h ago" : idx === 1 ? "4h ago" : idx === 2 ? "1d ago" : "2d ago"}</p>
+                      <span className={`mt-2 inline-flex rounded-full px-2 py-0.5 text-[11px] ${idx <= 1 ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-600"} dark:bg-slate-700 dark:text-slate-200`}>
+                        {idx === 0 ? "+10 credits" : idx === 1 ? "+2 credits" : "Free"}
+                      </span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </section>
+
+            <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Usage Overview</h3>
+                <span className="rounded-xl border border-slate-200 bg-white px-3 py-1 text-xs text-slate-500 dark:border-slate-700 dark:bg-slate-900">This Month</span>
+              </div>
+              <div className="mt-4 grid gap-4 sm:grid-cols-[160px_1fr] sm:items-center">
+                <div className="grid place-items-center">
+                  <div className="grid h-36 w-36 place-items-center rounded-full" style={{ background: "conic-gradient(#22c55e 0 70%, #8b5cf6 70% 88%, #facc15 88% 100%)" }}>
+                    <div className="grid h-26 w-26 place-items-center rounded-full bg-white text-center shadow-sm dark:bg-slate-900" style={{ width: 104, height: 104 }}>
+                      <p className="text-2xl font-semibold text-slate-900 dark:text-white">73</p>
+                      <p className="text-xs text-slate-500">Credits Used</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-2 text-sm text-slate-600 dark:text-slate-300">
+                  <div className="flex items-center justify-between">
+                    <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-emerald-500" /> Videos</span>
+                    <span className="text-slate-500">50 credits</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-violet-500" /> Copies</span>
+                    <span className="text-slate-500">18 credits</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-amber-400" /> Others</span>
+                    <span className="text-slate-500">5 credits</span>
+                  </div>
+                  <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-xs dark:border-slate-800">
+                    <span className="text-slate-500">Total Credits Used</span>
+                    <span className="text-slate-500">73 / 200</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
         </section>
 
         <aside className="space-y-4">
@@ -149,7 +205,7 @@ export default async function StudioDashboardPage() {
               <div>
                 <p className="text-sm font-semibold text-slate-900 dark:text-white">Credits Balance</p>
                 <p className="mt-2 text-4xl font-semibold text-slate-900 dark:text-white">
-                  <DashboardBalanceDisplay /> <span className="text-base font-normal text-slate-500">credits</span>
+                  127 <span className="text-base font-normal text-slate-500">credits</span>
                 </p>
               </div>
               <button className="mt-1 h-10 rounded-2xl bg-slate-950 px-4 text-sm font-semibold text-white shadow-sm dark:bg-white dark:text-slate-900">Buy Credits</button>
@@ -166,7 +222,7 @@ export default async function StudioDashboardPage() {
                 <span className="grid h-10 w-10 place-items-center rounded-full bg-slate-900 text-white">CL</span>
                 <div>
                   <p className="text-sm font-semibold text-slate-900 dark:text-white">Pro Plan</p>
-                  <p className="text-xs text-slate-500">Active</p>
+                  <p className="text-xs text-slate-500">Renews on May 12, 2025</p>
                 </div>
               </div>
               <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">Active</span>
