@@ -35,7 +35,7 @@ export default function PricingPage() {
       {/* Header */}
       <motion.section
         variants={itemVariants}
-        className="cl-card p-6 md:p-8"
+        className="cl-card p-5 md:p-8"
       >
         <ClipLoopLogo href="/" />
         <p className="cl-kicker mt-4">Pricing</p>
@@ -55,18 +55,18 @@ export default function PricingPage() {
         <motion.article
           variants={itemVariants}
           whileHover={{ y: -4 }}
-          className="cl-card p-6"
+          className="cl-card p-5 md:p-8"
         >
-          <p className="text-sm font-medium uppercase tracking-[0.2em] text-[#8B8B8B] text-[#8B8B8B]">
+          <p className="text-sm font-medium uppercase tracking-[0.2em] text-[#8B8B8B]">
             Free
           </p>
-          <h2 className="mt-2 text-3xl font-semibold text-white text-white">
+          <h2 className="mt-2 text-3xl font-semibold text-white">
             $0
-            <span className="text-base font-medium text-[#8B8B8B] text-[#8B8B8B]">
+            <span className="text-base font-medium text-[#8B8B8B]">
               /month
             </span>
           </h2>
-          <p className="mt-4 text-sm text-[#8B8B8B] text-[#8B8B8B]">
+          <p className="mt-4 text-sm text-[#8B8B8B]">
             Best for testing ClipLoop with one business profile and light
             monthly output.
           </p>
@@ -98,12 +98,12 @@ export default function PricingPage() {
           <div className="relative">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-sm font-medium uppercase tracking-[0.2em] text-[#8B8B8B] text-[#8B8B8B]">
+                <p className="text-sm font-medium uppercase tracking-[0.2em] text-[#8B8B8B]">
                   Pro
                 </p>
-                <h2 className="mt-2 text-3xl font-semibold text-white text-white">
+                <h2 className="mt-2 text-3xl font-semibold text-white">
                   $5
-                  <span className="text-base font-medium text-[#8B8B8B] text-[#8B8B8B]">
+                  <span className="text-base font-medium text-[#8B8B8B]">
                     /month
                   </span>
                 </h2>
@@ -117,7 +117,7 @@ export default function PricingPage() {
               </motion.span>
             </div>
 
-            <p className="mt-4 text-sm text-[#8B8B8B] text-[#8B8B8B]">
+            <p className="mt-4 text-sm text-[#8B8B8B]">
               For operators who need higher generation/render throughput and
               multiple active projects.
             </p>

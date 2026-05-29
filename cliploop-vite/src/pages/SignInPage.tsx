@@ -23,9 +23,9 @@ export default function SignInPage() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
-      className="mx-auto flex min-h-[calc(100vh-9rem)] max-w-md items-center justify-center"
+      className="mx-auto flex min-h-[calc(100vh-9rem)] max-w-md items-center justify-center px-4"
     >
-      <section className="w-full rounded-xl border border-[#1F1F1F] bg-[#0E0E0E] p-7 border-[#1F1F1F] bg-[#0E0E0E]">
+      <section className="w-full rounded-xl border border-[#1F1F1F] bg-[#0E0E0E] p-5 md:p-7">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -44,7 +44,7 @@ export default function SignInPage() {
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
-            className="mt-5 rounded-lg border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-300 text-rose-300"
+            className="mt-5 rounded-lg border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-300"
           >
             Google sign-in failed. Check your account access and try again.
           </motion.div>
@@ -58,7 +58,7 @@ export default function SignInPage() {
         >
           <button
             onClick={handleGoogleSignIn}
-            className="flex h-12 w-full items-center justify-center rounded-lg border border-[#1F1F1F] bg-white px-4 text-sm font-semibold text-black transition hover:bg-neutral-200 disabled:cursor-not-allowed disabled:opacity-70 border-[#1F1F1F]"
+            className="flex h-12 w-full items-center justify-center rounded-lg border border-[#1F1F1F] bg-white px-4 text-sm font-semibold text-black transition hover:bg-neutral-200 disabled:cursor-not-allowed disabled:opacity-70"
           >
             Continue with Google
           </button>

@@ -14,10 +14,10 @@ export default function ProjectsPage() {
       animate={{ opacity: 1, y: 0 }}
       className="space-y-5"
     >
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-white text-white">Projects</h1>
-          <p className="mt-1 text-sm text-[#8B8B8B] text-[#8B8B8B]">
+          <h1 className="text-xl font-semibold text-white md:text-2xl">Projects</h1>
+          <p className="mt-1 text-sm text-[#8B8B8B]">
             Manage your brand projects and content strategy.
           </p>
         </div>
@@ -26,7 +26,7 @@ export default function ProjectsPage() {
         </button>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {projects.map((project, i) => (
           <motion.div
             key={project.name}
@@ -34,28 +34,19 @@ export default function ProjectsPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.08 }}
             whileHover={{ y: -4 }}
-            className="rounded-2xl border border-[#1F1F1F] bg-[#0E0E0E] p-4 shadow-sm border-[#1F1F1F] bg-[#0E0E0E]"
+            className="rounded-2xl border border-[#1F1F1F] bg-[#0E0E0E] p-4"
           >
-            <div className="flex items-start justify-between">
-              <p className="text-sm font-semibold text-white text-white">{project.name}</p>
-              <span className={`rounded-full px-2 py-0.5 text-[11px] ${project.active ? "bg-white/15 text-white" : "bg-[#111111] text-[#8B8B8B]"}`}>
+            <div className="flex items-start justify-between gap-2">
+              <p className="text-sm font-semibold text-white">{project.name}</p>
+              <span className={`flex-shrink-0 rounded-full px-2 py-0.5 text-[11px] ${project.active ? "bg-white/15 text-white" : "bg-[#111111] text-[#8B8B8B]"}`}>
                 {project.active ? "Active" : "Archived"}
               </span>
             </div>
             <p className="mt-1 text-xs text-[#8B8B8B]">{project.type}</p>
-            <div className="mt-4 grid grid-cols-3 gap-2 border-t border-[#1F1F1F] pt-3 border-[#1F1F1F]">
-              <div className="text-center">
-                <p className="text-lg font-semibold text-white text-white">{project.videos}</p>
-                <p className="text-xs text-[#8B8B8B]">Videos</p>
-              </div>
-              <div className="text-center">
-                <p className="text-lg font-semibold text-white text-white">{project.copies}</p>
-                <p className="text-xs text-[#8B8B8B]">Copies</p>
-              </div>
-              <div className="text-center">
-                <p className="text-lg font-semibold text-white text-white">{project.weeks}</p>
-                <p className="text-xs text-[#8B8B8B]">Weeks</p>
-              </div>
+            <div className="mt-4 flex gap-3 border-t border-[#1F1F1F] pt-3 text-xs text-[#8B8B8B]">
+              <span><span className="font-semibold text-white">{project.videos}</span> Videos</span>
+              <span><span className="font-semibold text-white">{project.copies}</span> Copies</span>
+              <span><span className="font-semibold text-white">{project.weeks}</span> Weeks</span>
             </div>
           </motion.div>
         ))}

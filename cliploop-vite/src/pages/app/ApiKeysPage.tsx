@@ -8,14 +8,14 @@ export default function ApiKeysPage() {
       className="space-y-5"
     >
       <div>
-        <h1 className="text-2xl font-semibold text-white text-white">API Keys</h1>
-        <p className="mt-1 text-sm text-[#8B8B8B] text-[#8B8B8B]">
+        <h1 className="text-xl font-semibold text-white md:text-2xl">API Keys</h1>
+        <p className="mt-1 text-sm text-[#8B8B8B]">
           Manage your developer API keys for programmatic access.
         </p>
       </div>
 
-      <div className="rounded-2xl border border-[#1F1F1F] bg-[#0E0E0E] p-5 shadow-sm border-[#1F1F1F] bg-[#0E0E0E]">
-        <p className="text-sm text-[#8B8B8B] text-[#8B8B8B]">
+      <div className="rounded-2xl border border-[#1F1F1F] bg-[#0E0E0E] p-5">
+        <p className="text-sm text-[#8B8B8B]">
           No API keys yet. Create one to start building with ClipLoop.
         </p>
         <button className="mt-4 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-neutral-200">

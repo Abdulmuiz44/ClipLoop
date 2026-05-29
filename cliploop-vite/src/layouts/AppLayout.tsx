@@ -17,41 +17,48 @@ const navItems: NavItem[] = [
 export function AppLayout() {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
   const initials = useMemo(() => "CL", []);
 
-  // Override: for the app layout, we render the dark sidebar + light content area
   return (
-    <div className="relative min-h-screen bg-[#050505] bg-[#050505]">
+    <div className="min-h-screen bg-[#050505]">
       {/* Mobile overlay */}
       {sidebarOpen && (
         <button
-          className="fixed inset-0 z-30 bg-black/40 md:hidden"
+          className="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm md:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar — fixed on all screens, content offset on desktop */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 flex w-72 flex-col bg-[#05070d] p-4 text-white transition-transform md:static md:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col bg-[#05070d] p-4 text-white transition-transform duration-200 md:w-72 md:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <ClipLoopLogo href="/app" light />
+        <div className="flex items-center justify-between">
+          <ClipLoopLogo href="/app" light />
+          <button
+            className="grid h-8 w-8 place-items-center rounded-lg text-[#8B8B8B] hover:bg-[#0E0E0E] hover:text-white md:hidden"
+            onClick={() => setSidebarOpen(false)}
+            aria-label="Close sidebar"
+          >
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <path d="M4 4l10 10M14 4L4 14" />
+            </svg>
+          </button>
+        </div>
 
         <Link
           to="/app/create"
-          className="mt-6 inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#0E0E0E] px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-[#1F1F1F]"
+          className="mt-5 inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#0E0E0E] px-4 text-sm font-semibold text-white transition hover:bg-[#1F1F1F]"
           onClick={() => setSidebarOpen(false)}
         >
-          <span className="inline-flex h-6 w-6 items-center justify-center rounded-lg border border-[#1F1F1F] bg-[#0E0E0E] text-white">
-            +
-          </span>
+          <span className="inline-flex h-6 w-6 items-center justify-center rounded-lg border border-[#1F1F1F] bg-[#0E0E0E] text-white">+</span>
           Create New
-          <span className="ml-1 text-[#8B8B8B]">✦</span>
+          <span className="text-[#8B8B8B]">✦</span>
         </Link>
 
-        <nav className="mt-5 space-y-1.5">
+        <nav className="mt-5 space-y-1 overflow-y-auto">
           {navItems.map((item) => {
             const active =
               location.pathname === item.to ||
@@ -76,10 +83,10 @@ export function AppLayout() {
           })}
         </nav>
 
-        <div className="mt-auto space-y-3">
+        <div className="mt-auto space-y-3 pt-4">
           <Link
             to="/pricing"
-            className="block rounded-2xl border border-[#1F1F1F] bg-[#0E0E0E] p-4 text-sm text-slate-300 shadow-sm transition hover:border-white"
+            className="block rounded-2xl border border-[#1F1F1F] bg-[#0E0E0E] p-4 text-sm text-slate-300 transition hover:border-white"
           >
             <p className="font-semibold text-white">Upgrade to Pro</p>
             <p className="mt-1 text-xs text-[#8B8B8B]">
@@ -105,21 +112,24 @@ export function AppLayout() {
         </div>
       </aside>
 
-      {/* Main content area */}
-      <div className="min-w-0 bg-[#050505] bg-[#050505] md:ml-0">
+      {/* Main content — offset by sidebar width on desktop */}
+      <div className="min-w-0 md:ml-72">
         {/* Top bar */}
-        <header className="sticky top-0 z-20 border-b border-[#1F1F1F] bg-[#0E0E0E]/95 px-4 py-3 backdrop-blur border-[#1F1F1F] bg-[#050505]/90">
+        <header className="sticky top-0 z-20 border-b border-[#1F1F1F] bg-[#050505]/90 px-4 py-3 backdrop-blur">
           <div className="flex items-center gap-3">
             <button
-              className="rounded-md border border-[#1F1F1F] bg-[#0E0E0E] px-3 py-1.5 text-sm text-slate-300 md:hidden border-[#1F1F1F] bg-[#0E0E0E] text-slate-300"
+              className="grid h-9 w-9 place-items-center rounded-lg border border-[#1F1F1F] bg-[#0E0E0E] text-slate-300 md:hidden"
               onClick={() => setSidebarOpen(true)}
+              aria-label="Open sidebar"
             >
-              Menu
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <path d="M2 4h14M2 9h14M2 14h14" />
+              </svg>
             </button>
             <input
               aria-label="Search"
               placeholder="Search projects, content, templates..."
-              className="w-full max-w-[520px] rounded-2xl border border-[#1F1F1F] bg-[#0E0E0E] py-2.5 pl-4 pr-4 text-sm text-slate-300 outline-none focus:border-white border-[#1F1F1F] bg-[#0E0E0E] text-slate-200"
+              className="w-full max-w-[520px] rounded-2xl border border-[#1F1F1F] bg-[#0E0E0E] py-2.5 pl-4 pr-4 text-sm text-slate-200 outline-none transition focus:border-white"
             />
           </div>
         </header>
@@ -129,7 +139,7 @@ export function AppLayout() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, ease: "easeOut" }}
-          className="p-4 md:p-6"
+          className="p-4 md:p-6 lg:p-8"
         >
           <Outlet />
         </motion.main>

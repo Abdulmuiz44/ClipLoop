@@ -45,26 +45,26 @@ export default function LandingPage() {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="space-y-8"
+      className="space-y-6 md:space-y-8"
     >
       {/* Hero */}
       <motion.section
         variants={itemVariants}
-        className="cl-card relative overflow-hidden p-8 md:p-10"
+        className="cl-card relative overflow-hidden p-5 md:p-10"
       >
         {/* Decorative blobs with animation */}
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 30, repeat: Infinity, ease: "linear" as const }}
-          className="absolute -right-12 -top-12 h-56 w-56 rounded-full blur-3xl bg-white/[0.03]"
+          className="absolute -right-12 -top-12 h-40 w-40 rounded-full blur-3xl bg-white/[0.03] md:h-56 md:w-56"
         />
         <motion.div
           animate={{ rotate: -360 }}
           transition={{ duration: 25, repeat: Infinity, ease: "linear" as const }}
-          className="absolute -bottom-20 left-0 h-56 w-56 rounded-full bg-blue-500/10 blur-3xl "
+          className="absolute -bottom-20 left-0 h-40 w-40 rounded-full bg-blue-500/10 blur-3xl md:h-56 md:w-56"
         />
-        <div className="relative grid gap-8 md:grid-cols-[1.1fr_0.9fr]">
-          <div className="space-y-5">
+        <div className="relative grid gap-6 md:gap-8 md:grid-cols-[1.1fr_0.9fr]">
+          <div className="space-y-4 md:space-y-5">
             <motion.p
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -77,7 +77,7 @@ export default function LandingPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.6 }}
-              className="max-w-3xl text-4xl font-semibold tracking-tight text-white md:text-5xl text-white"
+              className="max-w-3xl text-3xl font-semibold tracking-tight text-white md:text-5xl"
             >
               Build weekly growth assets without{" "}
               <span className="gradient-text">rebuilding your workflow</span>{" "}
@@ -168,7 +168,7 @@ export default function LandingPage() {
       {/* Roadmap section */}
       <motion.section
         variants={itemVariants}
-        className="cl-card p-6 md:p-8"
+        className="cl-card p-5 md:p-8"
       >
         <div className="grid gap-6 md:grid-cols-[0.9fr_1.1fr]">
           <div>
@@ -217,7 +217,7 @@ export default function LandingPage() {
       {/* CTA */}
       <motion.section
         variants={itemVariants}
-        className="cl-card relative overflow-hidden p-8 text-center"
+        className="cl-card relative overflow-hidden p-6 text-center md:p-8"
       >
         <motion.div
           animate={{ scale: [1, 1.05, 1] }}
@@ -225,10 +225,10 @@ export default function LandingPage() {
           className="absolute inset-0 bg-gradient-to-r from-white/[0.02] via-transparent to-white/[0.02]"
         />
         <div className="relative">
-          <h2 className="text-2xl font-semibold text-white text-white">
+          <h2 className="text-xl font-semibold text-white md:text-2xl">
             Ready to build your growth loop?
           </h2>
-          <p className="mt-2 text-sm text-[#8B8B8B] text-[#8B8B8B]">
+          <p className="mt-2 text-sm text-[#8B8B8B]">
             Start with one project and see how ClipLoop changes your weekly
             workflow.
           </p>
