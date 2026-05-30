@@ -1,1 +1,27 @@
-{"version":"7","dialect":"postgresql","entries":[]}
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    { "idx": 0, "version": "7", "when": 1719792000000, "tag": "0000_initial", "breakpoints": true },
+    { "idx": 1, "version": "7", "when": 1719792010000, "tag": "0001_content_assets", "breakpoints": true },
+    { "idx": 2, "version": "7", "when": 1719792020000, "tag": "0002_template_default", "breakpoints": true },
+    { "idx": 3, "version": "7", "when": 1719792030000, "tag": "0003_publish_queue", "breakpoints": true },
+    { "idx": 4, "version": "7", "when": 1719792040000, "tag": "0004_tracking_metrics", "breakpoints": true },
+    { "idx": 5, "version": "7", "when": 1719792050000, "tag": "0005_iteration_experiments", "breakpoints": true },
+    { "idx": 6, "version": "7", "when": 1719792060000, "tag": "0006_billing_access_limits", "breakpoints": true },
+    { "idx": 7, "version": "7", "when": 1719792070000, "tag": "0007_usage_counter_period_type", "breakpoints": true },
+    { "idx": 8, "version": "7", "when": 1719792080000, "tag": "0008_lemonsqueezy_billing", "breakpoints": true },
+    { "idx": 9, "version": "7", "when": 1719792090000, "tag": "0009_connected_channels", "breakpoints": true },
+    { "idx": 10, "version": "7", "when": 1719792100000, "tag": "0010_project_business_profile", "breakpoints": true },
+    { "idx": 11, "version": "7", "when": 1719792110000, "tag": "0011_channel_aware_generation", "breakpoints": true },
+    { "idx": 12, "version": "7", "when": 1719792120000, "tag": "0012_content_item_target_channel", "breakpoints": true },
+    { "idx": 13, "version": "7", "when": 1719792130000, "tag": "0013_content_item_publish_strategy", "breakpoints": true },
+    { "idx": 14, "version": "7", "when": 1719792140000, "tag": "0014_manual_publish_queue_status", "breakpoints": true },
+    { "idx": 15, "version": "7", "when": 1719792150000, "tag": "0015_chat_first_workspace", "breakpoints": true },
+    { "idx": 16, "version": "7", "when": 1719792160000, "tag": "0016_credit_ledger", "breakpoints": true },
+    { "idx": 17, "version": "7", "when": 1719792170000, "tag": "0018_api_keys", "breakpoints": true },
+    { "idx": 18, "version": "7", "when": 1719792180000, "tag": "0019_idempotency_keys", "breakpoints": true },
+    { "idx": 19, "version": "7", "when": 1719792190000, "tag": "0020_usage_events", "breakpoints": true },
+    { "idx": 20, "version": "7", "when": 1719792200000, "tag": "0021_rate_limit_counters", "breakpoints": true }
+  ]
+}
