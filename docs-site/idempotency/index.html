@@ -1,0 +1,12 @@
+<h1>Idempotency</h1>
+<p class="lead">Prevent duplicate charges with <code>Idempotency-Key</code>. Include a unique key (at least 8 characters) in every request header.</p>
+<div class="code-block"><code>Idempotency-Key: my-campaign-launch-v2</code></div>
+<h2 id="behavior">Behavior</h2>
+<div class="table-wrap"><table>
+  <tr><th>Scenario</th><th>Result</th></tr>
+  <tr><td>Same key + same body</td><td><span class="badge badge-ok">Cached</span> Returns cached response, no re-charge</td></tr>
+  <tr><td>Same key + different body</td><td><span class="badge badge-err">409</span> IDEMPOTENCY_CONFLICT</td></tr>
+  <tr><td>Key missing</td><td><span class="badge badge-err">400</span> IDEMPOTENCY_KEY_REQUIRED</td></tr>
+  <tr><td>Key in use (job running)</td><td><span class="badge badge-warn">409</span> IDEMPOTENCY_IN_PROGRESS</td></tr>
+</table></div>
+<div class="callout">💡 Use a deterministic key per content piece (e.g. <code>weekly-promo-{date}-{appName}</code>) so retries are safe and intentional.</div>

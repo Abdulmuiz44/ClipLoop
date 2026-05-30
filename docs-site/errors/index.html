@@ -1,0 +1,19 @@
+<h1>Error Codes</h1>
+<p class="lead">The API returns standard HTTP status codes with structured error details.</p>
+<div class="table-wrap"><table>
+  <tr><th>HTTP</th><th>Code</th><th>Description</th></tr>
+  <tr><td><span class="badge badge-err">400</span></td><td><code>IDEMPOTENCY_KEY_REQUIRED</code></td><td>Missing Idempotency-Key header</td></tr>
+  <tr><td><span class="badge badge-err">401</span></td><td><code>API_KEY_MISSING</code></td><td>Authorization header not provided</td></tr>
+  <tr><td><span class="badge badge-err">401</span></td><td><code>API_KEY_INVALID</code></td><td>API key not recognized</td></tr>
+  <tr><td><span class="badge badge-err">402</span></td><td><code>CREDITS_INSUFFICIENT</code></td><td>Not enough credits—top up in dashboard</td></tr>
+  <tr><td><span class="badge badge-err">403</span></td><td><code>SCOPE_DENIED</code></td><td>Key lacks required scope</td></tr>
+  <tr><td><span class="badge badge-err">409</span></td><td><code>IDEMPOTENCY_CONFLICT</code></td><td>Same idempotency key + different body</td></tr>
+  <tr><td><span class="badge badge-warn">409</span></td><td><code>IDEMPOTENCY_IN_PROGRESS</code></td><td>Job already running</td></tr>
+  <tr><td><span class="badge badge-err">500</span></td><td><code>renderer_unavailable</code></td><td>Render engine temporarily down—retry</td></tr>
+</table></div>
+<div class="code-block"><code>{
+  "error": {
+    "code": "CREDITS_INSUFFICIENT",
+    "message": "Generation credits depleted."
+  }
+}</code></div>

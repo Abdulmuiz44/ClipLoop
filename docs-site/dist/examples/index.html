@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+<title>Examples · ClipLoop Developer Docs</title>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<a href="#content" class="skip-link">Skip to content</a>
+<button class="mobile-toggle" aria-label="Open menu" onclick="document.getElementById('sidebar').classList.add('open');document.getElementById('overlay').classList.add('open')">☰</button>
+<div class="sidebar-overlay" id="overlay" onclick="document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('open')"></div>
+<nav class="sidebar" id="sidebar" aria-label="Docs navigation">
+  <div class="logo">
+    <div class="logo-mark">CL</div>
+    <div class="logo-text">ClipLoop<small>Developer Docs</small></div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-title">Getting Started</div>
+    <a href="/overview/" class="nav-link ">Overview</a>
+    <a href="/quickstart/" class="nav-link ">Quickstart</a>
+    <a href="/authentication/" class="nav-link ">Authentication</a>
+    <a href="/idempotency/" class="nav-link ">Idempotency</a>
+    <a href="/credits/" class="nav-link ">Credits & Billing</a>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-section">
+    <div class="nav-section-title">API Reference</div>
+    <a href="/weekly-promo-api/" class="nav-link ">Weekly Promo API</a>
+    <a href="/examples/" class="nav-link active">Examples</a>
+    <a href="/errors/" class="nav-link ">Error Codes</a>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-section">
+    <div class="nav-section-title">More</div>
+    <a href="/roadmap/" class="nav-link ">Roadmap</a>
+    <a href="https://app.cliploop.site" class="nav-link">App Dashboard →</a>
+    <a href="https://cliploop.site" class="nav-link">Marketing Site →</a>
+  </div>
+</nav>
+<main class="main" id="content">
+  <div class="content">
+    
+    <h1>Examples</h1>
+<p class="lead">Copy and adapt these examples to call the Weekly Promo API from your backend or scripts.</p>
+
+<h2 id="curl">cURL</h2>
+<div class="code-block"><code>curl -X POST https://app.cliploop.site/api/public/weekly-promo \
+  -H "Authorization: Bearer $CLIPLOOP_API_KEY" \
+  -H "Idempotency-Key: $IDEMPOTENCY_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "appName": "ClipLoop",
+    "appWebsiteUrl": "https://cliploop.site",
+    "weeklyUpdate": "ClipLoop now has a public API for weekly promo generation.",
+    "targetAudience": "indie app builders and SaaS founders",
+    "callToAction": "Try ClipLoop",
+    "channel": "x",
+    "tone": "clear, sharp, builder focused"
+  }'</code></div>
+
+<h2 id="javascript">JavaScript (fetch)</h2>
+<div class="code-block"><code>const response = await fetch("https://app.cliploop.site/api/public/weekly-promo", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.CLIPLOOP_API_KEY}`,
+    "Idempotency-Key": `promo-${Date.now()}`,
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    appName: "ClipLoop",
+    appWebsiteUrl: "https://cliploop.site",
+    weeklyUpdate: "ClipLoop now has a public API for weekly promo generation.",
+    targetAudience: "indie app builders and SaaS founders",
+    callToAction: "Try ClipLoop",
+    channel: "x",
+    tone: "clear, sharp, builder focused"
+  })
+});
+const data = await response.json();
+if (!response.ok) throw new Error(data.error?.message || `HTTP ${response.status}`);</code></div>
+
+<h2 id="node">Node.js</h2>
+<div class="code-block"><code>const response = await fetch("https://app.cliploop.site/api/public/weekly-promo", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.CLIPLOOP_API_KEY}`,
+    "Idempotency-Key": `promo-${Date.now()}`,
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    appName: "ClipLoop",
+    appWebsiteUrl: "https://cliploop.site",
+    weeklyUpdate: "ClipLoop now has a public API for weekly promo generation.",
+    targetAudience: "indie app builders and SaaS founders",
+    callToAction: "Try ClipLoop",
+    channel: "x",
+    tone: "clear, sharp, builder focused"
+  })
+});
+const data = await response.json();
+if (!response.ok) throw new Error(data.error?.message || `HTTP ${response.status}`);</code></div>
+
+<h2 id="environment-variables">Environment variables</h2>
+<div class="code-block"><code>CLIPLOOP_API_KEY=clp_li...
+IDEMPOTENCY_KEY=promo-2026-05-30-cliploop</code></div>
+<div class="callout">⚠️ Never commit real API keys to source control. Store them in environment variables or a secrets manager.</div>
+
+    <footer>
+      <p style="display:flex; flex-wrap:wrap; gap:14px; align-items:center; justify-content:space-between">
+        <span>© 2026 ClipLoop · Built by <a href="https://talocode.com" style="color:var(--text3)">Talocode</a></span>
+        <span style="display:flex; gap:14px">
+          <a href="https://cliploop.site">Marketing</a>
+          <a href="https://app.cliploop.site">Dashboard</a>
+          <a href="https://github.com/talocode/cliploop">GitHub</a>
+        </span>
+      </p>
+    </footer>
+  </div>
+</main>
+<script>
+document.getElementById('overlay').addEventListener('click', function(){
+  document.getElementById('sidebar').classList.remove('open');
+  this.classList.remove('open');
+});
+</script>
+</body>
+</html>

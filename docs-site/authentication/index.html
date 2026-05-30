@@ -1,0 +1,14 @@
+<h1>Authentication</h1>
+<p class="lead">All public API endpoints require a Bearer API key.</p>
+<h2 id="authorization-header">Authorization header</h2>
+<div class="code-block"><code>Authorization: Bearer clp_li...</code></div>
+<h2 id="scopes">Scopes</h2>
+<p>The weekly promo endpoint requires the scope <code>weekly_promo:generate</code>. Keys are scoped at creation time.</p>
+<h2 id="security-rules">Security rules</h2>
+<ul style="margin-left:20px; line-height:2">
+  <li>Never expose raw API keys in frontend code or client-side apps</li>
+  <li>Make API calls from your backend or server-side environment only</li>
+  <li>Rotate keys periodically via the dashboard</li>
+  <li>Revoke compromised keys immediately</li>
+</ul>
+<div class="callout warn">⚠️ Only the key prefix is stored server-side. The raw key is shown once at creation.</div>

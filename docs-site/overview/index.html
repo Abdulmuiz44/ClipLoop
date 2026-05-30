@@ -1,0 +1,29 @@
+<h1>ClipLoop Developer Docs</h1>
+<p class="lead">Programmable video generation for developers and product teams. Generate promo videos, scene specs, and video artifacts from an API.</p>
+
+<div class="card">
+  <div class="card-title">✨ Current API</div>
+  <p style="margin:0">The first public endpoint is <strong>Weekly Promo</strong> — generate a short-form promo video from a URL and a weekly update.</p>
+</div>
+<p>ClipLoop is an <strong>API-first</strong> platform. Send structured inputs, receive video artifacts. No browser UI required. The dashboard is one consumer — you can build your own.</p>
+
+<h2 id="key-concepts">Key concepts</h2>
+<table>
+  <tr><td><strong>API Key</strong></td><td>Scoped bearer token for authentication. Created in the dashboard.</td></tr>
+  <tr><td><strong>Credits</strong></td><td>Pay-per-use unit. 5 generation credits per weekly promo API call.</td></tr>
+  <tr><td><strong>Idempotency Key</strong></td><td>Prevents double charges. Same key + same body = cached result.</td></tr>
+  <tr><td><strong>Scope</strong></td><td>API keys require <code>weekly_promo:generate</code> for the promo endpoint.</td></tr>
+</table>
+
+<h2 id="quick-links">Quick links</h2>
+<div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:12px; margin-top:12px">
+  <a href="/quickstart/" class="card" style="text-decoration:none; margin:0"><div style="font-weight:600; color:var(--white); margin-bottom:4px">Quickstart</div><div style="font-size:13px; color:var(--text2)">Create account, generate API key, make your first request</div></a>
+  <a href="/authentication/" class="card" style="text-decoration:none; margin:0"><div style="font-weight:600; color:var(--white); margin-bottom:4px">Authentication</div><div style="font-size:13px; color:var(--text2)">Bearer keys, scopes, and security best practices</div></a>
+  <a href="/examples/" class="card" style="text-decoration:none; margin:0"><div style="font-weight:600; color:var(--white); margin-bottom:4px">Examples</div><div style="font-size:13px; color:var(--text2)">cURL, JavaScript, and Node.js code samples</div></a>
+  <a href="/errors/" class="card" style="text-decoration:none; margin:0"><div style="font-weight:600; color:var(--white); margin-bottom:4px">Error Codes</div><div style="font-size:13px; color:var(--text2)">HTTP status codes and structured error bodies</div></a>
+</div>
+
+<h2 id="get-started">Get started</h2>
+<p>Create your first API key and make a test request.</p>
+<div class="callout">⚠️ The raw API key is shown <strong>only once</strong> at creation. Store it securely. Never log full keys.</div>
+<a href="https://app.cliploop.site/app/settings/api-keys" class="cta">Generate API Key →</a>

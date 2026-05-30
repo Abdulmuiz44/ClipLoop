@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+<title>Weekly Promo Api · ClipLoop Developer Docs</title>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<a href="#content" class="skip-link">Skip to content</a>
+<button class="mobile-toggle" aria-label="Open menu" onclick="document.getElementById('sidebar').classList.add('open');document.getElementById('overlay').classList.add('open')">☰</button>
+<div class="sidebar-overlay" id="overlay" onclick="document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('open')"></div>
+<nav class="sidebar" id="sidebar" aria-label="Docs navigation">
+  <div class="logo">
+    <div class="logo-mark">CL</div>
+    <div class="logo-text">ClipLoop<small>Developer Docs</small></div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-title">Getting Started</div>
+    <a href="/overview/" class="nav-link ">Overview</a>
+    <a href="/quickstart/" class="nav-link ">Quickstart</a>
+    <a href="/authentication/" class="nav-link ">Authentication</a>
+    <a href="/idempotency/" class="nav-link ">Idempotency</a>
+    <a href="/credits/" class="nav-link ">Credits & Billing</a>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-section">
+    <div class="nav-section-title">API Reference</div>
+    <a href="/weekly-promo-api/" class="nav-link active">Weekly Promo API</a>
+    <a href="/examples/" class="nav-link ">Examples</a>
+    <a href="/errors/" class="nav-link ">Error Codes</a>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-section">
+    <div class="nav-section-title">More</div>
+    <a href="/roadmap/" class="nav-link ">Roadmap</a>
+    <a href="https://app.cliploop.site" class="nav-link">App Dashboard →</a>
+    <a href="https://cliploop.site" class="nav-link">Marketing Site →</a>
+  </div>
+</nav>
+<main class="main" id="content">
+  <div class="content">
+    
+    <h1>Weekly Promo API</h1>
+<p class="lead">Generate a short-form weekly promo video script, scene plan, and rendered artifact from a public URL.</p>
+<div class="endpoint"><span class="badge badge-post">POST</span><code>https://app.cliploop.site/api/public/weekly-promo</code></div>
+<h2 id="request-body">Request body</h2>
+<div class="code-block"><code>{
+  "appName": "ClipLoop",
+  "appWebsiteUrl": "https://cliploop.site",
+  "weeklyUpdate": "ClipLoop now has a public API for weekly promo generation.",
+  "targetAudience": "indie app builders and SaaS founders",
+  "callToAction": "Try ClipLoop",
+  "channel": "x",
+  "tone": "clear, sharp, builder focused"
+}</code></div>
+<div class="table-wrap"><table>
+  <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+  <tr><td><code>appName</code></td><td>string</td><td>✅</td><td>Your app or product name</td></tr>
+  <tr><td><code>appWebsiteUrl</code></td><td>url</td><td>—</td><td>Website for brand extraction</td></tr>
+  <tr><td><code>weeklyUpdate</code></td><td>string</td><td>✅</td><td>What's new this week (8–500 chars)</td></tr>
+  <tr><td><code>targetAudience</code></td><td>string</td><td>—</td><td>Primary audience description</td></tr>
+  <tr><td><code>callToAction</code></td><td>string</td><td>—</td><td>Desired CTA text</td></tr>
+  <tr><td><code>channel</code></td><td>enum</td><td>✅</td><td><code>instagram</code>, <code>tiktok</code>, <code>whatsapp</code>, or <code>x</code></td></tr>
+  <tr><td><code>tone</code></td><td>string</td><td>—</td><td>Promo tone (e.g. <code>professional</code>, <code>energetic</code>)</td></tr>
+</table></div>
+
+<h2 id="response-body">Response body</h2>
+<div class="code-block"><code>{
+  "artifactId": "clp_abc123",
+  "previewUrl": "https://cdn.cliploop.site/...",
+  "downloadUrl": "https://cdn.cliploop.site/.../download",
+  "artifactUrl": "https://cdn.cliploop.site/.../video.mp4",
+  "script": { "hook": "...", "body": ["..."], "caption": "...", "cta": "..." },
+  "scenePlan": ["Scene 1: ..."],
+  "creditsCharged": 5,
+  "idempotencyKey": "my-campaign-launch-v2",
+  "renderStatus": "rendered"
+}</code></div>
+<div class="table-wrap"><table>
+  <tr><th>Field</th><th>Description</th></tr>
+  <tr><td><code>artifactId</code></td><td>Unique artifact identifier</td></tr>
+  <tr><td><code>previewUrl</code></td><td>Preview image URL</td></tr>
+  <tr><td><code>downloadUrl</code></td><td>Direct download link</td></tr>
+  <tr><td><code>artifactUrl</code></td><td>CDN URL for the rendered video</td></tr>
+  <tr><td><code>script</code></td><td>Full script object</td></tr>
+  <tr><td><code>scenePlan</code></td><td>Ordered scene descriptions</td></tr>
+  <tr><td><code>creditsCharged</code></td><td>Credits deducted from your balance</td></tr>
+  <tr><td><code>renderStatus</code></td><td>One of: <code>rendered</code>, <code>renderer_unavailable</code>, <code>pending</code></td></tr>
+</table></div>
+<div class="callout">Renderer fallback: If the video engine is unavailable, the API returns the script and scene plan with <code>renderStatus: "renderer_unavailable"</code>. You can retry later or use the script output directly.</div>
+
+    <footer>
+      <p style="display:flex; flex-wrap:wrap; gap:14px; align-items:center; justify-content:space-between">
+        <span>© 2026 ClipLoop · Built by <a href="https://talocode.com" style="color:var(--text3)">Talocode</a></span>
+        <span style="display:flex; gap:14px">
+          <a href="https://cliploop.site">Marketing</a>
+          <a href="https://app.cliploop.site">Dashboard</a>
+          <a href="https://github.com/talocode/cliploop">GitHub</a>
+        </span>
+      </p>
+    </footer>
+  </div>
+</main>
+<script>
+document.getElementById('overlay').addEventListener('click', function(){
+  document.getElementById('sidebar').classList.remove('open');
+  this.classList.remove('open');
+});
+</script>
+</body>
+</html>

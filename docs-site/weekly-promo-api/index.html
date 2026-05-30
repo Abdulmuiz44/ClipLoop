@@ -1,0 +1,48 @@
+<h1>Weekly Promo API</h1>
+<p class="lead">Generate a short-form weekly promo video script, scene plan, and rendered artifact from a public URL.</p>
+<div class="endpoint"><span class="badge badge-post">POST</span><code>https://app.cliploop.site/api/public/weekly-promo</code></div>
+<h2 id="request-body">Request body</h2>
+<div class="code-block"><code>{
+  "appName": "ClipLoop",
+  "appWebsiteUrl": "https://cliploop.site",
+  "weeklyUpdate": "ClipLoop now has a public API for weekly promo generation.",
+  "targetAudience": "indie app builders and SaaS founders",
+  "callToAction": "Try ClipLoop",
+  "channel": "x",
+  "tone": "clear, sharp, builder focused"
+}</code></div>
+<div class="table-wrap"><table>
+  <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+  <tr><td><code>appName</code></td><td>string</td><td>✅</td><td>Your app or product name</td></tr>
+  <tr><td><code>appWebsiteUrl</code></td><td>url</td><td>—</td><td>Website for brand extraction</td></tr>
+  <tr><td><code>weeklyUpdate</code></td><td>string</td><td>✅</td><td>What's new this week (8–500 chars)</td></tr>
+  <tr><td><code>targetAudience</code></td><td>string</td><td>—</td><td>Primary audience description</td></tr>
+  <tr><td><code>callToAction</code></td><td>string</td><td>—</td><td>Desired CTA text</td></tr>
+  <tr><td><code>channel</code></td><td>enum</td><td>✅</td><td><code>instagram</code>, <code>tiktok</code>, <code>whatsapp</code>, or <code>x</code></td></tr>
+  <tr><td><code>tone</code></td><td>string</td><td>—</td><td>Promo tone (e.g. <code>professional</code>, <code>energetic</code>)</td></tr>
+</table></div>
+
+<h2 id="response-body">Response body</h2>
+<div class="code-block"><code>{
+  "artifactId": "clp_abc123",
+  "previewUrl": "https://cdn.cliploop.site/...",
+  "downloadUrl": "https://cdn.cliploop.site/.../download",
+  "artifactUrl": "https://cdn.cliploop.site/.../video.mp4",
+  "script": { "hook": "...", "body": ["..."], "caption": "...", "cta": "..." },
+  "scenePlan": ["Scene 1: ..."],
+  "creditsCharged": 5,
+  "idempotencyKey": "my-campaign-launch-v2",
+  "renderStatus": "rendered"
+}</code></div>
+<div class="table-wrap"><table>
+  <tr><th>Field</th><th>Description</th></tr>
+  <tr><td><code>artifactId</code></td><td>Unique artifact identifier</td></tr>
+  <tr><td><code>previewUrl</code></td><td>Preview image URL</td></tr>
+  <tr><td><code>downloadUrl</code></td><td>Direct download link</td></tr>
+  <tr><td><code>artifactUrl</code></td><td>CDN URL for the rendered video</td></tr>
+  <tr><td><code>script</code></td><td>Full script object</td></tr>
+  <tr><td><code>scenePlan</code></td><td>Ordered scene descriptions</td></tr>
+  <tr><td><code>creditsCharged</code></td><td>Credits deducted from your balance</td></tr>
+  <tr><td><code>renderStatus</code></td><td>One of: <code>rendered</code>, <code>renderer_unavailable</code>, <code>pending</code></td></tr>
+</table></div>
+<div class="callout">Renderer fallback: If the video engine is unavailable, the API returns the script and scene plan with <code>renderStatus: "renderer_unavailable"</code>. You can retry later or use the script output directly.</div>

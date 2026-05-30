@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+<title>Errors · ClipLoop Developer Docs</title>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<a href="#content" class="skip-link">Skip to content</a>
+<button class="mobile-toggle" aria-label="Open menu" onclick="document.getElementById('sidebar').classList.add('open');document.getElementById('overlay').classList.add('open')">☰</button>
+<div class="sidebar-overlay" id="overlay" onclick="document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('open')"></div>
+<nav class="sidebar" id="sidebar" aria-label="Docs navigation">
+  <div class="logo">
+    <div class="logo-mark">CL</div>
+    <div class="logo-text">ClipLoop<small>Developer Docs</small></div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-title">Getting Started</div>
+    <a href="/overview/" class="nav-link ">Overview</a>
+    <a href="/quickstart/" class="nav-link ">Quickstart</a>
+    <a href="/authentication/" class="nav-link ">Authentication</a>
+    <a href="/idempotency/" class="nav-link ">Idempotency</a>
+    <a href="/credits/" class="nav-link ">Credits & Billing</a>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-section">
+    <div class="nav-section-title">API Reference</div>
+    <a href="/weekly-promo-api/" class="nav-link ">Weekly Promo API</a>
+    <a href="/examples/" class="nav-link ">Examples</a>
+    <a href="/errors/" class="nav-link active">Error Codes</a>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-section">
+    <div class="nav-section-title">More</div>
+    <a href="/roadmap/" class="nav-link ">Roadmap</a>
+    <a href="https://app.cliploop.site" class="nav-link">App Dashboard →</a>
+    <a href="https://cliploop.site" class="nav-link">Marketing Site →</a>
+  </div>
+</nav>
+<main class="main" id="content">
+  <div class="content">
+    
+    <h1>Error Codes</h1>
+<p class="lead">The API returns standard HTTP status codes with structured error details.</p>
+<div class="table-wrap"><table>
+  <tr><th>HTTP</th><th>Code</th><th>Description</th></tr>
+  <tr><td><span class="badge badge-err">400</span></td><td><code>IDEMPOTENCY_KEY_REQUIRED</code></td><td>Missing Idempotency-Key header</td></tr>
+  <tr><td><span class="badge badge-err">401</span></td><td><code>API_KEY_MISSING</code></td><td>Authorization header not provided</td></tr>
+  <tr><td><span class="badge badge-err">401</span></td><td><code>API_KEY_INVALID</code></td><td>API key not recognized</td></tr>
+  <tr><td><span class="badge badge-err">402</span></td><td><code>CREDITS_INSUFFICIENT</code></td><td>Not enough credits—top up in dashboard</td></tr>
+  <tr><td><span class="badge badge-err">403</span></td><td><code>SCOPE_DENIED</code></td><td>Key lacks required scope</td></tr>
+  <tr><td><span class="badge badge-err">409</span></td><td><code>IDEMPOTENCY_CONFLICT</code></td><td>Same idempotency key + different body</td></tr>
+  <tr><td><span class="badge badge-warn">409</span></td><td><code>IDEMPOTENCY_IN_PROGRESS</code></td><td>Job already running</td></tr>
+  <tr><td><span class="badge badge-err">500</span></td><td><code>renderer_unavailable</code></td><td>Render engine temporarily down—retry</td></tr>
+</table></div>
+<div class="code-block"><code>{
+  "error": {
+    "code": "CREDITS_INSUFFICIENT",
+    "message": "Generation credits depleted."
+  }
+}</code></div>
+
+    <footer>
+      <p style="display:flex; flex-wrap:wrap; gap:14px; align-items:center; justify-content:space-between">
+        <span>© 2026 ClipLoop · Built by <a href="https://talocode.com" style="color:var(--text3)">Talocode</a></span>
+        <span style="display:flex; gap:14px">
+          <a href="https://cliploop.site">Marketing</a>
+          <a href="https://app.cliploop.site">Dashboard</a>
+          <a href="https://github.com/talocode/cliploop">GitHub</a>
+        </span>
+      </p>
+    </footer>
+  </div>
+</main>
+<script>
+document.getElementById('overlay').addEventListener('click', function(){
+  document.getElementById('sidebar').classList.remove('open');
+  this.classList.remove('open');
+});
+</script>
+</body>
+</html>
