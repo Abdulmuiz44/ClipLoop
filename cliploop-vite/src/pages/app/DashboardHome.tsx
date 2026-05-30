@@ -4,6 +4,13 @@ import { useEffect, useState } from "react";
 
 const API_BASE = import.meta.env.DEV ? "/api" : "https://app.cliploop.site/api";
 
+type SessionUser = {
+  id: string;
+  email: string;
+  name?: string;
+  image?: string;
+};
+
 type UsageData = {
   dashboard: {
     credits: { generationBalance: number; renderBalance: number; totalBalance: number; periodKey: string };
@@ -65,6 +72,7 @@ export default function DashboardHome() {
   const [data, setData] = useState<UsageData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [user, setUser] = useState<SessionUser | null>(null);
 
   useEffect(() => {
     fetch(`${API_BASE}/me/usage`)
@@ -80,6 +88,11 @@ export default function DashboardHome() {
         setError(e.message);
         setLoading(false);
       });
+
+    fetch(`${API_BASE}/auth/session`, { credentials: "include" })
+      .then((r) => r.json())
+      .then((s) => { if (s?.user) setUser(s.user); })
+      .catch(() => {});
   }, []);
 
   const dashboard = data?.dashboard;
@@ -243,7 +256,7 @@ export default function DashboardHome() {
         <motion.section variants={itemAnim} className="rounded-2xl border border-[#1F1F1F] bg-[#0E0E0E] p-4">
           <div className="flex items-center justify-between">
             <p className="text-sm font-semibold text-white">API Keys</p>
-            <Link to="/app/settings/api-keys" className="text-xs text-[#8B8B8B] hover:text-white">
+            <Link to="/dashboard/settings/api-keys" className="text-xs text-[#8B8B8B] hover:text-white">
               Manage →
             </Link>
           </div>
@@ -287,13 +300,14 @@ export default function DashboardHome() {
         <motion.section variants={itemAnim} className="rounded-2xl border border-[#1F1F1F] bg-[#0E0E0E] p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-full bg-[#0E0E0E] text-white">CL</span>
+              <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-full bg-[#0E0E0E] text-white text-xs font-semibold">
+                {user ? (user.name || user.email).slice(0, 2).toUpperCase() : "?"}
+              </span>
               <div>
-                <p className="text-sm font-semibold text-white">Pro Plan</p>
-                <p className="text-xs text-[#8B8B8B]">Active</p>
+                <p className="text-sm font-semibold text-white">{user?.name || "Account"}</p>
+                <p className="text-xs text-[#8B8B8B]">{user?.email || ""}</p>
               </div>
             </div>
-            <span className="rounded-full border border-[#333333] px-2 py-0.5 text-xs font-medium text-[#A3A3A3]">Active</span>
           </div>
         </motion.section>
 

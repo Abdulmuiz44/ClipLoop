@@ -21,7 +21,7 @@ export function PublicLayout() {
           <ClipLoopLogo href="/" />
           <div className="flex items-center gap-1.5 md:gap-2">
             <a
-              href="https://app.cliploop.site/app"
+              href="https://app.cliploop.site/dashboard"
               className="rounded-md px-2.5 py-1.5 text-sm text-slate-300 transition hover:bg-[#1F1F1F] hover:text-white md:px-3"
             >
               Open App

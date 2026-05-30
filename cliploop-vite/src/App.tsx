@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { PublicLayout } from "./layouts/PublicLayout";
 import { AppLayout } from "./layouts/AppLayout";
 import LandingPage from "./pages/LandingPage";
@@ -31,13 +31,21 @@ export default function App() {
 
       {/* App routes with sidebar */}
       <Route element={<AppLayout />}>
-        <Route path="/app" element={<DashboardHome />} />
-        <Route path="/app/create" element={<CreatePage />} />
-        <Route path="/app/projects" element={<ProjectsPage />} />
-        <Route path="/app/chats" element={<ChatsPage />} />
-        <Route path="/app/weekly-promo" element={<WeeklyPromoPage />} />
-        <Route path="/app/settings/api-keys" element={<ApiKeysPage />} />
+        <Route path="/dashboard" element={<DashboardHome />} />
+        <Route path="/dashboard/create" element={<CreatePage />} />
+        <Route path="/dashboard/projects" element={<ProjectsPage />} />
+        <Route path="/dashboard/chats" element={<ChatsPage />} />
+        <Route path="/dashboard/weekly-promo" element={<WeeklyPromoPage />} />
+        <Route path="/dashboard/settings/api-keys" element={<ApiKeysPage />} />
       </Route>
+
+      {/* Redirect /app/* to /dashboard/* */}
+      <Route path="/app" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/app/create" element={<Navigate to="/dashboard/create" replace />} />
+      <Route path="/app/projects" element={<Navigate to="/dashboard/projects" replace />} />
+      <Route path="/app/chats" element={<Navigate to="/dashboard/chats" replace />} />
+      <Route path="/app/weekly-promo" element={<Navigate to="/dashboard/weekly-promo" replace />} />
+      <Route path="/app/settings/api-keys" element={<Navigate to="/dashboard/settings/api-keys" replace />} />
     </Routes>
   );
 }
