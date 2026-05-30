@@ -45,7 +45,7 @@ const mainNav: NavItem[] = [
 ];
 
 const secondaryNav: NavItem[] = [
-  { to: "/pricing", label: "Billing", icon: <Bi /> },
+  { to: "/dashboard/billing", label: "Billing", icon: <Bi /> },
 ];
 
 // ── Helpers ──
@@ -164,7 +164,7 @@ export function AppLayout() {
         {/* Footer */}
         <div className="border-t border-neutral-800 px-2 py-2.5">
           {/* Upgrade card */}
-          <Link to="/pricing" onClick={close} className="mb-2 block rounded-xl border border-neutral-800 bg-neutral-900/50 p-2.5 transition hover:border-neutral-700">
+          <Link to="/dashboard/billing" onClick={close} className="mb-2 block rounded-xl border border-neutral-800 bg-neutral-900/50 p-2.5 transition hover:border-neutral-700">
             <p className="text-sm font-semibold text-white">Upgrade to Pro</p>
             <p className="mt-0.5 text-xs text-neutral-500">More credits &amp; features</p>
             <span className="mt-1.5 inline-flex h-6 items-center rounded-md bg-white px-2.5 text-[11px] font-semibold text-black">Upgrade</span>

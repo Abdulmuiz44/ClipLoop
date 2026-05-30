@@ -1,107 +1,107 @@
-# ClipLoop Billing & Credits
+# Billing & Credits
 
 ## Credit Types
 
-ClipLoop uses a **dual-bucket credit system**:
+ClipLoop uses a dual-credit system:
 
-| Bucket | Used For | Example Cost |
-|--------|----------|-------------|
-| `generation` | AI content generation (LLM calls) | Weekly promo generation = 5 credits |
-| `render` | Video rendering (HyperFrames) | Video render = 1 credit |
+| Bucket | Purpose | Used By |
+|--------|---------|---------|
+| **Generation** | LLM prompts, copy generation, API calls | Chat copy gen, weekly promo API, strategy cycles |
+| **Render** | Video rendering | Video gen + render (chat) |
 
-## How Credits Are Charged
+## Credit Charges
 
-1. **Monthly grant** — Users receive credits at the start of each billing period based on their plan limits.
-2. **Per-action charge** — Each billable action debits the appropriate bucket:
-   - `api_weekly_promo_generate` → 5 generation credits
-   - `chat_generate_copy` → 1 generation credit
-   - `strategy_cycle_generate_posts` → 5 generation credits
-   - `content_item_render` → 1 render credit
-3. **Credit reservation** — Credits are checked BEFORE the action runs (`assertCanAffordAction`). If insufficient, a `402 CREDITS_INSUFFICIENT` error is returned.
-4. **Final charge** — Credits are debited AFTER successful completion via `chargeCredits`.
-5. **Idempotency** — Same reference (idempotency key / reference ID) cannot double-charge.
+One credit = one unit. Actions charge as follows:
 
-## Credit Pack Config (In-Memory)
+| Action | Bucket | Cost |
+|--------|--------|------|
+| Plain chat message | — | Free |
+| Copy generation (chat) | Generation | 1 |
+| Video generation (chat) | Generation | 1 |
+| Video render (chat) | Render | 1 |
+| Weekly promo pack (chat) | Generation | 5 |
+| Content item regenerate | Generation | 1 |
+| **POST /api/public/weekly-promo** | Generation | **5** |
+| Export bundle | — | Free |
 
-Packs are defined in `src/core/billing/policy.ts` as in-memory constants.
-They are loaded at startup and returned via the credits policy module.
+## Monthly Grants
 
-| Pack ID | Bucket | Credits | Price (USD) |
-|---------|--------|---------|-------------|
-| `starter_generation` | generation | 100 | $9 |
-| `pro_generation` | generation | 500 | $29 |
-| `render_pack` | render | 50 | $19 |
+At the start of each billing period, free-plan users receive:
 
-## Current API Cost
+- **12 generation credits**
+- **6 render credits**
 
-| Endpoint | Credits Charged | Bucket |
-|----------|----------------|--------|
-| `POST /api/public/weekly-promo` | 5 | generation |
+These are applied automatically the first time you perform a billable action each month.
+Pro plan users receive higher limits (80 generation / 40 render).
 
-## Credit Purchase Flow (Future)
+## Insufficient Credits
 
-When Lemon Squeezy is configured with credit pack products:
+- Chat: returns an error message in the UI.
+- API: returns `402 Payment Required` with a JSON body explaining which bucket is low.
 
-1. User clicks "Buy" on a credit pack in the dashboard.
-2. Dashboard calls `POST /api/billing/checkout` with `variantId` matching the pack.
-3. Lemon Squeezy creates a checkout session, user completes payment.
-4. Lemon Squeezy sends `order_created` webhook to `POST /api/webhooks/lemonsqueezy`.
-5. Webhook verifies signature (`x-signature` header).
-6. Webhook maps `variant_id` → credit pack → credits → bucket.
-7. `creditTopUp()` creates a ledger entry with reason `purchase` and credits the account.
-8. Duplicate webhook deliveries are prevented by the unique constraint on `(user_id, reference_type, reference_id)` → `("lemon_order", order_id)`.
+## Credit Pack Purchases
 
-### Env Vars for Purchase Flow
+One-time credit packs are planned via Lemon Squeezy:
+
+| Pack | Bucket | Credits | Price |
+|------|--------|---------|-------|
+| Starter Generation | Generation | 100 | $9 |
+| Pro Generation | Generation | 500 | $29 |
+| Render Pack | Render | 50 | $19 |
+
+Packs are one-time purchases. Credits never expire.
+
+### Future Webhook Flow (not yet wired)
 
 ```
-LEMON_SQUEEZY_API_KEY=
-LEMON_SQUEEZY_STORE_ID=
-LEMON_SQUEEZY_STARTER_VARIANT_ID=
-LEMON_SQUEEZY_WEBHOOK_SECRET=
-CREDIT_PACK_STARTER_VARIANT_ID=  # variant_id for starter_generation pack
-CREDIT_PACK_PRO_VARIANT_ID=      # variant_id for pro_generation pack
-CREDIT_PACK_RENDER_VARIANT_ID=   # variant_id for render_pack
+User clicks Buy → Lemon Squeezy checkout → order_created webhook
+  → POST /api/webhooks/lemonsqueezy (validates signature)
+  → syncLemonSqueezyOrder() identifies variant ID
+  → creditTopUp() creates credit ledger entry
+  → User sees balance update on next dashboard load
 ```
 
-### Webhook Safety Rules
+### Required Environment Variables
 
-- **Always verify** `x-signature` header before processing.
-- **Idempotent ledger entries** — unique constraint on `(user_id, reference_type, reference_id)` prevents double-crediting.
-- **Known variant IDs only** — unknown variants are logged but not credited.
-- **No fake payments** — all credit additions go through verified webhooks or manual adjustments only.
+```env
+# Lemon Squeezy API
+LEMON_SQUEEZY_API_KEY=          # LS API key for verify/validate
+LEMON_SQUEEZY_WEBHOOK_SECRET=    # Webhook signing secret
 
-## Admin Tools
+# Credit pack variant IDs
+CREDIT_PACK_STARTER_VARIANT_ID=
+CREDIT_PACK_PRO_VARIANT_ID=
+CREDIT_PACK_RENDER_VARIANT_ID=
 
-### Manual Credit Top-Up
-
-In `MOCK_MODE=true` or for admin debugging, the `creditTopUp()` service function can be called directly:
-
-```typescript
-import { creditTopUp } from "@/domains/credits/service";
-
-await creditTopUp({
-  userId: "user-uuid",
-  bucket: "generation",
-  amount: 100,
-  referenceType: "manual_adjustment",
-  referenceId: "admin-note-here",
-  metadata: { note: "Manual top-up for testing" },
-});
+# Optional: direct checkout URLs (replaces variant-based flow)
+CREDIT_PACK_STARTER_CHECKOUT_URL=
+CREDIT_PACK_PRO_CHECKOUT_URL=
+CREDIT_PACK_RENDER_CHECKOUT_URL=
 ```
 
-**No credit purchase UI should fake payment success.** All credit additions must be verifiable through the ledger.
+## Renderer Fallback Behavior
 
-## DB Schema Changes (0022)
+When HyperFrames renderer is unavailable:
 
-Migration `0022_credit_purchase.sql` adds the `purchase` value to the `credit_reason` enum:
+- The API returns `200 OK` with `renderStatus: "renderer_unavailable"` and `previewUrl: null` or `"pending"`.
+- Generation credits are still charged — the LLM work was completed.
+- Render credits are **not** charged when the renderer is unavailable.
+- You can retry later with the same idempotency key to resume from cached LLM output.
 
-```sql
-ALTER TYPE "credit_reason" ADD VALUE IF NOT EXISTS 'purchase';
-```
+## Idempotency
 
-This enables ledger entries with reason `"purchase"` for credit pack top-ups.
+All credit charges use an `idempotencyKey` / `referenceId` pair. Replaying the same request:
 
-## Tests
+- Does **not** double-charge credits.
+- Returns the same response as the original request.
+- Uses a unique constraint on `(user_id, reference_type, reference_id)`.
 
-- `src/tests/core-billing-policy.test.ts` — validates billing policy entries
-- `src/tests/billing-idempotency.integration.test.ts` — validates idempotent credit charging
+## Verification
+
+Tests in `src/tests/billing-idempotency.integration.test.ts`:
+- Single charge deducts the correct amount.
+- Replay returns idempotent result (no double charge).
+- Insufficient credits returns 402 / InsufficientCreditsError.
+- Concurrent requests maintain correctness.
+
+Run: `npm run test:billing`

@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "cd cliploop-vite && npm install --silent && npm run build && cp -r dist/* ../public/",
     "build": "next build",
     "start": "node scripts/db-fix.js && next start",
     "lint": "next lint",

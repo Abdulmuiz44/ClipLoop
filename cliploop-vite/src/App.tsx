@@ -10,6 +10,7 @@ import ProjectsPage from "./pages/app/ProjectsPage";
 import ChatsPage from "./pages/app/ChatsPage";
 import WeeklyPromoPage from "./pages/app/WeeklyPromo";
 import ApiKeysPage from "./pages/app/ApiKeysPage";
+import BillingPage from "./pages/app/BillingPage";
 import TermsPage from "./pages/TermsPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import SupportPage from "./pages/SupportPage";
@@ -37,6 +38,7 @@ export default function App() {
         <Route path="/dashboard/chats" element={<ChatsPage />} />
         <Route path="/dashboard/weekly-promo" element={<WeeklyPromoPage />} />
         <Route path="/dashboard/settings/api-keys" element={<ApiKeysPage />} />
+        <Route path="/dashboard/billing" element={<BillingPage />} />
       </Route>
 
       {/* Redirect /app/* to /dashboard/* */}
