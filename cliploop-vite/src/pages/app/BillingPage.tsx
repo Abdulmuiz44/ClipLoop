@@ -72,26 +72,31 @@ export default function BillingPage() {
         return r.json();
       })
       .then((json) => {
-        const d = json.dashboard;
-        setWallet({
-          generationBalance: d.credits.generationBalance,
-          renderBalance: d.credits.renderBalance,
-          totalBalance: d.credits.totalBalance,
-          creditsSpentLast7d: d.creditsSpentLast7d,
-          creditsSpentLast30d: d.creditsSpentLast30d,
-          publicApiUsageCount: d.publicApiUsageCount,
-        });
-        setTransactions(
-          (d.usageEvents ?? []).map((e: Record<string, unknown>) => ({
-            id: e.id as string,
-            action: e.action as string,
-            creditsAmount: (e.creditsAmount as number) ?? null,
-            createdAt: e.createdAt as string,
-            bucket: (e.creditsBucket as string) ?? "",
-            direction: (e.creditsAmount as number) != null && (e.creditsAmount as number) > 0 ? "credit" : "debit",
-          }))
-        );
-        setLoading(false);
+        try {
+          const d = json.dashboard;
+          if (!d || !d.credits) throw new Error("API response missing dashboard data: " + JSON.stringify(json).slice(0, 200));
+          setWallet({
+            generationBalance: d.credits.generationBalance,
+            renderBalance: d.credits.renderBalance,
+            totalBalance: d.credits.totalBalance,
+            creditsSpentLast7d: d.creditsSpentLast7d,
+            creditsSpentLast30d: d.creditsSpentLast30d,
+            publicApiUsageCount: d.publicApiUsageCount,
+          });
+          setTransactions(
+            (d.usageEvents ?? []).map((e: Record<string, unknown>) => ({
+              id: e.id as string,
+              action: e.action as string,
+              creditsAmount: (e.creditsAmount as number) ?? null,
+              createdAt: e.createdAt as string,
+              bucket: (e.creditsBucket as string) ?? "",
+              direction: (e.creditsAmount as number) != null && (e.creditsAmount as number) > 0 ? "credit" : "debit",
+            }))
+          );
+          setLoading(false);
+        } catch (innerErr) {
+          throw new Error("Parse error: " + (innerErr instanceof Error ? innerErr.message : String(innerErr)));
+        }
       })
       .catch((e) => {
         setError(e.message);
@@ -139,8 +144,8 @@ export default function BillingPage() {
 
           {/* Credit packs */}
           <motion.div variants={itemAnim}>
-            <h2 className="text-lg font-semibold text-white">Buy Credits</h2>
-            <p className="mt-0.5 text-sm text-[#8B8B8B]">Purchase one-time credit packs. Credits never expire.</p>
+            <h2 className="text-lg font-semibold text-white">Credit Top-up</h2>
+            <p className="mt-0.5 text-sm text-[#8B8B8B]">Purchase one-time credit packs. Credit top-up is coming soon.</p>
             <div className="mt-4 grid gap-4 sm:grid-cols-3">
               {CREDIT_PACKS.map((pack) => (
                 <div key={pack.id} className="rounded-2xl border border-[#1F1F1F] bg-[#0E0E0E] p-5 transition hover:border-neutral-700">
