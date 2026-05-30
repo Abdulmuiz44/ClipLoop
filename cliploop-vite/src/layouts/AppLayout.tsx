@@ -159,6 +159,19 @@ export function AppLayout() {
               </Link>
             );
           })}
+          {/* External docs link */}
+          <a
+            href="https://github.com/talocode/cliploop/blob/main/docs/PUBLIC_API.md"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-slate-300 transition hover:bg-white/5 hover:text-white"
+          >
+            <span className="grid h-9 w-9 place-items-center rounded-xl bg-white/5 text-white/90">📄</span>
+            <span className="font-medium">API Docs</span>
+            <svg className="ml-auto h-3 w-3 text-[#8B8B8B]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M7 17L17 7M17 7H7M17 7V17" />
+            </svg>
+          </a>
         </nav>
 
         <div className="mt-auto space-y-3 pt-4">

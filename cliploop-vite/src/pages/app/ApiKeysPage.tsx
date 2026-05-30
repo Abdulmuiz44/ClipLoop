@@ -331,6 +331,161 @@ export default function ApiKeysPage() {
           </div>
         </motion.div>
       )}
+
+      {/* ===== API Quick Start ===== */}
+      {!loading && !error && (
+        <motion.div variants={itemAnim} className="rounded-2xl border border-[#1F1F1F] bg-[#0E0E0E]">
+          <ApiQuickStart keys={activeKeys} />
+        </motion.div>
+      )}
     </motion.div>
+  );
+}
+
+function ApiQuickStart({ keys }: { keys: ApiKey[] }) {
+  const [open, setOpen] = useState(false);
+  const [endpointCopied, setEndpointCopied] = useState(false);
+  const [curlCopied, setCurlCopied] = useState(false);
+
+  const endpoint = "POST https://app.cliploop.site/api/public/weekly-promo";
+  const sampleKey = keys.length > 0 ? `${keys[0].keyPrefix}...` : "clp_YOUR_API_KEY";
+
+  const curlExample = `curl -X POST https://app.cliploop.site/api/public/weekly-promo \\
+  -H "Authorization: Bearer ${sampleKey}" \\
+  -H "Idempotency-Key: my-unique-key-abc123" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "appName": "MyApp",
+    "appWebsiteUrl": "https://myapp.com",
+    "weeklyUpdate": "Launched v2 with real-time collaboration",
+    "channel": "tiktok",
+    "tone": "energetic"
+  }'`;
+
+  function copy(text: string, setter: (v: boolean) => void) {
+    navigator.clipboard.writeText(text).then(
+      () => { setter(true); setTimeout(() => setter(false), 2500); },
+    );
+  }
+
+  return (
+    <div>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full items-center justify-between px-5 py-4 text-left"
+      >
+        <div>
+          <p className="text-sm font-semibold text-white">API Quick Start</p>
+          <p className="text-xs text-[#8B8B8B]">Copy endpoint, curl example, and error codes</p>
+        </div>
+        <span className={`text-[#8B8B8B] transition-transform ${open ? "rotate-180" : ""}`}>▾</span>
+      </button>
+
+      {open && (
+        <motion.div
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: "auto", opacity: 1 }}
+          className="space-y-5 border-t border-[#1F1F1F] px-5 pb-5 pt-4"
+        >
+          {/* Security warning */}
+          <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-300">
+            ⚠ Keep your API key secret. Never share it or commit it to code. Store it in environment variables
+            or a secrets manager. The full key is shown <strong>once</strong> at creation.
+          </div>
+
+          {/* Endpoint */}
+          <div>
+            <p className="mb-1.5 text-sm font-medium text-white">Endpoint</p>
+            <div className="flex items-center gap-2">
+              <code className="flex-1 select-all break-all rounded-xl bg-[#0A0A0A] px-3 py-2 font-mono text-xs text-emerald-300">
+                {endpoint}
+              </code>
+              <button
+                onClick={() => copy(endpoint, setEndpointCopied)}
+                className="flex-shrink-0 rounded-xl bg-white px-3 py-2 text-xs font-semibold text-black hover:bg-neutral-200"
+              >
+                {endpointCopied ? "Copied!" : "Copy"}
+              </button>
+            </div>
+          </div>
+
+          {/* curl example */}
+          <div>
+            <p className="mb-1.5 text-sm font-medium text-white">curl</p>
+            <div className="relative">
+              <pre className="overflow-x-auto rounded-xl bg-[#0A0A0A] p-3 font-mono text-xs text-white/80">
+                {curlExample}
+              </pre>
+              <button
+                onClick={() => copy(curlExample, setCurlCopied)}
+                className="absolute right-2 top-2 rounded-lg bg-white/10 px-2 py-1 text-[11px] text-white/60 hover:bg-white/20"
+              >
+                {curlCopied ? "Copied!" : "Copy"}
+              </button>
+            </div>
+          </div>
+
+          {/* JS fetch */}
+          <div>
+            <p className="mb-1.5 text-sm font-medium text-white">JavaScript (fetch)</p>
+            <pre className="overflow-x-auto rounded-xl bg-[#0A0A0A] p-3 font-mono text-xs text-white/80">{`const res = await fetch("https://app.cliploop.site/api/public/weekly-promo", {
+  method: "POST",
+  headers: {
+    Authorization: "Bearer ${sampleKey}",
+    "Idempotency-Key": "my-unique-key-abc123",
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    appName: "MyApp",
+    weeklyUpdate: "Launched v2 with real-time collaboration",
+    channel: "tiktok",
+    tone: "energetic",
+  }),
+});
+const data = await res.json();
+console.log(data.script.hook, data.creditsCharged);`}</pre>
+          </div>
+
+          {/* Error codes */}
+          <div>
+            <p className="mb-1.5 text-sm font-medium text-white">Error Codes</p>
+            <div className="overflow-x-auto rounded-xl bg-[#0A0A0A] p-3">
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="text-[#8B8B8B]">
+                    <th className="pb-1.5 pr-4 font-medium">Code</th>
+                    <th className="pb-1.5 pr-4 font-medium">Status</th>
+                    <th className="pb-1.5 font-medium">Description</th>
+                  </tr>
+                </thead>
+                <tbody className="text-white/70">
+                  <tr><td className="py-1 pr-4 font-mono text-rose-300">API_KEY_MISSING</td><td className="py-1 pr-4">401</td><td className="py-1">No Authorization header</td></tr>
+                  <tr><td className="py-1 pr-4 font-mono text-rose-300">API_KEY_INVALID</td><td className="py-1 pr-4">401</td><td className="py-1">Key not found, revoked, or malformed</td></tr>
+                  <tr><td className="py-1 pr-4 font-mono text-rose-300">SCOPE_DENIED</td><td className="py-1 pr-4">403</td><td className="py-1">Missing weekly_promo:generate scope</td></tr>
+                  <tr><td className="py-1 pr-4 font-mono text-yellow-300">IDEMPOTENCY_KEY_REQUIRED</td><td className="py-1 pr-4">400</td><td className="py-1">Header missing or too short</td></tr>
+                  <tr><td className="py-1 pr-4 font-mono text-yellow-300">IDEMPOTENCY_CONFLICT</td><td className="py-1 pr-4">409</td><td className="py-1">Same key, different request body</td></tr>
+                  <tr><td className="py-1 pr-4 font-mono text-yellow-300">IDEMPOTENCY_IN_PROGRESS</td><td className="py-1 pr-4">409</td><td className="py-1">Request still in progress</td></tr>
+                  <tr><td className="py-1 pr-4 font-mono text-blue-300">RATE_LIMIT_EXCEEDED</td><td className="py-1 pr-4">429</td><td className="py-1">3 requests per 60 sec</td></tr>
+                  <tr><td className="py-1 pr-4 font-mono text-orange-300">CREDITS_INSUFFICIENT</td><td className="py-1 pr-4">402</td><td className="py-1">Not enough credits</td></tr>
+                  <tr><td className="py-1 pr-4 font-mono text-orange-300">VALIDATION_ERROR</td><td className="py-1 pr-4">400</td><td className="py-1">Body failed validation</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Docs link */}
+          <div className="pt-1">
+            <a
+              href="https://github.com/talocode/cliploop/blob/main/docs/PUBLIC_API.md"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-emerald-400 hover:text-emerald-300"
+            >
+              View full API docs on GitHub →
+            </a>
+          </div>
+        </motion.div>
+      )}
+    </div>
   );
 }
