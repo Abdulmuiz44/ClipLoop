@@ -94,6 +94,17 @@ async function run() {
 
     // 0021: rate limit counters
     `CREATE TABLE IF NOT EXISTS "rate_limit_counters" ("id" uuid PRIMARY KEY DEFAULT gen_random_uuid(), "identifier" text NOT NULL, "window_start" timestamptz NOT NULL, "counter" integer NOT NULL DEFAULT 0, "created_at" timestamptz NOT NULL DEFAULT now())`,
+
+    // Credit accounts (billing)
+    `CREATE TABLE IF NOT EXISTS "credit_accounts" ("id" uuid PRIMARY KEY DEFAULT gen_random_uuid(), "user_id" uuid NOT NULL, "generation_balance" integer NOT NULL DEFAULT 0, "render_balance" integer NOT NULL DEFAULT 0, "created_at" timestamptz NOT NULL DEFAULT now(), "updated_at" timestamptz NOT NULL DEFAULT now())`,
+    `CREATE UNIQUE INDEX IF NOT EXISTS "credit_accounts_user_id_unique" ON "credit_accounts" ("user_id")`,
+
+    // Credit ledger entries (billing)
+    `CREATE TABLE IF NOT EXISTS "credit_ledger_entries" ("id" uuid PRIMARY KEY DEFAULT gen_random_uuid(), "user_id" uuid NOT NULL, "credit_account_id" uuid NOT NULL, "bucket" text NOT NULL, "direction" text NOT NULL, "reason" text NOT NULL, "amount_delta" integer NOT NULL, "balance_after" integer NOT NULL, "reference_type" text, "reference_id" text, "metadata_json" jsonb NOT NULL DEFAULT '{}'::jsonb, "created_at" timestamptz NOT NULL DEFAULT now())`,
+    `CREATE INDEX IF NOT EXISTS "credit_ledger_entries_user_id_idx" ON "credit_ledger_entries" ("user_id")`,
+    `CREATE INDEX IF NOT EXISTS "credit_ledger_entries_credit_account_id_idx" ON "credit_ledger_entries" ("credit_account_id")`,
+    `CREATE INDEX IF NOT EXISTS "credit_ledger_entries_user_created_at_idx" ON "credit_ledger_entries" ("user_id", "created_at")`,
+    `CREATE UNIQUE INDEX IF NOT EXISTS "credit_ledger_entries_user_reference_unique" ON "credit_ledger_entries" ("user_id", "reference_type", "reference_id")`,
   ];
 
   for (const sql of fixes) {
