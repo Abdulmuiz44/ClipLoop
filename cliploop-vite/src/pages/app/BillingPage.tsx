@@ -163,6 +163,34 @@ export default function BillingPage() {
             </div>
           </motion.div>
 
+          {/* Developer links */}
+          <motion.div variants={itemAnim} className="rounded-2xl border border-[#1F1F1F] bg-[#0E0E0E] p-5">
+            <h2 className="text-base font-semibold text-white">Next steps</h2>
+            <p className="mt-1 text-xs text-[#8B8B8B]">Create keys and explore the API docs.</p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <Link to="/app/settings/api-keys" className="rounded-xl border border-[#1F1F1F] bg-[#050505] p-4 text-sm text-[#A3A3A3] hover:border-neutral-600">
+                <p className="text-xs font-medium uppercase tracking-wider text-[#8B8B8B]">In-app</p>
+                <p className="mt-1 text-white">API Keys</p>
+                <p className="mt-1 text-xs text-[#555]">Create or revoke keys</p>
+              </Link>
+              <a href="https://docs.cliploop.site/credits/" target="_blank" rel="noreferrer" className="rounded-xl border border-[#1F1F1F] bg-[#050505] p-4 text-sm text-[#A3A3A3] hover:border-neutral-600">
+                <p className="text-xs font-medium uppercase tracking-wider text-[#8B8B8B]">Docs</p>
+                <p className="mt-1 text-white">Credits & Billing</p>
+                <p className="mt-1 text-xs text-[#555]">Limits, top-up and usage</p>
+              </a>
+              <a href="https://docs.cliploop.site/quickstart/" target="_blank" rel="noreferrer" className="rounded-xl border border-[#1F1F1F] bg-[#050505] p-4 text-sm text-[#A3A3A3] hover:border-neutral-600">
+                <p className="text-xs font-medium uppercase tracking-wider text-[#8B8B8B]">Docs</p>
+                <p className="mt-1 text-white">Quickstart</p>
+                <p className="mt-1 text-xs text-[#555]">First API call in under 5 min</p>
+              </a>
+              <a href="https://docs.cliploop.site/weekly-promo-api/" target="_blank" rel="noreferrer" className="rounded-xl border border-[#1F1F1F] bg-[#050505] p-4 text-sm text-[#A3A3A3] hover:border-neutral-600">
+                <p className="text-xs font-medium uppercase tracking-wider text-[#8B8B8B]">Docs</p>
+                <p className="mt-1 text-white">Weekly Promo API</p>
+                <p className="mt-1 text-xs text-[#555]">Request, response, and examples</p>
+              </a>
+            </div>
+          </motion.div>
+
           {/* API cost table */}
           <motion.div variants={itemAnim} className="rounded-2xl border border-[#1F1F1F] bg-[#0E0E0E] p-4">
             <h2 className="text-base font-semibold text-white">Credit Costs</h2>
