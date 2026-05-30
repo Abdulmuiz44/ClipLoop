@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "node scripts/migrate.js && next start",
+    "start": "node scripts/db-fix.js && next start",
     "lint": "next lint",
     "test:billing": "LLM_PROVIDER=mock MOCK_LLM=true NODE_ENV=test tsx --test src/tests/billing-idempotency.integration.test.ts",
     "db:generate": "drizzle-kit generate",
