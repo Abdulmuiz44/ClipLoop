@@ -18,6 +18,11 @@ export type PlanLimits = {
   connectedChannels: number;
 };
 
+function toFiniteNumber(value: unknown): number {
+  const n = typeof value === "number" ? value : Number(value ?? 0);
+  return Number.isFinite(n) ? n : 0;
+}
+
 export type CurrentUsageSummary = {
   limits: PlanLimits;
   usage: {
@@ -233,11 +238,11 @@ export async function getCurrentUsageSummary(userId: string): Promise<CurrentUsa
   ]);
 
   const usage = {
-    postsPerWeek: weekly[0]?.postsGenerated ?? 0,
-    postsPerMonth: monthly[0]?.postsGenerated ?? 0,
-    manualRegenerationsPerWeek: weekly[0]?.manualRegenerations ?? 0,
-    rendersPerMonth: monthly[0]?.videosRendered ?? 0,
-    publishesPerMonth: monthly[0]?.postsPublished ?? 0,
+    postsPerWeek: toFiniteNumber(weekly[0]?.postsGenerated),
+    postsPerMonth: toFiniteNumber(monthly[0]?.postsGenerated),
+    manualRegenerationsPerWeek: toFiniteNumber(weekly[0]?.manualRegenerations),
+    rendersPerMonth: toFiniteNumber(monthly[0]?.videosRendered),
+    publishesPerMonth: toFiniteNumber(monthly[0]?.postsPublished),
   };
 
   return {
