@@ -1,7 +1,7 @@
 import { env } from "@/lib/env";
 import { generateThumbnail } from "@/lib/render/ffmpeg";
-import type { RenderAdapter, RenderAdapterResult } from "@/lib/render/adapters/types";
-import { assertHyperframesAvailable, renderWithHyperframesCli } from "@/lib/render/hyperframes/cli";
+import type { RenderAdapter, RenderAdapterInput, RenderAdapterResult } from "@/lib/render/adapters/types";
+import { assertHyperframesAvailable, HyperframesUnavailableError, renderWithHyperframesCli } from "@/lib/render/hyperframes/cli";
 import { buildHyperframesComposition } from "@/lib/render/hyperframes/composition";
 import { getRenderTemplate } from "@/lib/render/templates";
 import type { CreativeBrief } from "@/lib/prompts/types";
@@ -13,6 +13,21 @@ export class HyperframesDisabledError extends Error {
   }
 }
 
+function hyperframesFallbackResult(input: RenderAdapterInput): RenderAdapterResult {
+  return {
+    renderer: "hyperframes",
+    templateId: "unavailable",
+    durationSec: 0,
+    width: 0,
+    height: 0,
+    videoPath: "",
+    videoUrl: "",
+    thumbnailPath: "",
+    thumbnailUrl: "",
+    metadataJson: { rendererStatus: "unavailable", message: "HyperFrames CLI not installed on this server" },
+  };
+}
+
 export const hyperframesRenderAdapter: RenderAdapter = {
   backend: "hyperframes",
   async render(input) {
@@ -20,7 +35,14 @@ export const hyperframesRenderAdapter: RenderAdapter = {
       throw new HyperframesDisabledError();
     }
 
-    assertHyperframesAvailable();
+    try {
+      assertHyperframesAvailable();
+    } catch (err) {
+      if (err instanceof HyperframesUnavailableError) {
+        return hyperframesFallbackResult(input);
+      }
+      throw err;
+    }
 
     const renderTemplate = getRenderTemplate(input.templateId);
     const brief: CreativeBrief = {

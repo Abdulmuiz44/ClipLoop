@@ -115,12 +115,13 @@ export async function POST(request: Request) {
     // 12. Shape response with all required fields
     const responseJson = {
       artifactId: result.id,
-      previewUrl: result.preview.videoUrl ?? null,
-      downloadUrl: result.preview.downloadUrl ?? null,
-      artifactUrl: result.artifact.artifactUrl ?? null,
+      previewUrl: result.preview.videoUrl || null,
+      downloadUrl: result.preview.downloadUrl || null,
+      artifactUrl: result.artifact.artifactUrl || null,
       script: result.script,
       scenePlan: result.scenePlan,
       creditsCharged,
+      renderStatus: result.preview.videoUrl ? "rendered" : "renderer_unavailable",
       idempotencyKey: idempotencyKey.trim(),
     };
 
