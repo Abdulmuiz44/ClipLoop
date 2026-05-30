@@ -1,7 +1,12 @@
 import { z } from "zod";
 
 const envSchema = z.object({
-  DATABASE_URL: z.string().min(1).default("postgres://postgres:postgres@localhost:5432/cliploop"),
+  DATABASE_URL: z
+    .preprocess((v) => {
+      if (typeof v !== "string") return v;
+      return v.trim().replace(/^"|"$/g, "").replace(/^'|'$/g, "");
+    }, z.string().min(1))
+    .default("postgres://postgres:***@localhost:5432/cliploop"),
   // NOTE: z.coerce.boolean() treats any non-empty string (including "false") as true.
   // We need explicit string parsing for env vars.
   MOCK_MODE: z
