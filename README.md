@@ -631,3 +631,18 @@ LEMON_SQUEEZY_WEBHOOK_SECRET=
 - ClipLoop currently supports one paid plan only: Starter monthly.
 - The app uses Lemon Squeezy hosted checkout and customer-portal links rather than a custom in-app billing portal.
 - Real auth is still minimal, so in non-mock environments the checkout launcher relies on the email entered at checkout start to create or match the account record.
+
+## Developer docs site
+
+The ClipLoop developer documentation lives in `docs-site/` and is served at https://docs.cliploop.site.
+
+- Source: `docs-site/index.html` (single static HTML file, no build step required)
+- Local preview: `cd docs-site && npm run dev` (serves on :3000)
+- Build: `cd docs-site && npm run build` (outputs to `docs-site/dist/`)
+- Deployment: Render static site
+  - Root directory: `docs-site/`
+  - Build command: `npm run build`
+  - Publish directory: `docs-site/dist`
+  - Custom domain: `docs.cliploop.site`
+
+Content source of truth for API docs is `docs/PUBLIC_API.md`. The docs site mirrors and formats that content for developers.

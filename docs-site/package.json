@@ -1,0 +1,10 @@
+{
+  "name": "cliploop-docs",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "npx serve -l 3000",
+    "build": "cp -r index.html dist/",
+    "preview": "npx serve -l 3000 dist"
+  }
+}
