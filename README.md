@@ -48,33 +48,25 @@ ClipLoop uses a **two-surface split architecture** — a Vite marketing frontend
 - FFmpeg (system dependency for rendering)
 - Optional Mistral chat provider via REST API
 
-## Product direction (dashboard + guided creation)
+## Product direction — programmable video generation
 
-Primary authenticated experience:
-- `/app`: studio dashboard (operational home)
-- `/app/create`: guided prompt-to-video path
-- `/app/chats`: chat strategy and generation workspace
-- `/app/projects`: project list and entry point into project detail pages
-- `/dashboard/manual-queue` and `/dashboard/settings`: operational surfaces retained
-- onboarding-first behavior still applies for users without project context
+ClipLoop is an **API-first programmable video generation platform**.
 
-Secondary surfaces still available:
-- settings, manual queue, legacy workflow pages
-- existing backend loops remain operational and reusable by chat orchestration
+Short-term wedge: weekly promo videos for indie app builders.
+Long-term goal: developers, creators, businesses, and apps generate videos from prompts, code, product data, and structured scene specs.
 
-### Dashboard sections: real vs fallback
+Key docs:
+- [`docs/PRODUCT_DIRECTION.md`](docs/PRODUCT_DIRECTION.md) — vision, architecture, pipeline, monetization
+- [`docs/API_PLATFORM_ROADMAP.md`](docs/API_PLATFORM_ROADMAP.md) — endpoint and SDK roadmap
+- [`docs/BILLING_CREDITS.md`](docs/BILLING_CREDITS.md) — credit model and billing flow
+- Public API docs site: https://docs.cliploop.site *(content source in `docs/`)*
 
-- Real data-backed:
-  - credits balance + plan status (`credit_accounts`, plan state)
-  - usage overview (`usage_counters` + plan limits)
-  - projects list (`projects`)
-  - recent outputs (`content_items` + `content_assets` thumbnails where available)
-  - recent activity (`credit_ledger_entries`)
-- Graceful fallback states:
-  - outputs without thumbnails show a clean "No preview" tile
-  - empty projects/activity/outputs sections show actionable CTAs, not fake metrics
+Product surfaces:
+- `cliploop.site` — marketing frontend
+- `app.cliploop.site` — authenticated dashboard + Next.js `/api` backend
+- `docs.cliploop.site` — developer documentation (planned)
 
-## UI direction (Mistral-inspired)
+## Architecture
 
 The authenticated product shell now follows a restrained, premium visual language inspired by Mistral admin:
 - white/off-white surfaces
