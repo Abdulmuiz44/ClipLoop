@@ -65,7 +65,7 @@ export default function BillingPage() {
   useEffect(() => {
     fetch(`${API_BASE}/me/usage`)
       .then((r) => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        if (!r.ok) return r.json().then((body) => { throw new Error(body?.error || `HTTP ${r.status}`); });
         return r.json();
       })
       .then((json) => {
