@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { syncLemonSqueezySubscription, verifyLemonSqueezyWebhook } from "@/domains/billing/service";
+import { syncLemonSqueezySubscription, syncLemonSqueezyOrder, verifyLemonSqueezyWebhook } from "@/domains/billing/service";
 
 export async function POST(request: Request) {
   const rawBody = await request.text();
@@ -18,19 +18,35 @@ export async function POST(request: Request) {
       );
     }
 
-    // Parse and sync - errors here should be retried
+    // Parse body to determine event type
+    let payload: Record<string, unknown>;
     try {
-      const payload = JSON.parse(rawBody);
-      const result = await syncLemonSqueezySubscription(payload);
+      payload = JSON.parse(rawBody);
+    } catch {
+      return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    }
+
+    const eventName = (payload as any)?.meta?.event_name ?? "";
+    const dataType = (payload as any)?.data?.type ?? "";
+
+    try {
+      if (dataType === "orders" || eventName === "order_created") {
+        const result = await syncLemonSqueezyOrder(payload as any);
+        return NextResponse.json(result, { status: 200 });
+      }
+
+      // Default: try subscription sync (handles subscription_* events)
+      const result = await syncLemonSqueezySubscription(payload as any);
       return NextResponse.json(result, { status: 200 });
     } catch (syncError) {
       console.error("[billing] lemonsqueezy_webhook_sync_failed", {
         error: syncError instanceof Error ? syncError.message : "Unknown error",
-        payload: rawBody,
+        eventName,
+        dataType,
       });
       // Return 500 so LemonSqueezy retries
       return NextResponse.json(
-        { error: "Subscription sync failed. Will retry." },
+        { error: "Webhook sync failed. Will retry." },
         { status: 500 },
       );
     }

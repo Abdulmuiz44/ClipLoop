@@ -2,6 +2,7 @@ import crypto from "node:crypto";
 import { and, desc, eq, or } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
 import { env } from "@/lib/env";
+import { creditTopUp } from "@/domains/credits/service";
 
 type InternalSubscriptionStatus = "incomplete" | "trialing" | "active" | "past_due" | "canceled" | "unpaid" | "paused" | "expired";
 
@@ -50,6 +51,39 @@ type LemonSubscriptionPayload = {
         customer_portal?: string | null;
         update_payment_method?: string | null;
       } | null;
+    };
+  };
+};
+
+type LemonOrderPayload = {
+  meta?: {
+    event_name?: string;
+    custom_data?: {
+      user_id?: string;
+    };
+  };
+  data?: {
+    id?: string;
+    type?: string;
+    attributes?: {
+      store_id?: number;
+      customer_id?: number;
+      identifier?: string;
+      order_number?: number;
+      user_name?: string;
+      user_email?: string;
+      currency?: string;
+      total?: number;
+      subtotal?: number;
+      status?: string;
+      first_subscription_item?: {
+        variant_id?: number;
+        variant_name?: string;
+        product_id?: number;
+        product_name?: string;
+      };
+      created_at?: string;
+      updated_at?: string;
     };
   };
 };
@@ -444,5 +478,89 @@ export async function refreshBillingManagementUrl(userId: string) {
   return {
     url: managementUrl,
     subscriptionId: subscription.id,
+  };
+}
+
+/**
+ * Handle a Lemon Squeezy order_created webhook for one-time credit pack purchases.
+ * Maps variant_id -> credit pack -> credits -> top-up.
+ */
+const CREDIT_PACK_VARIANT_MAP: Record<number, { bucket: "generation" | "render"; credits: number }> = {};
+
+export function registerCreditPackVariant(variantId: number, bucket: "generation" | "render", credits: number) {
+  CREDIT_PACK_VARIANT_MAP[variantId] = { bucket, credits };
+}
+
+export async function syncLemonSqueezyOrder(payload: LemonOrderPayload) {
+  const eventName = payload.meta?.event_name;
+  if (eventName !== "order_created") {
+    return { ignored: true as const, reason: `unhandled_event: ${eventName}` };
+  }
+
+  const attributes = payload.data?.attributes;
+  const lemonOrderId = payload.data?.id ?? "";
+  if (!attributes || !lemonOrderId) {
+    return { ignored: true as const, reason: "missing_order_data" };
+  }
+
+  const email = attributes.user_email?.trim().toLowerCase();
+  if (!email) {
+    return { ignored: true as const, reason: "missing_email" };
+  }
+
+  // Find user by email or custom_data user_id
+  const userId = payload.meta?.custom_data?.user_id ?? null;
+  const user = await getOrCreateBillingUser({
+    userId: userId ?? null,
+    email,
+    fullName: attributes.user_name ?? null,
+  });
+
+  // Determine variant and credit mapping
+  const variantId = attributes.first_subscription_item?.variant_id;
+  const pack = variantId ? CREDIT_PACK_VARIANT_MAP[variantId] : null;
+  const bucket = pack?.bucket ?? "generation";
+  const credits = pack?.credits ?? 0;
+
+  if (credits <= 0) {
+    console.warn("[billing] sync_order_unknown_variant", {
+      lemonOrderId,
+      variantId,
+      userId: user.id,
+    });
+    // Still record but with 0 credits
+  }
+
+  const result = await creditTopUp({
+    userId: user.id,
+    bucket,
+    amount: credits,
+    referenceType: "lemon_order",
+    referenceId: lemonOrderId,
+    metadata: {
+      eventName,
+      variantId,
+      lemonOrderId,
+      orderNumber: attributes.order_number,
+      total: attributes.total,
+      currency: attributes.currency,
+    },
+  });
+
+  console.info("[billing] synced_lemonsqueezy_order", {
+    eventName,
+    userId: user.id,
+    lemonOrderId,
+    variantId,
+    bucket,
+    credits,
+  });
+
+  return {
+    ignored: false as const,
+    userId: user.id,
+    lemonOrderId,
+    bucket,
+    credits,
   };
 }

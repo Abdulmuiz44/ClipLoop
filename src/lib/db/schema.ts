@@ -72,6 +72,7 @@ export const creditReasonEnum = pgEnum("credit_reason", [
   "action_generate_video_generation",
   "action_generate_video_render",
   "manual_adjustment",
+  "purchase",
 ]);
 
 export const apiKeyStatusEnum = pgEnum("api_key_status", ["active", "revoked"]);

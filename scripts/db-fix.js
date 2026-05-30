@@ -95,6 +95,9 @@ async function run() {
     // 0021: rate limit counters
     `CREATE TABLE IF NOT EXISTS "rate_limit_counters" ("id" uuid PRIMARY KEY DEFAULT gen_random_uuid(), "identifier" text NOT NULL, "window_start" timestamptz NOT NULL, "counter" integer NOT NULL DEFAULT 0, "created_at" timestamptz NOT NULL DEFAULT now())`,
 
+    // 0022: credit pack purchase reason
+    `ALTER TYPE "credit_reason" ADD VALUE IF NOT EXISTS 'purchase'`,
+
     // Credit accounts (billing)
     `CREATE TABLE IF NOT EXISTS "credit_accounts" ("id" uuid PRIMARY KEY DEFAULT gen_random_uuid(), "user_id" uuid NOT NULL, "generation_balance" integer NOT NULL DEFAULT 0, "render_balance" integer NOT NULL DEFAULT 0, "created_at" timestamptz NOT NULL DEFAULT now(), "updated_at" timestamptz NOT NULL DEFAULT now())`,
     `CREATE UNIQUE INDEX IF NOT EXISTS "credit_accounts_user_id_unique" ON "credit_accounts" ("user_id")`,

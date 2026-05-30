@@ -49,3 +49,51 @@ export function getBillingPolicy(action: BillingActionId): BillingPolicyEntry {
   return BILLING_POLICY[action];
 }
 
+// ── Credit Pack Config ────────────────────────────────────────────────
+// In-memory credit pack definitions. Actual pricing/purchase goes through
+// Lemon Squeezy when configured. These values are informative defaults
+// used in the dashboard "Buy Credits" UI before checkout is wired up.
+
+export type CreditPackId = "starter_generation" | "pro_generation" | "render_pack";
+
+export type CreditPack = {
+  id: CreditPackId;
+  label: string;
+  description: string;
+  bucket: "generation" | "render";
+  credits: number;
+  priceUsd: number;
+  variantId?: string; // Lemon Squeezy variant ID when configured
+};
+
+export const CREDIT_PACKS: CreditPack[] = [
+  {
+    id: "starter_generation",
+    label: "Starter Generation Pack",
+    description: "100 generation credits — enough for ~20 weekly promos or ~100 copy generations",
+    bucket: "generation",
+    credits: 100,
+    priceUsd: 9,
+  },
+  {
+    id: "pro_generation",
+    label: "Pro Generation Pack",
+    description: "500 generation credits — bulk rate for high-volume usage",
+    bucket: "generation",
+    credits: 500,
+    priceUsd: 29,
+  },
+  {
+    id: "render_pack",
+    label: "Render Pack",
+    description: "50 render credits for video rendering",
+    bucket: "render",
+    credits: 50,
+    priceUsd: 19,
+  },
+];
+
+export function getCreditPack(id: CreditPackId): CreditPack | undefined {
+  return CREDIT_PACKS.find((p) => p.id === id);
+}
+

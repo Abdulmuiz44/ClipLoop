@@ -128,7 +128,7 @@ export default function DashboardHome() {
         {dashboard && !loading && !error && (
           <>
             {/* Credits + Usage Overview grid */}
-            <motion.div variants={itemAnim} className="grid gap-4 sm:grid-cols-2">
+            <motion.div variants={itemAnim} className="grid gap-4 sm:grid-cols-3">
               {/* Credits card */}
               <div className="rounded-2xl border border-[#1F1F1F] bg-[#0E0E0E] p-4">
                 <p className="text-sm font-semibold text-white">Credits Balance</p>
@@ -172,6 +172,41 @@ export default function DashboardHome() {
                     <span className="font-semibold text-white">{dashboard.publicApiUsageCount}</span>
                   </div>
                 </div>
+              </div>
+
+              {/* Buy Credits */}
+              <div className="rounded-2xl border border-[#1F1F1F] bg-[#0E0E0E] p-4">
+                <p className="text-sm font-semibold text-white">Buy Credits</p>
+                <p className="mt-1 text-xs text-[#8B8B8B]">
+                  Purchase credit packs for API usage and content generation.
+                </p>
+                <div className="mt-3 space-y-2">
+                  <div className="rounded-xl bg-[#111111] p-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-white">100 generation credits</p>
+                        <p className="text-xs text-[#8B8B8B]">~20 weekly promos</p>
+                      </div>
+                      <span className="text-sm font-semibold text-white">$9</span>
+                    </div>
+                  </div>
+                  <div className="rounded-xl bg-[#111111] p-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-white">500 generation credits</p>
+                        <p className="text-xs text-[#8B8B8B]">~100 weekly promos</p>
+                      </div>
+                      <span className="text-sm font-semibold text-white">$29</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-3 rounded-xl border border-dashed border-[#1F1F1F] bg-[#050505] p-3 text-center">
+                  <p className="text-xs font-medium text-amber-400">Coming soon</p>
+                  <p className="mt-0.5 text-[11px] text-[#8B8B8B]">Credit purchase via Lemon Squeezy is being set up.</p>
+                </div>
+                <p className="mt-2 text-[11px] text-[#555]">
+                  1 weekly promo API call = 5 generation credits.
+                </p>
               </div>
             </motion.div>
 

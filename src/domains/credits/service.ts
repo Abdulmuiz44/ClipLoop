@@ -9,7 +9,8 @@ type CreditReason =
   | "action_generate_copy"
   | "action_generate_video_generation"
   | "action_generate_video_render"
-  | "manual_adjustment";
+  | "manual_adjustment"
+  | "purchase";
 
 type ChargeInput = {
   userId: string;
@@ -474,6 +475,8 @@ export function formatCreditReason(reason: CreditReason) {
       return "Promo video rendering";
     case "manual_adjustment":
       return "Manual adjustment";
+    case "purchase":
+      return "Credit pack purchase";
     default:
       return reason;
   }
@@ -482,4 +485,69 @@ export function formatCreditReason(reason: CreditReason) {
 export async function getCreditWalletWithRecentTransactions(userId: string) {
   const [wallet, transactions] = await Promise.all([getCreditWalletSummary(userId), listRecentCreditTransactions(userId, 12)]);
   return { wallet, transactions };
+}
+
+export async function creditTopUp(input: {
+  userId: string;
+  bucket: CreditBucket;
+  amount: number;
+  referenceType?: string;
+  referenceId?: string;
+  metadata?: Record<string, unknown>;
+}) {
+  await getOrCreateCreditAccount(input.userId);
+
+  return db.transaction(async (tx) => {
+    // Idempotency check
+    if (input.referenceType && input.referenceId) {
+      const existing = await tx.query.creditLedgerEntries.findFirst({
+        where: and(
+          eq(schema.creditLedgerEntries.userId, input.userId),
+          eq(schema.creditLedgerEntries.referenceType, input.referenceType!),
+          eq(schema.creditLedgerEntries.referenceId, input.referenceId!),
+        ),
+      });
+      if (existing) return existing;
+    }
+
+    const account = await tx.query.creditAccounts.findFirst({
+      where: eq(schema.creditAccounts.userId, input.userId),
+    });
+    if (!account) throw new Error("Credit account not found.");
+
+    const currentBalance = input.bucket === "generation" ? account.generationBalance : account.renderBalance;
+    const nextBalance = currentBalance + input.amount;
+
+    const [entry] = await tx
+      .insert(schema.creditLedgerEntries)
+      .values({
+        userId: input.userId,
+        creditAccountId: account.id,
+        bucket: input.bucket,
+        direction: "credit",
+        reason: "purchase",
+        amountDelta: input.amount,
+        balanceAfter: nextBalance,
+        referenceType: input.referenceType ?? null,
+        referenceId: input.referenceId ?? null,
+        metadataJson: { ...input.metadata, source: "credit_top_up" },
+      })
+      .returning();
+
+    if (!entry) throw new Error("Could not persist credit top-up entry.");
+
+    if (input.bucket === "generation") {
+      await tx
+        .update(schema.creditAccounts)
+        .set({ generationBalance: nextBalance, updatedAt: new Date() })
+        .where(eq(schema.creditAccounts.id, account.id));
+    } else {
+      await tx
+        .update(schema.creditAccounts)
+        .set({ renderBalance: nextBalance, updatedAt: new Date() })
+        .where(eq(schema.creditAccounts.id, account.id));
+    }
+
+    return entry;
+  });
 }
