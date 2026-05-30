@@ -62,5 +62,12 @@ export function toErrorResponse(error: unknown) {
     );
   }
 
-  return NextResponse.json({ error: error instanceof Error ? error.message : "Internal error" }, { status: 500 });
+  // Expose the underlying PG error from DrizzleQueryError for debugging.
+  const cause = error instanceof Error ? (error as any).cause : undefined;
+  const detail = cause instanceof Error ? cause.message : undefined;
+
+  return NextResponse.json(
+    { error: error instanceof Error ? error.message : "Internal error", detail },
+    { status: 500 },
+  );
 }
