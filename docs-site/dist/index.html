@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+<title>ClipLoop Developer Docs</title>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<a href="#content" class="skip-link">Skip to content</a>
+<button class="mobile-toggle" aria-label="Open menu" onclick="document.getElementById('sidebar').classList.add('open');document.getElementById('overlay').classList.add('open')">☰</button>
+<div class="sidebar-overlay" id="overlay" onclick="document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('open')"></div>
+<nav class="sidebar" id="sidebar" aria-label="Docs navigation">
+  <div class="logo">
+    <div class="logo-mark">CL</div>
+    <div class="logo-text">ClipLoop<small>Developer Docs</small></div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-title">Getting Started</div>
+    <a href="/overview/" class="nav-link active">Overview</a>
+    <a href="/quickstart/" class="nav-link ">Quickstart</a>
+    <a href="/authentication/" class="nav-link ">Authentication</a>
+    <a href="/idempotency/" class="nav-link ">Idempotency</a>
+    <a href="/credits/" class="nav-link ">Credits & Billing</a>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-section">
+    <div class="nav-section-title">API Reference</div>
+    <a href="/weekly-promo-api/" class="nav-link ">Weekly Promo API</a>
+    <a href="/examples/" class="nav-link ">Examples</a>
+    <a href="/errors/" class="nav-link ">Error Codes</a>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-section">
+    <div class="nav-section-title">More</div>
+    <a href="/roadmap/" class="nav-link ">Roadmap</a>
+    <a href="https://app.cliploop.site" class="nav-link">App Dashboard →</a>
+    <a href="https://cliploop.site" class="nav-link">Marketing Site →</a>
+  </div>
+</nav>
+<main class="main" id="content">
+  <div class="content">
+    
+    <h1>ClipLoop Developer Docs</h1>
+<p class="lead">Programmable video generation for developers and product teams. Generate promo videos, scene specs, and video artifacts from an API.</p>
+
+<div class="card">
+  <div class="card-title">✨ Current API</div>
+  <p style="margin:0">The first public endpoint is <strong>Weekly Promo</strong> — generate a short-form promo video from a URL and a weekly update.</p>
+</div>
+<p>ClipLoop is an <strong>API-first</strong> platform. Send structured inputs, receive video artifacts. No browser UI required. The dashboard is one consumer — you can build your own.</p>
+
+<h2 id="key-concepts">Key concepts</h2>
+<table>
+  <tr><td><strong>API Key</strong></td><td>Scoped bearer token for authentication. Created in the dashboard.</td></tr>
+  <tr><td><strong>Credits</strong></td><td>Pay-per-use unit. 5 generation credits per weekly promo API call.</td></tr>
+  <tr><td><strong>Idempotency Key</strong></td><td>Prevents double charges. Same key + same body = cached result.</td></tr>
+  <tr><td><strong>Scope</strong></td><td>API keys require <code>weekly_promo:generate</code> for the promo endpoint.</td></tr>
+</table>
+
+<h2 id="quick-links">Quick links</h2>
+<div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:12px; margin-top:12px">
+  <a href="/quickstart/" class="card" style="text-decoration:none; margin:0"><div style="font-weight:600; color:var(--white); margin-bottom:4px">Quickstart</div><div style="font-size:13px; color:var(--text2)">Create account, generate API key, make your first request</div></a>
+  <a href="/authentication/" class="card" style="text-decoration:none; margin:0"><div style="font-weight:600; color:var(--white); margin-bottom:4px">Authentication</div><div style="font-size:13px; color:var(--text2)">Bearer keys, scopes, and security best practices</div></a>
+  <a href="/examples/" class="card" style="text-decoration:none; margin:0"><div style="font-weight:600; color:var(--white); margin-bottom:4px">Examples</div><div style="font-size:13px; color:var(--text2)">cURL, JavaScript, and Node.js code samples</div></a>
+  <a href="/errors/" class="card" style="text-decoration:none; margin:0"><div style="font-weight:600; color:var(--white); margin-bottom:4px">Error Codes</div><div style="font-size:13px; color:var(--text2)">HTTP status codes and structured error bodies</div></a>
+</div>
+
+<h2 id="get-started">Get started</h2>
+<p>Create your first API key and make a test request.</p>
+<div class="callout">⚠️ The raw API key is shown <strong>only once</strong> at creation. Store it securely. Never log full keys.</div>
+<a href="https://app.cliploop.site/app/settings/api-keys" class="cta">Generate API Key →</a>
+
+    <footer>
+      <p style="display:flex; flex-wrap:wrap; gap:14px; align-items:center; justify-content:space-between">
+        <span>© 2026 ClipLoop · Built by <a href="https://talocode.com" style="color:var(--text3)">Talocode</a></span>
+        <span style="display:flex; gap:14px">
+          <a href="https://cliploop.site">Marketing</a>
+          <a href="https://app.cliploop.site">Dashboard</a>
+          <a href="https://github.com/talocode/cliploop">GitHub</a>
+        </span>
+      </p>
+    </footer>
+  </div>
+</main>
+<script>
+document.getElementById('overlay').addEventListener('click', function(){
+  document.getElementById('sidebar').classList.remove('open');
+  this.classList.remove('open');
+});
+</script>
+</body>
+</html>
