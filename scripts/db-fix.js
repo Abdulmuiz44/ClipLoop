@@ -16,6 +16,20 @@ async function run() {
   const pool = new Pool({ connectionString: url });
 
   const fixes = [
+    // ── Enum types (DO block for idempotent creation) ──
+    `DO $$ BEGIN CREATE TYPE "render_status" AS ENUM('pending', 'queued', 'rendering', 'completed', 'failed'); EXCEPTION WHEN duplicate_object THEN null; END $$`,
+    `DO $$ BEGIN CREATE TYPE "publish_status" AS ENUM('draft', 'approved', 'scheduled', 'publishing', 'published', 'failed', 'skipped'); EXCEPTION WHEN duplicate_object THEN null; END $$`,
+    `DO $$ BEGIN CREATE TYPE "subscription_status" AS ENUM('incomplete', 'trialing', 'active', 'past_due', 'canceled', 'unpaid', 'paused', 'expired'); EXCEPTION WHEN duplicate_object THEN null; END $$`,
+    `DO $$ BEGIN CREATE TYPE "credit_reason" AS ENUM('monthly_grant', 'action_generate_copy', 'action_generate_video_generation', 'action_generate_video_render', 'manual_adjustment', 'purchase'); EXCEPTION WHEN duplicate_object THEN null; END $$`,
+    `DO $$ BEGIN CREATE TYPE "credit_bucket" AS ENUM('generation', 'render'); EXCEPTION WHEN duplicate_object THEN null; END $$`,
+    `DO $$ BEGIN CREATE TYPE "credit_direction" AS ENUM('credit', 'debit'); EXCEPTION WHEN duplicate_object THEN null; END $$`,
+
+    // ── Core tables (0000) ──
+    `CREATE TABLE IF NOT EXISTS "users" ("id" uuid PRIMARY KEY DEFAULT gen_random_uuid(), "email" text NOT NULL, "full_name" text, "plan" text NOT NULL DEFAULT 'free', "billing_status" text, "stripe_customer_id" text, "created_at" timestamptz NOT NULL DEFAULT now(), "updated_at" timestamptz NOT NULL DEFAULT now())`,
+    `CREATE UNIQUE INDEX IF NOT EXISTS "users_email_unique" ON "users" ("email")`,
+    `CREATE TABLE IF NOT EXISTS "usage_counters" ("id" uuid PRIMARY KEY DEFAULT gen_random_uuid(), "user_id" uuid NOT NULL, "project_id" uuid, "period_start" date NOT NULL, "period_end" date NOT NULL, "posts_generated" integer NOT NULL DEFAULT 0, "manual_regenerations" integer NOT NULL DEFAULT 0, "videos_rendered" integer NOT NULL DEFAULT 0, "posts_published" integer NOT NULL DEFAULT 0, "created_at" timestamptz NOT NULL DEFAULT now(), "updated_at" timestamptz NOT NULL DEFAULT now())`,
+    `CREATE UNIQUE INDEX IF NOT EXISTS "usage_counters_user_project_period_unique" ON "usage_counters" ("user_id", "project_id", "period_start", "period_end")`,
+
     // 0006: billing access limits
     `ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "is_beta_approved" boolean NOT NULL DEFAULT false`,
     `ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "beta_approved_at" timestamptz`,
