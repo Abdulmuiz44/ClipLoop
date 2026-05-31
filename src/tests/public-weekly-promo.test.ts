@@ -229,3 +229,84 @@ test("weekly_promo:generate scope is defined", async () => {
   const { isPublicApiScopeId } = await import("@/lib/public-api/scopes");
   assert.equal(isPublicApiScopeId("weekly_promo:generate"), true);
 });
+
+// --- Debug response behavior ---
+
+function buildTestErrorBody(params: {
+  code: string;
+  message: string;
+  debugMode: boolean;
+  extra?: Record<string, unknown>;
+}) {
+  const base = { error: params.message, code: params.code };
+
+  if (!params.debugMode) {
+    return base;
+  }
+
+  return {
+    ...base,
+    debug: {
+      route: "public-weekly-promo",
+      code: params.code,
+      status: 500,
+      errorName: "Error",
+      safeMessage: params.message,
+      secretsExposed: false,
+      ...params.extra,
+    },
+  };
+}
+
+test("without debug header: generic response unchanged", () => {
+  const body = buildTestErrorBody({
+    code: "VIDEO_RENDER_FAILED",
+    message: "Rendered video output is missing.",
+    debugMode: false,
+  });
+
+  assert.equal(body.error, "Rendered video output is missing.");
+  assert.equal(body.code, "VIDEO_RENDER_FAILED");
+  assert.ok(!("debug" in body));
+});
+
+test("with X-ClipLoop-Debug: safe: sanitized debug fields included", () => {
+  const body = buildTestErrorBody({
+    code: "VIDEO_RENDER_FAILED",
+    message: "Rendered video output is missing.",
+    debugMode: true,
+    extra: {
+      errorName: "VideoRenderFailedError",
+      idempotencyKeyPrefix: "cliploop-real",
+      idempotencyCleanupRan: true,
+    },
+  });
+
+  assert.ok("debug" in body);
+  assert.equal(body.debug.route, "public-weekly-promo");
+  assert.equal(body.debug.code, "VIDEO_RENDER_FAILED");
+  assert.equal(body.debug.safeMessage, "Rendered video output is missing.");
+  assert.equal(body.debug.errorName, "VideoRenderFailedError");
+  assert.equal(body.debug.idempotencyKeyPrefix, "cliploop-real");
+  assert.equal(body.debug.idempotencyCleanupRan, true);
+});
+
+test("debug response does not include Authorization, API key, DATABASE_URL, stack, raw body", () => {
+  const body = buildTestErrorBody({
+    code: "VIDEO_RENDER_UNAVAILABLE",
+    message: "Video renderer is unavailable.",
+    debugMode: true,
+    extra: {
+      idempotencyKeyPrefix: "cliploop-real",
+      idempotencyCleanupRan: false,
+    },
+  });
+
+  const serialized = JSON.stringify(body);
+  assert.ok(!serialized.includes("Authorization"));
+  assert.ok(!serialized.includes("DATABASE_URL"));
+  assert.ok(!serialized.includes("CLIPLOOP_API_KEY"));
+  assert.ok(!serialized.includes("stack"));
+  assert.ok(!serialized.includes("raw body"));
+  assert.ok(!serialized.includes("api-key"));
+});
