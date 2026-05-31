@@ -4,14 +4,17 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-function writePage(relPath, html) {
-  const abs = path.join(root, relPath);
-  fs.mkdirSync(path.dirname(abs), { recursive: true });
-  fs.writeFileSync(abs, html, 'utf8');
-  console.log('wrote', abs);
+function write(rel, html) {
+  const src = path.join(root, rel, 'index.html');
+  const dst = path.join(root, 'dist', rel, 'index.html');
+  fs.mkdirSync(path.dirname(src), { recursive: true });
+  fs.mkdirSync(path.dirname(dst), { recursive: true });
+  fs.writeFileSync(src, html, 'utf8');
+  fs.writeFileSync(dst, html, 'utf8');
+  console.log('wrote', rel);
 }
 
-const page = (title, body) => `<!DOCTYPE html>
+const shell = (title, body) => `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -20,28 +23,72 @@ const page = (title, body) => `<!DOCTYPE html>
 <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-<div class="container">
-  <nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">Docs</a> <span aria-hidden="true">/</span> ${title}</nav>
-  ${body}
-  <footer>
-    <p>
-      <span>© 2026 ClipLoop · Built by <a href="https://talocode.com" style="color:var(--text3)">Talocode</a></span>
-      <span>
-        <a href="https://cliploop.site">Marketing</a> ·
-        <a href="https://app.cliploop.site">Dashboard</a> ·
-        <a href="https://github.com/talocode/cliploop">GitHub</a>
-      </span>
-    </p>
-  </footer>
-</div>
+<a href="#content" class="skip-link">Skip to content</a>
+<button class="mobile-toggle" aria-label="Open menu" onclick="document.getElementById('sidebar').classList.add('open');document.getElementById('overlay').classList.add('open')">☰</button>
+<div class="sidebar-overlay" id="overlay" onclick="document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('open')"></div>
+<nav class="sidebar" id="sidebar" aria-label="Docs navigation">
+  <div class="logo">
+    <div class="logo-mark">CL</div>
+    <div class="logo-text">ClipLoop<small>Developer Docs</small></div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-title">Getting Started</div>
+    <a href="/overview/" class="nav-link ">Overview</a>
+    <a href="/quickstart/" class="nav-link ">Quickstart</a>
+    <a href="/authentication/" class="nav-link ">Authentication</a>
+    <a href="/idempotency/" class="nav-link ">Idempotency</a>
+    <a href="/credits/" class="nav-link ">Credits & Billing</a>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-section">
+    <div class="nav-section-title">API Reference</div>
+    <a href="/weekly-promo-api/" class="nav-link ">Weekly Promo API</a>
+    <a href="/api-keys/" class="nav-link ">API Keys</a>
+    <a href="/rate-limits/" class="nav-link ">Rate Limits</a>
+    <a href="/video-jobs/" class="nav-link ">Video Jobs</a>
+    <a href="/sdks/" class="nav-link ">SDKs</a>
+    <a href="/cli/" class="nav-link ">CLI</a>
+    <a href="/examples/" class="nav-link ">Examples</a>
+    <a href="/errors/" class="nav-link ">Error Codes</a>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-section">
+    <div class="nav-section-title">More</div>
+    <a href="/roadmap/" class="nav-link ">Roadmap</a>
+    <a href="/changelog/" class="nav-link ">Changelog</a>
+    <a href="https://app.cliploop.site" class="nav-link">App Dashboard →</a>
+    <a href="https://cliploop.site" class="nav-link">Marketing Site →</a>
+  </div>
+</nav>
+<main class="main" id="content">
+  <div class="content">
+    ${body}
+    <footer>
+      <p style="display:flex; flex-wrap:wrap; gap:14px; align-items:center; justify-content:space-between">
+        <span>© 2026 ClipLoop · Built by <a href="https://talocode.com" style="color:var(--text3)">Talocode</a></span>
+        <span style="display:flex; gap:14px">
+          <a href="https://cliploop.site">Marketing</a>
+          <a href="https://app.cliploop.site">Dashboard</a>
+          <a href="https://github.com/talocode/cliploop">GitHub</a>
+        </span>
+      </p>
+    </footer>
+  </div>
+</main>
+<script>
+document.getElementById('overlay').addEventListener('click', function(){
+  document.getElementById('sidebar').classList.remove('open');
+  this.classList.remove('open');
+});
+</script>
 </body>
 </html>
 `;
 
-writePage(path.join('api-keys', 'index.html'), page('API Keys', `<h1>API Keys</h1>
+write('api-keys', shell('API Keys', `<h1>API Keys</h1>
 <p class="lead">ClipLoop API keys follow a simple creation, usage, and rotation model.</p>
 <h2 id="creating-keys">Creating keys</h2>
-<p>Create API keys in the dashboard: <a href="https://app.cliploop.site/dashboard/api-keys">https://app.cliploop.site/dashboard/api-keys</a>.</p>
+<p>Create API keys in the dashboard: <a href="https://app.cliploop.site/dashboard/settings/api-keys">https://app.cliploop.site/dashboard/settings/api-keys</a>.</p>
 <p>When creating a key, assign only the minimum scopes your use case needs. The Weekly Promo API requires the <code>weekly_promo:generate</code> scope.</p>
 <h2 id="treating-keys-like-secrets">Treating keys like secrets</h2>
 <p class="callout">ClipLoop shows each key once on creation. After that, you will only ever see its prefix in the dashboard again.</p>
@@ -51,9 +98,9 @@ writePage(path.join('api-keys', 'index.html'), page('API Keys', `<h1>API Keys</h
 <h2 id="allowed-use">Allowed use</h2>
 <p>Use API keys only from server-side code, backend jobs, CLIs, or secure workers. Never expose API keys in frontend apps, mobile bundles, public repositories, or client-side JavaScript.</p>
 <h2 id="related">Related</h2>
-<p><a href="/authentication/">Authentication</a> · <a href="/quickstart/">Quickstart</a> · <a href="https://app.cliploop.site/dashboard/billing">Billing</a></p>`));
+<p><a href="/authentication/">Authentication</a> · <a href="/quickstart/">Quickstart</a> · <a href="/credits/">Credits & Billing</a></p>`));
 
-writePage(path.join('rate-limits', 'index.html'), page('Rate Limits', `<h1>Rate Limits</h1>
+write('rate-limits', shell('Rate Limits', `<h1>Rate Limits</h1>
 <p class="lead">Rate limits protect rendering credits, queue capacity, and platform stability.</p>
 <h2 id="current-model">Current model</h2>
 <p>ClipLoop applies rate limits at the account and key scope level to prevent runaway usage, render bursts, and abuse. Safe usage patterns still work well for normal builders and automation workflows.</p>
@@ -72,7 +119,7 @@ writePage(path.join('rate-limits', 'index.html'), page('Rate Limits', `<h1>Rate 
 <h2 id="related">Related</h2>
 <p><a href="/weekly-promo-api/">Weekly Promo API</a> · <a href="/idempotency/">Idempotency</a></p>`));
 
-writePage(path.join('video-jobs', 'index.html'), page('Video Jobs', `<h1>Video Jobs</h1>
+write('video-jobs', shell('Video Jobs', `<h1>Video Jobs</h1>
 <p class="lead">Future video generation will use an async job model for longer renders and more control.</p>
 <h2 id="what-is-changing">What is changing</h2>
 <p>The first generation endpoint, Weekly Promo API, returns a completed artifact inline. Future generic video generation likely will use a job model because longer renders need status tracking, queuing, and download flexibility.</p>
@@ -99,7 +146,7 @@ writePage(path.join('video-jobs', 'index.html'), page('Video Jobs', `<h1>Video J
 <h2 id="related">Related</h2>
 <p><a href="/weekly-promo-api/">Weekly Promo API</a> · <a href="/rate-limits/">Rate Limits</a> · <a href="/roadmap/">Roadmap</a></p>`));
 
-writePage(path.join('sdks', 'index.html'), page('SDKs', `<h1>SDKs</h1>
+write('sdks', shell('SDKs', `<h1>SDKs</h1>
 <p class="lead">Official SDKs are planned to make the ClipLoop API easier to use from code.</p>
 <h2 id="current-best-path">Current best path</h2>
 <p>Use <code>fetch</code> or <code>curl</code> directly. See the <a href="/quickstart/">Quickstart</a> or <a href="/examples/">Examples</a>.</p>
@@ -117,7 +164,7 @@ writePage(path.join('sdks', 'index.html'), page('SDKs', `<h1>SDKs</h1>
 <h2 id="related">Related</h2>
 <p><a href="/cli/">CLI</a> · <a href="/quickstart/">Quickstart</a> · <a href="/weekly-promo-api/">Weekly Promo API</a></p>`));
 
-writePage(path.join('cli', 'index.html'), page('CLI', `<h1>CLI</h1>
+write('cli', shell('CLI', `<h1>CLI</h1>
 <p class="lead">A ClipLoop CLI is planned for terminals, scripts, and release workflows.</p>
 <h2 id="planned-commands">Planned commands</h2>
 <p class="callout"><span style="color:var(--accent)">Planned</span> The CLI is planned, but not live yet.</p>
@@ -138,13 +185,13 @@ writePage(path.join('cli', 'index.html'), page('CLI', `<h1>CLI</h1>
 <h2 id="related">Related</h2>
 <p><a href="/weekly-promo-api/">Weekly Promo API</a> · <a href="/sdks/">SDKs</a> · <a href="/video-jobs/">Video Jobs</a></p>`));
 
-writePage(path.join('changelog', 'index.html'), page('Changelog', `<h1>Changelog</h1>
+write('changelog', shell('Changelog', `<h1>Changelog</h1>
 <p class="lead">Key changes to the ClipLoop developer platform and API.</p>
 <h2 id="recent-updates">Recent updates</h2>
 <ul>
 <li>Three-surface architecture available: cliploop.site, app.cliploop.site, and docs.cliploop.site.</li>
 <li>Google authentication working.</li>
-<li>API keys dashboard available at <a href="https://app.cliploop.site/dashboard/api-keys">https://app.cliploop.site/dashboard/api-keys</a>.</li>
+<li>API keys dashboard available at <a href="https://app.cliploop.site/dashboard/settings/api-keys">https://app.cliploop.site/dashboard/settings/api-keys</a>.</li>
 <li>Public Weekly Promo API available.</li>
 <li>Usage and credits dashboard available.</li>
 <li>Billing page with credits view available at <a href="https://app.cliploop.site/dashboard/billing">https://app.cliploop.site/dashboard/billing</a>.</li>
