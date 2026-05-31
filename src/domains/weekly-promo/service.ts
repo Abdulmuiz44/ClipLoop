@@ -6,8 +6,6 @@ import { generateStructuredObject } from "@/lib/llm";
 import { extractWebsiteText } from "@/lib/business/extractWebsiteText";
 import { generateScenePlan } from "@/lib/prompts/scenePlanner";
 import type { SceneBlock } from "@/lib/render/hyperframes/types";
-import { prepareRenderOutput } from "@/lib/render/storage";
-import { hyperframesRenderAdapter } from "@/lib/render/adapters/hyperframes";
 import type { RenderAdapterResult } from "@/lib/render/adapters/types";
 import {
   productContextSchema,
@@ -70,8 +68,12 @@ const defaultDeps: Deps = {
   extractWebsiteTextFn: extractWebsiteText,
   generateStructuredObjectFn: generateStructuredObject,
   generateScenePlanFn: generateScenePlan,
-  prepareRenderOutputFn: prepareRenderOutput,
+  prepareRenderOutputFn: async (id: string) => {
+    const { prepareRenderOutput } = await import("@/lib/render/storage");
+    return prepareRenderOutput(id);
+  },
   renderFn: async ({ contentItemId, channel, script, appName, output }) => {
+    const { hyperframesRenderAdapter } = await import("@/lib/render/adapters/hyperframes");
     return hyperframesRenderAdapter.render({
       contentItemId,
       targetChannel: channel,
