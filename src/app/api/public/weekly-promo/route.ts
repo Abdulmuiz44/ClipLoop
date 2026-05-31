@@ -4,7 +4,7 @@ import { z } from "zod";
 import { getBillingPolicy } from "@/core/billing/policy";
 import { InsufficientCreditsError, assertCanAffordAction, chargeCredits } from "@/domains/credits/service";
 import { recordUsageEvent } from "@/domains/usage-events/service";
-import { runWeeklyPromoMvp } from "@/domains/weekly-promo/service";
+import { runWeeklyPromoMvp, VideoRendererUnavailableError, VideoRenderFailedError } from "@/domains/weekly-promo/service";
 import { ApiKeyAuthError } from "@/domains/api-keys/service";
 import { toErrorResponse } from "@/lib/http/errors";
 import { requireApiKeyIdentity, PublicApiAuthRequiredError } from "@/lib/public-api/auth";
@@ -17,8 +17,33 @@ import {
   IdempotencyInProgressError,
   IdempotencyKeyRequiredError,
 } from "@/lib/public-api/idempotency";
-import { VideoRendererUnavailableError, VideoRenderFailedError } from "@/domains/weekly-promo/service";
 import { weeklyPromoInputSchema } from "@/lib/validation/weekly-promo";
+
+function logWeeklyPromoError(context: {
+  idempotencyKey?: string;
+  errorName?: string;
+  code?: string;
+  status?: number;
+  message?: string;
+  rendererStatus?: unknown;
+  idempotencyCleanupRan?: boolean;
+  requestId?: string;
+}) {
+  const safe = {
+    route: "public-weekly-promo",
+    idempotencyKey: context.idempotencyKey ? `${String(context.idempotencyKey).slice(0, 12)}...` : undefined,
+    errorName: context.errorName,
+    code: context.code,
+    status: context.status,
+    message: context.message,
+    rendererStatus: context.rendererStatus,
+    idempotencyCleanupRan: context.idempotencyCleanupRan,
+    requestId: context.requestId,
+    secretsExposed: false,
+  };
+
+  console.log("[weekly-promo][error]", JSON.stringify(safe));
+}
 
 export async function POST(request: Request) {
   try {
@@ -180,6 +205,14 @@ export async function POST(request: Request) {
     }
     // Unknown errors
     if (error instanceof VideoRendererUnavailableError) {
+      logWeeklyPromoError({
+        idempotencyKey: idempotencyKey.trim(),
+        errorName: error.name,
+        code: "VIDEO_RENDER_UNAVAILABLE",
+        status: 503,
+        message: error.message,
+        idempotencyCleanupRan: idem.kind === "new",
+      });
       if (idem.kind === "new") {
         await completeIdempotentRequest({
           userId: identity.userId,
@@ -193,6 +226,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: error.message, code: "VIDEO_RENDER_UNAVAILABLE" }, { status: 503 });
     }
     if (error instanceof VideoRenderFailedError) {
+      logWeeklyPromoError({
+        idempotencyKey: idempotencyKey.trim(),
+        errorName: error.name,
+        code: "VIDEO_RENDER_FAILED",
+        status: 500,
+        message: error.message,
+        idempotencyCleanupRan: idem.kind === "new",
+      });
       if (idem.kind === "new") {
         await completeIdempotentRequest({
           userId: identity.userId,
@@ -215,6 +256,14 @@ export async function POST(request: Request) {
         status: "failed",
       });
     }
+    logWeeklyPromoError({
+      idempotencyKey: idempotencyKey.trim(),
+      errorName: error instanceof Error ? error.name : "Error",
+      code: "REQUEST_FAILED",
+      status: 500,
+      message: error instanceof Error ? error.message : "Request failed",
+      idempotencyCleanupRan: idem.kind === "new",
+    });
     return toErrorResponse(error);
   }
 }
