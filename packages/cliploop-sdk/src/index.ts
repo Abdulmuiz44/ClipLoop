@@ -1,21 +1,24 @@
+export type WeeklyPromoChannel = "instagram" | "tiktok" | "whatsapp" | "x";
+
 export type WeeklyPromoInput = {
   appName: string;
-  appWebsiteUrl: string;
+  appWebsiteUrl?: string;
   weeklyUpdate: string;
   targetAudience?: string;
   callToAction?: string;
-  channel?: string;
-  tone?: string;
+  channel: WeeklyPromoChannel;
+  tone: string;
 };
 
 export type WeeklyPromoResponse = {
   artifactId: string;
-  previewUrl: string;
-  downloadUrl: string;
-  artifactUrl: string;
-  script: string;
-  scenePlan: string;
+  previewUrl: string | null;
+  downloadUrl: string | null;
+  artifactUrl: string | null;
+  script: Record<string, unknown>;
+  scenePlan: unknown[];
   creditsCharged: number;
+  renderStatus: string;
   idempotencyKey: string;
 };
 
@@ -99,13 +102,24 @@ export class ClipLoopClient {
     const idempotencyKey =
       options.idempotencyKey ?? `cliploop-sdk-${crypto.randomUUID()}`;
 
-    const body = {
-      ...input,
-      targetAudience: input.targetAudience ?? null,
-      callToAction: input.callToAction ?? null,
-      channel: input.channel ?? null,
-      tone: input.tone ?? null,
+    const body: Record<string, unknown> = {
+      appName: input.appName,
+      weeklyUpdate: input.weeklyUpdate,
+      channel: input.channel,
+      tone: input.tone,
     };
+
+    if (input.appWebsiteUrl !== undefined) {
+      body.appWebsiteUrl = input.appWebsiteUrl;
+    }
+
+    if (input.targetAudience !== undefined) {
+      body.targetAudience = input.targetAudience;
+    }
+
+    if (input.callToAction !== undefined) {
+      body.callToAction = input.callToAction;
+    }
 
     const response = await fetch(
       `${this.baseURL}/api/public/weekly-promo`,

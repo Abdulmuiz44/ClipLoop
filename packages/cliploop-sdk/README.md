@@ -31,7 +31,7 @@ const result = await client.generateWeeklyPromo({
   weeklyUpdate: "Added revenue dashboard and AI reminders.",
   targetAudience: "Founders",
   callToAction: "Join waitlist",
-  channel: "Instagram Reels",
+  channel: "x",
   tone: "Excited"
 });
 
