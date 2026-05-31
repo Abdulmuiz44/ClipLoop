@@ -18,6 +18,20 @@ import {
   type WeeklyPromoScript,
 } from "@/lib/validation/weekly-promo";
 
+export class VideoRendererUnavailableError extends Error {
+  constructor(message = "Video renderer is unavailable.") {
+    super(message);
+    this.name = "VideoRendererUnavailableError";
+  }
+}
+
+export class VideoRenderFailedError extends Error {
+  constructor(message = "Video render failed.") {
+    super(message);
+    this.name = "VideoRenderFailedError";
+  }
+}
+
 type RenderChannel = "instagram" | "tiktok" | "whatsapp";
 
 const weeklyPromoToRenderChannel: Record<WeeklyPromoInput["channel"], RenderChannel> = {
@@ -238,6 +252,19 @@ export async function runWeeklyPromoMvp(rawInput: unknown, deps: Deps = defaultD
     appName: input.appName,
     output,
   });
+
+  const isRenderUnavailable =
+    renderResult.metadataJson &&
+    typeof renderResult.metadataJson === "object" &&
+    (renderResult.metadataJson as Record<string, unknown>).rendererStatus === "unavailable";
+
+  if (isRenderUnavailable) {
+    throw new VideoRendererUnavailableError();
+  }
+
+  if (!renderResult.videoUrl || !renderResult.thumbnailUrl || !renderResult.videoPath) {
+    throw new VideoRenderFailedError("Rendered video output is missing.");
+  }
 
   const artifact = await saveArtifact({
     id: artifactId,

@@ -17,6 +17,7 @@ import {
   IdempotencyInProgressError,
   IdempotencyKeyRequiredError,
 } from "@/lib/public-api/idempotency";
+import { VideoRendererUnavailableError, VideoRenderFailedError } from "@/domains/weekly-promo/service";
 import { weeklyPromoInputSchema } from "@/lib/validation/weekly-promo";
 
 export async function POST(request: Request) {
@@ -115,13 +116,13 @@ export async function POST(request: Request) {
     // 12. Shape response with all required fields
     const responseJson = {
       artifactId: result.id,
-      previewUrl: result.preview.videoUrl || null,
-      downloadUrl: result.preview.downloadUrl || null,
-      artifactUrl: result.artifact.artifactUrl || null,
+      previewUrl: result.preview.videoUrl,
+      downloadUrl: result.preview.downloadUrl,
+      artifactUrl: result.artifact.artifactUrl,
       script: result.script,
       scenePlan: result.scenePlan,
       creditsCharged,
-      renderStatus: result.preview.videoUrl ? "rendered" : "renderer_unavailable",
+      renderStatus: "rendered" as const,
       idempotencyKey: idempotencyKey.trim(),
     };
 
@@ -176,6 +177,43 @@ export async function POST(request: Request) {
     // Zod validation errors
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: error.flatten(), code: "VALIDATION_ERROR" }, { status: 400 });
+    }
+    // Unknown errors
+    if (error instanceof VideoRendererUnavailableError) {
+      if (idem.kind === "new") {
+        await completeIdempotentRequest({
+          userId: identity.userId,
+          path,
+          key: idempotencyKey.trim(),
+          responseStatus: 503,
+          responseJson: { error: error.message, code: "VIDEO_RENDER_UNAVAILABLE" },
+          status: "failed",
+        });
+      }
+      return NextResponse.json({ error: error.message, code: "VIDEO_RENDER_UNAVAILABLE" }, { status: 503 });
+    }
+    if (error instanceof VideoRenderFailedError) {
+      if (idem.kind === "new") {
+        await completeIdempotentRequest({
+          userId: identity.userId,
+          path,
+          key: idempotencyKey.trim(),
+          responseStatus: 500,
+          responseJson: { error: error.message, code: "VIDEO_RENDER_FAILED" },
+          status: "failed",
+        });
+      }
+      return NextResponse.json({ error: error.message, code: "VIDEO_RENDER_FAILED" }, { status: 500 });
+    }
+    if (idem.kind === "new") {
+      await completeIdempotentRequest({
+        userId: identity.userId,
+        path,
+        key: idempotencyKey.trim(),
+        responseStatus: 500,
+        responseJson: { error: error instanceof Error ? error.message : "Request failed", code: "REQUEST_FAILED" },
+        status: "failed",
+      });
     }
     return toErrorResponse(error);
   }
