@@ -1,0 +1,40 @@
+{
+  "name": "@cliploop/sdk",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "example:weekly-promo": "tsx examples/weekly-promo.ts"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  },
+  "engines": {
+    "node": ">=18.18"
+  },
+  "description": "ClipLoop TypeScript SDK for the Weekly Promo API and future video generation endpoints.",
+  "keywords": [
+    "cliploop",
+    "video",
+    "generation",
+    "sdk",
+    "api"
+  ],
+  "license": "UNLICENSED"
+}
