@@ -147,19 +147,12 @@ write('video-jobs', shell('Video Jobs', `<h1>Video Jobs</h1>
 <p><a href="/weekly-promo-api/">Weekly Promo API</a> · <a href="/rate-limits/">Rate Limits</a> · <a href="/roadmap/">Roadmap</a></p>`));
 
 write('sdks', shell('SDKs', `<h1>SDKs</h1>
-<p class="lead">Official SDKs are planned to make the ClipLoop API easier to use from code.</p>
-<h2 id="current-best-path">Current best path</h2>
-<p>Use <code>fetch</code> or <code>curl</code> directly. See the <a href="/quickstart/">Quickstart</a> or <a href="/examples/">Examples</a>.</p>
-<h2 id="planned-javascript-sdk">Planned JavaScript SDK</h2>
-<p>An official JavaScript/TypeScript SDK is the most likely first release.</p>
-<p><span style="color:var(--accent)">Coming soon</span> <code>npm install @cliploop/sdk</code> is not published yet. The package is tracked in the repo for now.</p>
-<p>Expected/base methods:</p>
-<ul>
-<li><code>generateWeeklyPromo()</code></li>
-<li><code>generateVideo()</code></li>
-<li><code>getJob()</code></li>
-<li><code>downloadArtifact()</code></li>
-</ul>
+<p class="lead">The official ClipLoop JavaScript/TypeScript SDK is live on npm.</p>
+<h2 id="official-typescript-sdk">Official TypeScript SDK</h2>
+<p><code>@cliploop/sdk</code> v0.1.0 is published on npm.</p>
+<p><a href="https://www.npmjs.com/package/@cliploop/sdk">View on npm →</a></p>
+<h2 id="installation">Installation</h2>
+<pre><code>npm install @cliploop/sdk</code></pre>
 <h2 id="usage">Usage</h2>
 <p class="callout"><span style="color:var(--accent)">Server-side only</span> Use this SDK from Node.js, backend jobs, or secure workers. Do not call it from browser apps that ship to end users, and never expose <code>CLIPLOOP_API_KEY</code> in frontend code.</p>
 <p>Set your API key in your environment:</p>
