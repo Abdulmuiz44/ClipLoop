@@ -18,6 +18,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
+    "prepack": "npm run build",
     "example:weekly-promo": "tsx examples/weekly-promo.ts"
   },
   "dependencies": {},
@@ -28,13 +29,30 @@
   "engines": {
     "node": ">=18.18"
   },
-  "description": "ClipLoop TypeScript SDK for the Weekly Promo API and future video generation endpoints.",
+  "description": "TypeScript SDK for the ClipLoop programmable video generation API.",
+  "homepage": "https://docs.cliploop.site/sdks/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/talocode/cliploop",
+    "directory": "packages/cliploop-sdk"
+  },
+  "bugs": {
+    "url": "https://github.com/talocode/cliploop/issues"
+  },
   "keywords": [
     "cliploop",
-    "video",
-    "generation",
+    "video-generation",
+    "video-api",
+    "ai-video",
     "sdk",
-    "api"
+    "typescript",
+    "talocode"
   ],
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "README.md",
+    "package.json"
+  ]
 }
