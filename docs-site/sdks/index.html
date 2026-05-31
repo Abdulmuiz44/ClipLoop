@@ -52,17 +52,46 @@
 <p>Use <code>fetch</code> or <code>curl</code> directly. See the <a href="/quickstart/">Quickstart</a> or <a href="/examples/">Examples</a>.</p>
 <h2 id="planned-javascript-sdk">Planned JavaScript SDK</h2>
 <p>An official JavaScript/TypeScript SDK is the most likely first release.</p>
-<p>Expected methods:</p>
+<p><span style="color:var(--accent)">Coming soon</span> <code>npm install @cliploop/sdk</code> is not published yet. The package is tracked in the repo for now.</p>
+<p>Expected/base methods:</p>
 <ul>
 <li><code>generateWeeklyPromo()</code></li>
 <li><code>generateVideo()</code></li>
 <li><code>getJob()</code></li>
 <li><code>downloadArtifact()</code></li>
 </ul>
-<h2 id="api-key">API key</h2>
-<p>Use the <code>CLIPLOOP_API_KEY</code> environment variable for local, server, and CI environments.</p>
+<h2 id="usage">Usage</h2>
+<p class="callout"><span style="color:var(--accent)">Server-side only</span> Use this SDK from Node.js, backend jobs, or secure workers. Do not call it from browser apps that ship to end users, and never expose <code>CLIPLOOP_API_KEY</code> in frontend code.</p>
+<p>Set your API key in your environment:</p>
+<pre><code>export CLIPLOOP_API_KEY="your-dashboard-api-key"</code></pre>
+<p>Then call the client:</p>
+<pre><code>import { ClipLoopClient } from "@cliploop/sdk";
+
+const client = new ClipLoopClient({
+  apiKey: process.env.CLIPLOOP_API_KEY
+});
+
+const result = await client.generateWeeklyPromo({
+  appName: "ClipLoop",
+  weeklyUpdate: "We shipped the first SDK foundation.",
+  channel: "x",
+  tone: "clear, sharp, builder focused",
+  appWebsiteUrl: "https://cliploop.site",
+  targetAudience: "indie app builders and SaaS founders",
+  callToAction: "Try ClipLoop"
+});
+
+console.log(result.artifactId);</code></pre>
+<h2 id="contract">Contract notes</h2>
+<ul>
+<li><code>channel</code> must be one of: <code>instagram</code>, <code>tiktok</code>, <code>whatsapp</code>, <code>x</code>.</li>
+<li><code>tone</code> is required.</li>
+<li><code>appWebsiteUrl</code> is optional. Omitted optional fields are not sent as <code>null</code>.</li>
+<li>Idempotency is handled automatically unless you pass <code>idempotencyKey</code>.</li>
+<li>The SDK calls <code>POST https://app.cliploop.site/api/public/weekly-promo</code>.</li>
+</ul>
 <h2 id="related">Related</h2>
-<p><a href="/cli/">CLI</a> · <a href="/quickstart/">Quickstart</a> · <a href="/weekly-promo-api/">Weekly Promo API</a></p>
+<p><a href="/cli/">CLI</a> · <a href="/quickstart/">Quickstart</a> · <a href="/weekly-promo-api/">Weekly Promo API</a> · <a href="/api-keys/">API Keys</a></p>
     <footer>
       <p style="display:flex; flex-wrap:wrap; gap:14px; align-items:center; justify-content:space-between">
         <span>© 2026 ClipLoop · Built by <a href="https://talocode.com" style="color:var(--text3)">Talocode</a></span>
