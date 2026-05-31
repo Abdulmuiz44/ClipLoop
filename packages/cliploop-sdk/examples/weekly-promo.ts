@@ -11,7 +11,7 @@ async function main() {
     weeklyUpdate: "Launched AI reminders.",
     targetAudience: "Indie founders",
     callToAction: "Try the beta",
-    channel: "LinkedIn",
+    channel: "x",
     tone: "Professional"
   });
 
