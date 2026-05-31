@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+<title>Video Jobs · ClipLoop Developer Docs</title>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<a href="#content" class="skip-link">Skip to content</a>
+<button class="mobile-toggle" aria-label="Open menu" onclick="document.getElementById('sidebar').classList.add('open');document.getElementById('overlay').classList.add('open')">☰</button>
+<div class="sidebar-overlay" id="overlay" onclick="document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('open')"></div>
+<nav class="sidebar" id="sidebar" aria-label="Docs navigation">
+  <div class="logo">
+    <div class="logo-mark">CL</div>
+    <div class="logo-text">ClipLoop<small>Developer Docs</small></div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-title">Getting Started</div>
+    <a href="/overview/" class="nav-link ">Overview</a>
+    <a href="/quickstart/" class="nav-link ">Quickstart</a>
+    <a href="/authentication/" class="nav-link ">Authentication</a>
+    <a href="/idempotency/" class="nav-link ">Idempotency</a>
+    <a href="/credits/" class="nav-link ">Credits & Billing</a>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-section">
+    <div class="nav-section-title">API Reference</div>
+    <a href="/weekly-promo-api/" class="nav-link ">Weekly Promo API</a>
+    <a href="/api-keys/" class="nav-link ">API Keys</a>
+    <a href="/rate-limits/" class="nav-link ">Rate Limits</a>
+    <a href="/video-jobs/" class="nav-link ">Video Jobs</a>
+    <a href="/sdks/" class="nav-link ">SDKs</a>
+    <a href="/cli/" class="nav-link ">CLI</a>
+    <a href="/examples/" class="nav-link ">Examples</a>
+    <a href="/errors/" class="nav-link ">Error Codes</a>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-section">
+    <div class="nav-section-title">More</div>
+    <a href="/roadmap/" class="nav-link ">Roadmap</a>
+    <a href="/changelog/" class="nav-link ">Changelog</a>
+    <a href="https://app.cliploop.site" class="nav-link">App Dashboard →</a>
+    <a href="https://cliploop.site" class="nav-link">Marketing Site →</a>
+  </div>
+</nav>
+<main class="main" id="content">
+  <div class="content">
+    <h1>Video Jobs</h1>
+<p class="lead">Future video generation will use an async job model for longer renders and more control.</p>
+<h2 id="what-is-changing">What is changing</h2>
+<p>The first generation endpoint, Weekly Promo API, returns a completed artifact inline. Future generic video generation likely will use a job model because longer renders need status tracking, queuing, and download flexibility.</p>
+<h2 id="job-flow">Job flow</h2>
+<p>When generic video jobs ship, the expected flow will follow a standard create, poll, download pattern:</p>
+<ul>
+<li>POST create job</li>
+<li>GET job status</li>
+<li>GET download or artifact</li>
+</ul>
+<h2 id="job-statuses">Job statuses</h2>
+<p>Planned status values:</p>
+<ul>
+<li><code>queued</code></li>
+<li><code>processing</code></li>
+<li><code>succeeded</code></li>
+<li><code>failed</code></li>
+<li><code>cancelled</code></li>
+</ul>
+<h2 id="why-jobs">Why jobs matter</h2>
+<p>Longer render times need more than an inline response. Jobs make timeout handling, progress tracking, and retries safer for production workflows.</p>
+<h2 id="webhooks">Webhooks</h2>
+<p class="callout"><span style="color:var(--accent)">Planned</span> Webhook delivery for job completion is planned, but not live yet.</p>
+<h2 id="related">Related</h2>
+<p><a href="/weekly-promo-api/">Weekly Promo API</a> · <a href="/rate-limits/">Rate Limits</a> · <a href="/roadmap/">Roadmap</a></p>
+    <footer>
+      <p style="display:flex; flex-wrap:wrap; gap:14px; align-items:center; justify-content:space-between">
+        <span>© 2026 ClipLoop · Built by <a href="https://talocode.com" style="color:var(--text3)">Talocode</a></span>
+        <span style="display:flex; gap:14px">
+          <a href="https://cliploop.site">Marketing</a>
+          <a href="https://app.cliploop.site">Dashboard</a>
+          <a href="https://github.com/talocode/cliploop">GitHub</a>
+        </span>
+      </p>
+    </footer>
+  </div>
+</main>
+<script>
+document.getElementById('overlay').addEventListener('click', function(){
+  document.getElementById('sidebar').classList.remove('open');
+  this.classList.remove('open');
+});
+</script>
+</body>
+</html>

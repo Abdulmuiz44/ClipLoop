@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-<title>[TITLE] · ClipLoop Developer Docs</title>
+<title>CLI · ClipLoop Developer Docs</title>
 <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
@@ -17,37 +17,55 @@
   </div>
   <div class="nav-section">
     <div class="nav-section-title">Getting Started</div>
-    <a href="/overview/" class="nav-link [OVERVIEW]">Overview</a>
-    <a href="/quickstart/" class="nav-link [QUICKSTART]">Quickstart</a>
-    <a href="/authentication/" class="nav-link [AUTH]">Authentication</a>
-    <a href="/idempotency/" class="nav-link [IDEMPOTENCY]">Idempotency</a>
-    <a href="/credits/" class="nav-link [CREDITS]">Credits & Billing</a>
+    <a href="/overview/" class="nav-link ">Overview</a>
+    <a href="/quickstart/" class="nav-link ">Quickstart</a>
+    <a href="/authentication/" class="nav-link ">Authentication</a>
+    <a href="/idempotency/" class="nav-link ">Idempotency</a>
+    <a href="/credits/" class="nav-link ">Credits & Billing</a>
   </div>
   <div class="nav-divider"></div>
   <div class="nav-section">
     <div class="nav-section-title">API Reference</div>
-    <a href="/weekly-promo-api/" class="nav-link [WEEKLY]">Weekly Promo API</a>
-    <a href="/api-keys/" class="nav-link [APIKEYS]">API Keys</a>
-    <a href="/rate-limits/" class="nav-link [RATELIMIT]">Rate Limits</a>
-    <a href="/video-jobs/" class="nav-link [VIDEOJOBS]">Video Jobs</a>
-    <a href="/sdks/" class="nav-link [SDKS]">SDKs</a>
-    <a href="/cli/" class="nav-link [CLI]">CLI</a>
-    <a href="/examples/" class="nav-link [EXAMPLES]">Examples</a>
-    <a href="/errors/" class="nav-link [ERRORS]">Error Codes</a>
+    <a href="/weekly-promo-api/" class="nav-link ">Weekly Promo API</a>
+    <a href="/api-keys/" class="nav-link ">API Keys</a>
+    <a href="/rate-limits/" class="nav-link ">Rate Limits</a>
+    <a href="/video-jobs/" class="nav-link ">Video Jobs</a>
+    <a href="/sdks/" class="nav-link ">SDKs</a>
+    <a href="/cli/" class="nav-link ">CLI</a>
+    <a href="/examples/" class="nav-link ">Examples</a>
+    <a href="/errors/" class="nav-link ">Error Codes</a>
   </div>
   <div class="nav-divider"></div>
   <div class="nav-section">
     <div class="nav-section-title">More</div>
-    <a href="/roadmap/" class="nav-link [ROADMAP]">Roadmap</a>
-    <a href="/changelog/" class="nav-link [CHANGELOG]">Changelog</a>
+    <a href="/roadmap/" class="nav-link ">Roadmap</a>
+    <a href="/changelog/" class="nav-link ">Changelog</a>
     <a href="https://app.cliploop.site" class="nav-link">App Dashboard →</a>
     <a href="https://cliploop.site" class="nav-link">Marketing Site →</a>
   </div>
 </nav>
 <main class="main" id="content">
   <div class="content">
-    [BREADCRUMB]
-    [BODY]
+    <h1>CLI</h1>
+<p class="lead">A ClipLoop CLI is planned for terminals, scripts, and release workflows.</p>
+<h2 id="planned-commands">Planned commands</h2>
+<p class="callout"><span style="color:var(--accent)">Planned</span> The CLI is planned, but not live yet.</p>
+<ul>
+<li><code>cliploop login</code></li>
+<li><code>cliploop generate</code></li>
+<li><code>cliploop jobs</code></li>
+<li><code>cliploop download</code></li>
+</ul>
+<h2 id="server-and-ci">Server and CI usage</h2>
+<p>For automation, set <code>CLIPLOOP_API_KEY</code> in your environment instead of interactive login. This works for backend jobs, CI pipelines, and short release workflows.</p>
+<h2 id="useful-for">Useful for</h2>
+<ul>
+<li>Indie builders iterating in terminals.</li>
+<li>Release workflows that generate promos before deploy.</li>
+<li>Automations that need simple, scripted API access.</li>
+</ul>
+<h2 id="related">Related</h2>
+<p><a href="/weekly-promo-api/">Weekly Promo API</a> · <a href="/sdks/">SDKs</a> · <a href="/video-jobs/">Video Jobs</a></p>
     <footer>
       <p style="display:flex; flex-wrap:wrap; gap:14px; align-items:center; justify-content:space-between">
         <span>© 2026 ClipLoop · Built by <a href="https://talocode.com" style="color:var(--text3)">Talocode</a></span>

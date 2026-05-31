@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+<title>API Keys · ClipLoop Developer Docs</title>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<a href="#content" class="skip-link">Skip to content</a>
+<button class="mobile-toggle" aria-label="Open menu" onclick="document.getElementById('sidebar').classList.add('open');document.getElementById('overlay').classList.add('open')">☰</button>
+<div class="sidebar-overlay" id="overlay" onclick="document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('open')"></div>
+<nav class="sidebar" id="sidebar" aria-label="Docs navigation">
+  <div class="logo">
+    <div class="logo-mark">CL</div>
+    <div class="logo-text">ClipLoop<small>Developer Docs</small></div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-title">Getting Started</div>
+    <a href="/overview/" class="nav-link ">Overview</a>
+    <a href="/quickstart/" class="nav-link ">Quickstart</a>
+    <a href="/authentication/" class="nav-link ">Authentication</a>
+    <a href="/idempotency/" class="nav-link ">Idempotency</a>
+    <a href="/credits/" class="nav-link ">Credits & Billing</a>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-section">
+    <div class="nav-section-title">API Reference</div>
+    <a href="/weekly-promo-api/" class="nav-link ">Weekly Promo API</a>
+    <a href="/api-keys/" class="nav-link ">API Keys</a>
+    <a href="/rate-limits/" class="nav-link ">Rate Limits</a>
+    <a href="/video-jobs/" class="nav-link ">Video Jobs</a>
+    <a href="/sdks/" class="nav-link ">SDKs</a>
+    <a href="/cli/" class="nav-link ">CLI</a>
+    <a href="/examples/" class="nav-link ">Examples</a>
+    <a href="/errors/" class="nav-link ">Error Codes</a>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-section">
+    <div class="nav-section-title">More</div>
+    <a href="/roadmap/" class="nav-link ">Roadmap</a>
+    <a href="/changelog/" class="nav-link ">Changelog</a>
+    <a href="https://app.cliploop.site" class="nav-link">App Dashboard →</a>
+    <a href="https://cliploop.site" class="nav-link">Marketing Site →</a>
+  </div>
+</nav>
+<main class="main" id="content">
+  <div class="content">
+    <h1>API Keys</h1>
+<p class="lead">ClipLoop API keys follow a simple creation, usage, and rotation model.</p>
+<h2 id="creating-keys">Creating keys</h2>
+<p>Create API keys in the dashboard: <a href="https://app.cliploop.site/dashboard/settings/api-keys">https://app.cliploop.site/dashboard/settings/api-keys</a>.</p>
+<p>When creating a key, assign only the minimum scopes your use case needs. The Weekly Promo API requires the <code>weekly_promo:generate</code> scope.</p>
+<h2 id="treating-keys-like-secrets">Treating keys like secrets</h2>
+<p class="callout">ClipLoop shows each key once on creation. After that, you will only ever see its prefix in the dashboard again.</p>
+<p>Revealing the full key value is intentionally disabled to limit leak blast radius. If you lose the full value, revoke the old key and create a new one.</p>
+<h2 id="revocation">Revocation</h2>
+<p>Revoke keys when they are no longer needed. A revoked key fails immediately, so rotate gracefully if downstream services depend on it.</p>
+<h2 id="allowed-use">Allowed use</h2>
+<p>Use API keys only from server-side code, backend jobs, CLIs, or secure workers. Never expose API keys in frontend apps, mobile bundles, public repositories, or client-side JavaScript.</p>
+<h2 id="related">Related</h2>
+<p><a href="/authentication/">Authentication</a> · <a href="/quickstart/">Quickstart</a> · <a href="/credits/">Credits & Billing</a></p>
+    <footer>
+      <p style="display:flex; flex-wrap:wrap; gap:14px; align-items:center; justify-content:space-between">
+        <span>© 2026 ClipLoop · Built by <a href="https://talocode.com" style="color:var(--text3)">Talocode</a></span>
+        <span style="display:flex; gap:14px">
+          <a href="https://cliploop.site">Marketing</a>
+          <a href="https://app.cliploop.site">Dashboard</a>
+          <a href="https://github.com/talocode/cliploop">GitHub</a>
+        </span>
+      </p>
+    </footer>
+  </div>
+</main>
+<script>
+document.getElementById('overlay').addEventListener('click', function(){
+  document.getElementById('sidebar').classList.remove('open');
+  this.classList.remove('open');
+});
+</script>
+</body>
+</html>

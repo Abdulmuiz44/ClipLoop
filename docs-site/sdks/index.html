@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-<title>[TITLE] · ClipLoop Developer Docs</title>
+<title>SDKs · ClipLoop Developer Docs</title>
 <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
@@ -17,37 +17,52 @@
   </div>
   <div class="nav-section">
     <div class="nav-section-title">Getting Started</div>
-    <a href="/overview/" class="nav-link [OVERVIEW]">Overview</a>
-    <a href="/quickstart/" class="nav-link [QUICKSTART]">Quickstart</a>
-    <a href="/authentication/" class="nav-link [AUTH]">Authentication</a>
-    <a href="/idempotency/" class="nav-link [IDEMPOTENCY]">Idempotency</a>
-    <a href="/credits/" class="nav-link [CREDITS]">Credits & Billing</a>
+    <a href="/overview/" class="nav-link ">Overview</a>
+    <a href="/quickstart/" class="nav-link ">Quickstart</a>
+    <a href="/authentication/" class="nav-link ">Authentication</a>
+    <a href="/idempotency/" class="nav-link ">Idempotency</a>
+    <a href="/credits/" class="nav-link ">Credits & Billing</a>
   </div>
   <div class="nav-divider"></div>
   <div class="nav-section">
     <div class="nav-section-title">API Reference</div>
-    <a href="/weekly-promo-api/" class="nav-link [WEEKLY]">Weekly Promo API</a>
-    <a href="/api-keys/" class="nav-link [APIKEYS]">API Keys</a>
-    <a href="/rate-limits/" class="nav-link [RATELIMIT]">Rate Limits</a>
-    <a href="/video-jobs/" class="nav-link [VIDEOJOBS]">Video Jobs</a>
-    <a href="/sdks/" class="nav-link [SDKS]">SDKs</a>
-    <a href="/cli/" class="nav-link [CLI]">CLI</a>
-    <a href="/examples/" class="nav-link [EXAMPLES]">Examples</a>
-    <a href="/errors/" class="nav-link [ERRORS]">Error Codes</a>
+    <a href="/weekly-promo-api/" class="nav-link ">Weekly Promo API</a>
+    <a href="/api-keys/" class="nav-link ">API Keys</a>
+    <a href="/rate-limits/" class="nav-link ">Rate Limits</a>
+    <a href="/video-jobs/" class="nav-link ">Video Jobs</a>
+    <a href="/sdks/" class="nav-link ">SDKs</a>
+    <a href="/cli/" class="nav-link ">CLI</a>
+    <a href="/examples/" class="nav-link ">Examples</a>
+    <a href="/errors/" class="nav-link ">Error Codes</a>
   </div>
   <div class="nav-divider"></div>
   <div class="nav-section">
     <div class="nav-section-title">More</div>
-    <a href="/roadmap/" class="nav-link [ROADMAP]">Roadmap</a>
-    <a href="/changelog/" class="nav-link [CHANGELOG]">Changelog</a>
+    <a href="/roadmap/" class="nav-link ">Roadmap</a>
+    <a href="/changelog/" class="nav-link ">Changelog</a>
     <a href="https://app.cliploop.site" class="nav-link">App Dashboard →</a>
     <a href="https://cliploop.site" class="nav-link">Marketing Site →</a>
   </div>
 </nav>
 <main class="main" id="content">
   <div class="content">
-    [BREADCRUMB]
-    [BODY]
+    <h1>SDKs</h1>
+<p class="lead">Official SDKs are planned to make the ClipLoop API easier to use from code.</p>
+<h2 id="current-best-path">Current best path</h2>
+<p>Use <code>fetch</code> or <code>curl</code> directly. See the <a href="/quickstart/">Quickstart</a> or <a href="/examples/">Examples</a>.</p>
+<h2 id="planned-javascript-sdk">Planned JavaScript SDK</h2>
+<p>An official JavaScript/TypeScript SDK is the most likely first release.</p>
+<p>Expected methods:</p>
+<ul>
+<li><code>generateWeeklyPromo()</code></li>
+<li><code>generateVideo()</code></li>
+<li><code>getJob()</code></li>
+<li><code>downloadArtifact()</code></li>
+</ul>
+<h2 id="api-key">API key</h2>
+<p>Use the <code>CLIPLOOP_API_KEY</code> environment variable for local, server, and CI environments.</p>
+<h2 id="related">Related</h2>
+<p><a href="/cli/">CLI</a> · <a href="/quickstart/">Quickstart</a> · <a href="/weekly-promo-api/">Weekly Promo API</a></p>
     <footer>
       <p style="display:flex; flex-wrap:wrap; gap:14px; align-items:center; justify-content:space-between">
         <span>© 2026 ClipLoop · Built by <a href="https://talocode.com" style="color:var(--text3)">Talocode</a></span>
