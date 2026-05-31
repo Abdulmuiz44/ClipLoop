@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+<title>Video Jobs · ClipLoop Developer Docs</title>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<div class="container">
+  <nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">Docs</a> <span aria-hidden="true">/</span> Video Jobs</nav>
+  <h1>Video Jobs</h1>
+<p class="lead">Future video generation will use an async job model for longer renders and more control.</p>
+<h2 id="what-is-changing">What is changing</h2>
+<p>The first generation endpoint, Weekly Promo API, returns a completed artifact inline. Future generic video generation likely will use a job model because longer renders need status tracking, queuing, and download flexibility.</p>
+<h2 id="job-flow">Job flow</h2>
+<p>When generic video jobs ship, the expected flow will follow a standard create, poll, download pattern:</p>
+<ul>
+<li>POST create job</li>
+<li>GET job status</li>
+<li>GET download or artifact</li>
+</ul>
+<h2 id="job-statuses">Job statuses</h2>
+<p>Planned status values:</p>
+<ul>
+<li><code>queued</code></li>
+<li><code>processing</code></li>
+<li><code>succeeded</code></li>
+<li><code>failed</code></li>
+<li><code>cancelled</code></li>
+</ul>
+<h2 id="why-jobs">Why jobs matter</h2>
+<p>Longer render times need more than an inline response. Jobs make timeout handling, progress tracking, and retries safer for production workflows.</p>
+<h2 id="webhooks">Webhooks</h2>
+<p class="callout"><span style="color:var(--accent)">Planned</span> Webhook delivery for job completion is planned, but not live yet.</p>
+<h2 id="related">Related</h2>
+<p><a href="/weekly-promo-api/">Weekly Promo API</a> · <a href="/rate-limits/">Rate Limits</a> · <a href="/roadmap/">Roadmap</a></p>
+  <footer>
+    <p>
+      <span>© 2026 ClipLoop · Built by <a href="https://talocode.com" style="color:var(--text3)">Talocode</a></span>
+      <span>
+        <a href="https://cliploop.site">Marketing</a> ·
+        <a href="https://app.cliploop.site">Dashboard</a> ·
+        <a href="https://github.com/talocode/cliploop">GitHub</a>
+      </span>
+    </p>
+  </footer>
+</div>
+</body>
+</html>

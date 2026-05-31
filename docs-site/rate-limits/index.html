@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+<title>Rate Limits · ClipLoop Developer Docs</title>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<div class="container">
+  <nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">Docs</a> <span aria-hidden="true">/</span> Rate Limits</nav>
+  <h1>Rate Limits</h1>
+<p class="lead">Rate limits protect rendering credits, queue capacity, and platform stability.</p>
+<h2 id="current-model">Current model</h2>
+<p>ClipLoop applies rate limits at the account and key scope level to prevent runaway usage, render bursts, and abuse. Safe usage patterns still work well for normal builders and automation workflows.</p>
+<h2 id="429-behavior">429 behavior</h2>
+<p>When you exceed a limit, the API returns <code>429 Too Many Requests</code>. Retry only after the indicated retry window, or use exponential backoff.</p>
+<h2 id="safe-retries">Safe retries</h2>
+<p>Combine retries with an <code>Idempotency-Key</code> so retries do not create duplicate generation requests. See <a href="/idempotency/">Idempotency</a> for the exact header format.</p>
+<h2 id="avoiding-duplicates">Avoiding duplicates</h2>
+<p>Do not fire multiple parallel requests for the same campaign or asset. Parallel duplicate generation can consume extra credits and queue slots without delivering additional value.</p>
+<h2 id="best-practices">Best practices</h2>
+<ul>
+<li>Respect production endpoints as shared capacity.</li>
+<li>Use backoff for recovery, not as a performance strategy.</li>
+<li>Prefer caching and deduping over retry storms.</li>
+</ul>
+<h2 id="related">Related</h2>
+<p><a href="/weekly-promo-api/">Weekly Promo API</a> · <a href="/idempotency/">Idempotency</a></p>
+  <footer>
+    <p>
+      <span>© 2026 ClipLoop · Built by <a href="https://talocode.com" style="color:var(--text3)">Talocode</a></span>
+      <span>
+        <a href="https://cliploop.site">Marketing</a> ·
+        <a href="https://app.cliploop.site">Dashboard</a> ·
+        <a href="https://github.com/talocode/cliploop">GitHub</a>
+      </span>
+    </p>
+  </footer>
+</div>
+</body>
+</html>
