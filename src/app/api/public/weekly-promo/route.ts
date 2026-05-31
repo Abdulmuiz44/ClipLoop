@@ -45,7 +45,35 @@ function logWeeklyPromoError(context: {
   console.log("[weekly-promo][error]", JSON.stringify(safe));
 }
 
+function buildErrorBody(params: {
+  code: string;
+  message: string;
+  debugMode: boolean;
+  extra?: Record<string, unknown>;
+}) {
+  const base = { error: params.message, code: params.code };
+
+  if (!params.debugMode) {
+    return base;
+  }
+
+  return {
+    ...base,
+    debug: {
+      route: "public-weekly-promo",
+      code: params.code,
+      status: 500,
+      errorName: "Error",
+      safeMessage: params.message,
+      secretsExposed: false,
+      ...params.extra,
+    },
+  };
+}
+
 export async function POST(request: Request) {
+  const debugMode = request.headers.get("x-cliploop-debug") === "safe";
+
   try {
     // 1. Authenticate via API key
     const identity = await requireApiKeyIdentity(request);
@@ -223,7 +251,17 @@ export async function POST(request: Request) {
           status: "failed",
         });
       }
-      return NextResponse.json({ error: error.message, code: "VIDEO_RENDER_UNAVAILABLE" }, { status: 503 });
+      const body = buildErrorBody({
+        code: "VIDEO_RENDER_UNAVAILABLE",
+        message: error.message,
+        debugMode,
+        extra: {
+          errorName: error.name,
+          idempotencyKeyPrefix: idempotencyKey.trim().slice(0, 12),
+          idempotencyCleanupRan: idem.kind === "new",
+        },
+      });
+      return NextResponse.json(body, { status: 503 });
     }
     if (error instanceof VideoRenderFailedError) {
       logWeeklyPromoError({
@@ -244,7 +282,17 @@ export async function POST(request: Request) {
           status: "failed",
         });
       }
-      return NextResponse.json({ error: error.message, code: "VIDEO_RENDER_FAILED" }, { status: 500 });
+      const body = buildErrorBody({
+        code: "VIDEO_RENDER_FAILED",
+        message: error.message,
+        debugMode,
+        extra: {
+          errorName: error.name,
+          idempotencyKeyPrefix: idempotencyKey.trim().slice(0, 12),
+          idempotencyCleanupRan: idem.kind === "new",
+        },
+      });
+      return NextResponse.json(body, { status: 500 });
     }
     if (idem.kind === "new") {
       await completeIdempotentRequest({
@@ -264,6 +312,17 @@ export async function POST(request: Request) {
       message: error instanceof Error ? error.message : "Request failed",
       idempotencyCleanupRan: idem.kind === "new",
     });
-    return toErrorResponse(error);
+    const message = error instanceof Error ? error.message : "Request failed";
+    const body = buildErrorBody({
+      code: "REQUEST_FAILED",
+      message,
+      debugMode,
+      extra: {
+        errorName: error instanceof Error ? error.name : "Error",
+        idempotencyKeyPrefix: idempotencyKey.trim().slice(0, 12),
+        idempotencyCleanupRan: idem.kind === "new",
+      },
+    });
+    return NextResponse.json(body, { status: 500 });
   }
 }
