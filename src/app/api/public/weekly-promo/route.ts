@@ -108,6 +108,8 @@ export async function POST(request: Request) {
 
 async function handleWeeklyPromoPost(request: Request) {
   const debugMode = request.headers.get("x-cliploop-debug") === "safe";
+  let idempotencyKeyForDebug: string | null = null;
+  let idempotencyKey: string | null = null;
 
   console.log(
     JSON.stringify({
@@ -137,7 +139,8 @@ async function handleWeeklyPromoPost(request: Request) {
     }
 
     // 4. Idempotency key — require before body parsing
-    const idempotencyKey = request.headers.get("Idempotency-Key") || request.headers.get("idempotency-key");
+    idempotencyKey = request.headers.get("Idempotency-Key") || request.headers.get("idempotency-key");
+    idempotencyKeyForDebug = idempotencyKey;
     if (!idempotencyKey || idempotencyKey.trim().length < 8) {
       throw new IdempotencyKeyRequiredError();
     }
