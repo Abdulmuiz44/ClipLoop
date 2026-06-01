@@ -72,7 +72,52 @@ function buildErrorBody(params: {
 }
 
 export async function POST(request: Request) {
+  try {
+    return await handleWeeklyPromoPost(request);
+  } catch (error) {
+    const debugMode = request.headers.get("x-cliploop-debug") === "safe";
+    const idempotencyKey = request.headers.get("Idempotency-Key") || request.headers.get("idempotency-key");
+    if (idempotencyKey && idempotencyKey.trim().length >= 8) {
+      // Best-effort idempotency cleanup; swallow secondary failures safely.
+      try {
+        const { completeIdempotentRequest } = await import("@/lib/public-api/idempotency");
+        await completeIdempotentRequest({
+          userId: "unknown",
+          path: "/api/public/weekly-promo",
+          key: idempotencyKey.trim(),
+          responseStatus: 500,
+          responseJson: { error: "Request failed.", code: "REQUEST_FAILED" },
+          status: "failed",
+        });
+      } catch {
+        // ignore cleanup failures in outermost catch
+      }
+    }
+    const body = buildErrorBody({
+      code: "REQUEST_FAILED",
+      message: error instanceof Error ? error.message : "Request failed",
+      debugMode,
+      extra: {
+        errorName: error instanceof Error ? error.name : "Error",
+        idempotencyKeyPrefix: idempotencyKey ? idempotencyKey.trim().slice(0, 12) : undefined,
+      },
+    });
+    return NextResponse.json(body, { status: 500 });
+  }
+}
+
+async function handleWeeklyPromoPost(request: Request) {
   const debugMode = request.headers.get("x-cliploop-debug") === "safe";
+
+  console.log(
+    JSON.stringify({
+      route: "public-weekly-promo",
+      event: "post_handler_started",
+      idempotencyKeyPrefix: (request.headers.get("Idempotency-Key") || "").slice(0, 12) || undefined,
+      debugMode,
+      secretsExposed: false,
+    }),
+  );
 
   try {
     // 1. Authenticate via API key
