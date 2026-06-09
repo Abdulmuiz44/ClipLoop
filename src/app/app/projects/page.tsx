@@ -10,11 +10,11 @@ export default async function ProjectsPage() {
   const projects = await listProjectsForUser(user.id);
 
   return (
-    <StudioShell title="Projects" subtitle="Your business and creator workspaces.">
+    <StudioShell title="Projects" subtitle="Your single active workspace for the MVP loop.">
       {projects.length === 0 ? (
         <div className="cl-card p-8 text-center">
           <p className="text-lg font-semibold text-slate-900">No projects yet</p>
-          <p className="mt-2 text-sm text-slate-600">Create your first project to unlock strategy, generation, and rendering.</p>
+          <p className="mt-2 text-sm text-slate-600">Create your first project to unlock the weekly Instagram pack.</p>
           <Link href="/dashboard/projects/new" className="mt-4 inline-flex rounded-lg bg-slate-900 px-4 py-2 text-sm text-white">Create project</Link>
         </div>
       ) : (

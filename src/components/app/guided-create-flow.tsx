@@ -25,8 +25,7 @@ type ResultData = {
 const VIDEO_CREDIT_COST = 2;
 
 function makeBrief(prompt: string): Brief {
-  const lower = prompt.toLowerCase();
-  const targetChannel = lower.includes("tiktok") ? "tiktok" : lower.includes("whatsapp") ? "whatsapp" : "instagram";
+  const targetChannel = "instagram";
   return {
     targetChannel,
     tone: "confident, clear, conversion-focused",
@@ -116,7 +115,7 @@ export function GuidedCreateFlow({ hasLowCredits }: { hasLowCredits: boolean }) 
         <h2 className="mt-1 text-lg font-semibold text-slate-900">Describe the promo concept</h2>
         <textarea
           className="cl-textarea mt-3"
-          placeholder="Example: Create a 15s TikTok promo for our new spring skincare bundle for busy professionals."
+          placeholder="Example: Create a 15s Instagram promo for our new spring skincare bundle for busy professionals."
           value={roughPrompt}
           onChange={(event) => setRoughPrompt(event.target.value)}
         />
@@ -139,8 +138,6 @@ export function GuidedCreateFlow({ hasLowCredits }: { hasLowCredits: boolean }) 
             <Field label="Target channel">
               <select className="cl-select" value={brief.targetChannel} onChange={(e) => setBrief({ ...brief, targetChannel: e.target.value as Brief["targetChannel"] })}>
                 <option value="instagram">Instagram</option>
-                <option value="tiktok">TikTok</option>
-                <option value="whatsapp">WhatsApp</option>
               </select>
             </Field>
             <Field label="Duration">

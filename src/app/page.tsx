@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AccessRequestForm } from "@/components/marketing/access-request-form";
+import { MvpContractBanner } from "@/components/app/mvp-contract-banner";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
@@ -8,24 +9,24 @@ export const metadata: Metadata = {
 
 const pillars = [
   {
-    title: "Plan with context",
-    body: "ClipLoop ingests your website and business profile, then assembles reusable project context for each cycle.",
+    title: "One project",
+    body: "ClipLoop starts with a single active workspace so every strategy cycle stays tied to one product story.",
   },
   {
-    title: "Generate with control",
-    body: "Chat-first creation with structured strategy, copy generation, and render controls under one operator surface.",
+    title: "One channel",
+    body: "Instagram is the MVP publishing target while generation, rendering, and tracking stay opinionated.",
   },
   {
-    title: "Ship and learn",
-    body: "Approve assets, push to queue, and iterate from tracked performance data and credit-backed workflows.",
+    title: "One weekly pack",
+    body: "Build a five-post pack each week, ship it, and improve from the results instead of expanding scope too early.",
   },
 ];
 
 const steps = [
-  "Capture business context and website signals",
-  "Generate strategy and content items for the week",
-  "Render short-form assets and review outputs",
-  "Export or publish and measure conversions",
+  "Create one active project with clear product context",
+  "Generate a five-post weekly pack from that project",
+  "Render and review the Instagram-ready assets",
+  "Publish, track, and feed the winner back into next week",
 ];
 
 export default function HomePage() {
@@ -37,9 +38,9 @@ export default function HomePage() {
         <div className="relative grid gap-8 md:grid-cols-[1.1fr_0.9fr]">
           <div className="space-y-5">
             <p className="cl-kicker">ClipLoop Platform</p>
-            <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-slate-900 md:text-5xl">Build weekly growth assets without rebuilding your workflow every week.</h1>
+            <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-slate-900 md:text-5xl">Run one focused weekly promo loop from a single project.</h1>
             <p className="max-w-2xl text-base leading-7 text-slate-600">
-              ClipLoop is a creative video operating system for businesses and creators: context assembly, planning, generation, rendering, and delivery in one controlled loop.
+              ClipLoop starts with one active workspace, one Instagram channel, and one five-post pack so you can ship, measure, and improve without extra setup.
             </p>
             <div className="flex flex-wrap gap-3">
               <Link href="/app" className="inline-flex rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-500">
@@ -66,6 +67,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <MvpContractBanner />
 
       <section className="grid gap-4 md:grid-cols-3">
         {pillars.map((pillar) => (

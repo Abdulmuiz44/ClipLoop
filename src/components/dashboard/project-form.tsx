@@ -169,19 +169,12 @@ export function ProjectForm() {
         </div>
         <fieldset className="space-y-2">
           <legend className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Preferred channels</legend>
-          <div className="grid gap-2 sm:grid-cols-3">
-            <label className="flex items-center gap-2 rounded-xl border bg-white p-3 cl-divider transition hover:bg-slate-50 cursor-pointer">
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+            <label className="flex items-center gap-2 text-sm font-medium text-slate-900">
               <input type="checkbox" name="preferredChannels" value="instagram" defaultChecked />
-              <span className="text-sm font-medium">Instagram</span>
+              Instagram
             </label>
-            <label className="flex items-center gap-2 rounded-xl border bg-white p-3 cl-divider transition hover:bg-slate-50 cursor-pointer">
-              <input type="checkbox" name="preferredChannels" value="tiktok" />
-              <span className="text-sm font-medium">TikTok</span>
-            </label>
-            <label className="flex items-center gap-2 rounded-xl border bg-white p-3 cl-divider transition hover:bg-slate-50 cursor-pointer">
-              <input type="checkbox" name="preferredChannels" value="whatsapp" />
-              <span className="text-sm font-medium">WhatsApp</span>
-            </label>
+            <p className="mt-2 text-xs leading-5 text-slate-500">MVP ships with Instagram first. Other channels stay in the plan, not in the default path.</p>
           </div>
         </fieldset>
         <div className="grid gap-4 md:grid-cols-2">
