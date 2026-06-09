@@ -1,6 +1,5 @@
 // Create an API key for E2E testing using the project's DB connection
-import { db } from "@/lib/db";
-import { schema } from "@/lib/db/schema";
+import { db, schema } from "@/lib/db";
 import { eq } from "drizzle-orm";
 import { createApiKey } from "@/domains/api-keys/service";
 

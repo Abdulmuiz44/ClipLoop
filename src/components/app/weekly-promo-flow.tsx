@@ -152,10 +152,8 @@ export function WeeklyPromoFlow({ recentPromos = [] }: { recentPromos?: RecentWe
           <Field label="Channel">
             <select className="cl-select" value={channel} onChange={(e) => setChannel(e.target.value as Channel)}>
               <option value="instagram">Instagram</option>
-              <option value="x">X</option>
-              <option value="tiktok">TikTok</option>
-              <option value="whatsapp">WhatsApp</option>
             </select>
+            <p className="mt-1 text-xs text-slate-500">MVP ships with Instagram only.</p>
           </Field>
           <Field label="Tone">
             <input className="cl-input" value={tone} onChange={(e) => setTone(e.target.value)} required />

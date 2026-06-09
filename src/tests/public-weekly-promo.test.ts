@@ -237,7 +237,7 @@ function buildTestErrorBody(params: {
   message: string;
   debugMode: boolean;
   extra?: Record<string, unknown>;
-}) {
+}) : any {
   const base = { error: params.message, code: params.code };
 
   if (!params.debugMode) {

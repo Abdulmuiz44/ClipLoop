@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode, useMemo, useState } from "react";
+import { MvpContractBanner } from "@/components/app/mvp-contract-banner";
 import { ClipLoopLogo } from "@/components/ui/cliploop-logo";
 import { signOutUser } from "@/lib/auth/actions";
 
@@ -75,11 +76,8 @@ const primaryNav: NavItem[] = [
   { href: "/app", label: "Home", icon: <NavIcon>{icons.home}</NavIcon> },
   { href: "/app/create", label: "Create", icon: <NavIcon>{icons.spark}</NavIcon> },
   { href: "/app/projects", label: "Projects", icon: <NavIcon>{icons.folder}</NavIcon> },
-  { href: "/dashboard/analytics", label: "Analytics", icon: <NavIcon>{icons.chart}</NavIcon> },
-  { href: "/dashboard/manual-queue", label: "Manual Queue", icon: <NavIcon>{icons.list}</NavIcon> },
-  { href: "/dashboard/business", label: "Brand Kit", icon: <NavIcon>{icons.bag}</NavIcon> },
-  { href: "/app/weekly-promo", label: "Templates", icon: <NavIcon>{icons.layout}</NavIcon> },
-  { href: "/app/chats", label: "Inspiration", icon: <NavIcon>{icons.bulb}</NavIcon> },
+  { href: "/app/chats", label: "Chats", icon: <NavIcon>{icons.bulb}</NavIcon> },
+  { href: "/app/weekly-promo", label: "Weekly Promo", icon: <NavIcon>{icons.layout}</NavIcon> },
   { href: "/dashboard/settings", label: "Settings", icon: <NavIcon>{icons.settings}</NavIcon> },
   { href: "/app/settings/api-keys", label: "API Keys", icon: <NavIcon>{icons.settings}</NavIcon> },
 ];
@@ -126,6 +124,26 @@ export function StudioShell({
           Create New
           <span className="ml-1 text-slate-500">✦</span>
         </Link>
+
+        <div className="mt-4 rounded-2xl border border-slate-800 bg-[#0b1020] p-4 text-slate-200">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-400">MVP lock</p>
+          <p className="mt-2 text-sm font-semibold text-white">One project. One channel. One weekly pack.</p>
+          <p className="mt-1 text-xs leading-5 text-slate-400">The product stays focused until the full weekly growth loop proves out.</p>
+          <div className="mt-3 grid gap-2">
+            <div className="flex items-center justify-between rounded-xl bg-white/5 px-3 py-2 text-xs">
+              <span className="text-slate-400">Projects</span>
+              <span className="font-medium text-white">1</span>
+            </div>
+            <div className="flex items-center justify-between rounded-xl bg-white/5 px-3 py-2 text-xs">
+              <span className="text-slate-400">Channel</span>
+              <span className="font-medium text-white">Instagram</span>
+            </div>
+            <div className="flex items-center justify-between rounded-xl bg-white/5 px-3 py-2 text-xs">
+              <span className="text-slate-400">Weekly pack</span>
+              <span className="font-medium text-white">5 posts</span>
+            </div>
+          </div>
+        </div>
 
         <nav className="mt-5 space-y-1.5">
           {primaryNav.map((item) => {
@@ -230,6 +248,9 @@ export function StudioShell({
         </header>
 
         <main className="p-4 md:p-6">
+          <div className="mb-5 md:mb-6">
+            <MvpContractBanner />
+          </div>
           {children}
           <footer className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-4 text-xs text-slate-500 dark:border-slate-800">
             <p>© 2026 ClipLoop. All rights reserved.</p>

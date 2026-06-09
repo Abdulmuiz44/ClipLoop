@@ -3,6 +3,7 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 
 import { generateStructuredObject } from "@/lib/llm";
+import { prepareRenderOutput } from "@/lib/render/storage";
 import { extractWebsiteText } from "@/lib/business/extractWebsiteText";
 import { generateScenePlan } from "@/lib/prompts/scenePlanner";
 import type { SceneBlock } from "@/lib/render/hyperframes/types";

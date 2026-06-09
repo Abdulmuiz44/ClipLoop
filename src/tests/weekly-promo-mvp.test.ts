@@ -20,7 +20,7 @@ test("weekly promo falls back when website scraping fails", async () => {
     extractWebsiteTextFn: async () => {
       throw new Error("Network timeout");
     },
-    generateStructuredObjectFn: (async ({ schema, prompt }) => {
+    generateStructuredObjectFn: (async ({ schema, prompt }: { schema: { parse: (value: unknown) => any }; prompt: string }) => {
       if (prompt.includes("Create a short weekly promo script")) {
         return schema.parse({
           hook: "Big update this week",
@@ -72,7 +72,7 @@ test("weekly promo script prompt keeps weekly update as primary topic and includ
       websiteUrl: "https://cliploop.ai",
       extractedText: "ClipLoop helps teams create weekly short videos.",
     }),
-    generateStructuredObjectFn: (async ({ schema, prompt }) => {
+    generateStructuredObjectFn: (async ({ schema, prompt }: { schema: { parse: (value: unknown) => any }; prompt: string }) => {
       prompts.push(prompt);
       if (prompt.includes("Extract structured product context")) {
         return schema.parse({
@@ -134,7 +134,7 @@ test("weekly promo builds scene plan, returns render preview, and saves artifact
       websiteUrl: "https://cliploop.ai",
       extractedText: "ClipLoop helps teams create weekly short videos.",
     }),
-    generateStructuredObjectFn: (async ({ schema, prompt }) => {
+    generateStructuredObjectFn: (async ({ schema, prompt }: { schema: { parse: (value: unknown) => any }; prompt: string }) => {
       if (prompt.includes("Extract structured product context")) {
         return schema.parse({
           productName: "ClipLoop",
@@ -170,7 +170,7 @@ test("weekly promo builds scene plan, returns render preview, and saves artifact
       videoUrl: `/generated/test/${contentItemId}.mp4`,
       thumbnailUrl: `/generated/test/${contentItemId}.jpg`,
     }),
-    renderFn: async ({ contentItemId, output, channel }) => {
+    renderFn: async ({ contentItemId, output, channel }: { contentItemId: string; output: { videoPath: string; videoUrl: string; thumbnailPath: string; thumbnailUrl: string }; channel: string }) => {
       seen.renderContentId = contentItemId;
       seen.renderChannel = channel;
       return {

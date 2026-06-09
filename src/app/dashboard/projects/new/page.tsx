@@ -5,9 +5,9 @@ export default function NewProjectPage() {
     <div className="mx-auto max-w-4xl space-y-6">
       <div className="space-y-2">
         <p className="cl-kicker font-bold tracking-widest text-slate-500 uppercase">Project Setup</p>
-        <h1 className="text-3xl font-semibold tracking-tight text-slate-950 md:text-[2.5rem]">Create a new project workspace</h1>
+        <h1 className="text-3xl font-semibold tracking-tight text-slate-950 md:text-[2.5rem]">Create the one active project for your MVP loop</h1>
         <p className="max-w-2xl text-base leading-7 text-slate-600">
-          Define your brand identity, target audience, and primary offers. This context ensures every generated promo fits your voice and growth goals.
+          Define your brand identity, target audience, and primary offer once, then use that workspace to drive the weekly Instagram pack.
         </p>
       </div>
 

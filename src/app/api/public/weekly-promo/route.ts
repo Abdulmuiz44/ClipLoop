@@ -77,14 +77,14 @@ export async function POST(request: Request) {
   } catch (error) {
     const debugMode = request.headers.get("x-cliploop-debug") === "safe";
     const idempotencyKey = request.headers.get("Idempotency-Key") || request.headers.get("idempotency-key");
-    if (idempotencyKey && idempotencyKey.trim().length >= 8) {
+    const trimmedIdempotencyKey = idempotencyKey?.trim() ?? "";
+    if (trimmedIdempotencyKey.length >= 8) {
       // Best-effort idempotency cleanup; swallow secondary failures safely.
       try {
-        const { completeIdempotentRequest } = await import("@/lib/public-api/idempotency");
         await completeIdempotentRequest({
           userId: "unknown",
           path: "/api/public/weekly-promo",
-          key: idempotencyKey.trim(),
+          key: trimmedIdempotencyKey,
           responseStatus: 500,
           responseJson: { error: "Request failed.", code: "REQUEST_FAILED" },
           status: "failed",
@@ -99,7 +99,7 @@ export async function POST(request: Request) {
       debugMode,
       extra: {
         errorName: error instanceof Error ? error.name : "Error",
-        idempotencyKeyPrefix: idempotencyKey ? idempotencyKey.trim().slice(0, 12) : undefined,
+        idempotencyKeyPrefix: trimmedIdempotencyKey ? trimmedIdempotencyKey.slice(0, 12) : undefined,
       },
     });
     return NextResponse.json(body, { status: 500 });
@@ -110,6 +110,10 @@ async function handleWeeklyPromoPost(request: Request) {
   const debugMode = request.headers.get("x-cliploop-debug") === "safe";
   let idempotencyKeyForDebug: string | null = null;
   let idempotencyKey: string | null = null;
+  let requestIdempotencyKey = "";
+  let authenticatedUserId = "unknown";
+  let idem: Awaited<ReturnType<typeof beginIdempotentRequest>> | null = null;
+  const path = "/api/public/weekly-promo";
 
   console.log(
     JSON.stringify({
@@ -124,6 +128,7 @@ async function handleWeeklyPromoPost(request: Request) {
   try {
     // 1. Authenticate via API key
     const identity = await requireApiKeyIdentity(request);
+    authenticatedUserId = identity.userId;
 
     // 2. Rate limit
     await consumeRateLimit({
@@ -144,6 +149,7 @@ async function handleWeeklyPromoPost(request: Request) {
     if (!idempotencyKey || idempotencyKey.trim().length < 8) {
       throw new IdempotencyKeyRequiredError();
     }
+    requestIdempotencyKey = idempotencyKey.trim();
 
     // 5. Parse and validate body EARLY — before idempotency to reject bad payloads fast
     const body = await request.json().catch(() => {
@@ -154,20 +160,20 @@ async function handleWeeklyPromoPost(request: Request) {
     const input = weeklyPromoInputSchema.parse(body);
 
     // 6. Idempotency — begin or replay
-    const path = "/api/public/weekly-promo";
     const requestHash = computeRequestHash({ method: "POST", path, body: input });
 
-    const idem = await beginIdempotentRequest({
-      userId: identity.userId,
+    const idemResult = await beginIdempotentRequest({
+      userId: authenticatedUserId,
       apiKeyId: identity.apiKeyId,
-      key: idempotencyKey.trim(),
+      key: requestIdempotencyKey,
       method: "POST",
       path,
       requestHash,
     });
+    idem = idemResult;
 
-    if (idem.kind === "replay") {
-      return NextResponse.json(idem.responseJson, { status: idem.responseStatus });
+    if (idemResult.kind === "replay") {
+      return NextResponse.json(idemResult.responseJson, { status: idemResult.responseStatus });
     }
 
     // 7. Check billing policy
@@ -185,12 +191,12 @@ async function handleWeeklyPromoPost(request: Request) {
 
     // 10. Charge credits (after successful generation)
     await chargeCredits({
-      userId: identity.userId,
+      userId: authenticatedUserId,
       bucket: policy.bucket,
       amount: policy.amount,
       reason: policy.reason,
       referenceType: "idempotency",
-      referenceId: idem.referenceId,
+      referenceId: idemResult.referenceId,
       metadata: {
         action: "api_weekly_promo_generate",
         apiKeyPrefix: identity.keyPrefix,
@@ -199,7 +205,7 @@ async function handleWeeklyPromoPost(request: Request) {
 
     // 11. Record usage event with keyPrefix (not full apiKeyId) in metadata
     await recordUsageEvent({
-      userId: identity.userId,
+      userId: authenticatedUserId,
       projectId: identity.projectId,
       apiKeyId: identity.apiKeyId,
       source: "public_api",
@@ -207,9 +213,9 @@ async function handleWeeklyPromoPost(request: Request) {
       creditsBucket: policy.bucket,
       creditsAmount: policy.amount,
       referenceType: "idempotency",
-      referenceId: idem.referenceId,
+      referenceId: idemResult.referenceId,
       metadata: {
-        idempotencyKey: idempotencyKey.trim(),
+        idempotencyKey: requestIdempotencyKey,
         keyPrefix: identity.keyPrefix,
       },
     });
@@ -224,13 +230,13 @@ async function handleWeeklyPromoPost(request: Request) {
       scenePlan: result.scenePlan,
       creditsCharged,
       renderStatus: "rendered" as const,
-      idempotencyKey: idempotencyKey.trim(),
+      idempotencyKey: requestIdempotencyKey,
     };
 
     await completeIdempotentRequest({
-      userId: identity.userId,
+      userId: authenticatedUserId,
       path,
-      key: idempotencyKey.trim(),
+      key: requestIdempotencyKey,
       responseStatus: 200,
       responseJson,
       status: "completed",
@@ -282,18 +288,18 @@ async function handleWeeklyPromoPost(request: Request) {
     // Unknown errors
     if (error instanceof VideoRendererUnavailableError) {
       logWeeklyPromoError({
-        idempotencyKey: idempotencyKey.trim(),
+        idempotencyKey: requestIdempotencyKey,
         errorName: error.name,
         code: "VIDEO_RENDER_UNAVAILABLE",
         status: 503,
         message: error.message,
-        idempotencyCleanupRan: idem.kind === "new",
+        idempotencyCleanupRan: idem?.kind === "new",
       });
-      if (idem.kind === "new") {
+      if (idem?.kind === "new") {
         await completeIdempotentRequest({
-          userId: identity.userId,
+          userId: authenticatedUserId,
           path,
-          key: idempotencyKey.trim(),
+          key: requestIdempotencyKey,
           responseStatus: 503,
           responseJson: { error: error.message, code: "VIDEO_RENDER_UNAVAILABLE" },
           status: "failed",
@@ -305,26 +311,26 @@ async function handleWeeklyPromoPost(request: Request) {
         debugMode,
         extra: {
           errorName: error.name,
-          idempotencyKeyPrefix: idempotencyKey.trim().slice(0, 12),
-          idempotencyCleanupRan: idem.kind === "new",
+          idempotencyKeyPrefix: requestIdempotencyKey.slice(0, 12),
+          idempotencyCleanupRan: idem?.kind === "new",
         },
       });
       return NextResponse.json(body, { status: 503 });
     }
     if (error instanceof VideoRenderFailedError) {
       logWeeklyPromoError({
-        idempotencyKey: idempotencyKey.trim(),
+        idempotencyKey: requestIdempotencyKey,
         errorName: error.name,
         code: "VIDEO_RENDER_FAILED",
         status: 500,
         message: error.message,
-        idempotencyCleanupRan: idem.kind === "new",
+        idempotencyCleanupRan: idem?.kind === "new",
       });
-      if (idem.kind === "new") {
+      if (idem?.kind === "new") {
         await completeIdempotentRequest({
-          userId: identity.userId,
+          userId: authenticatedUserId,
           path,
-          key: idempotencyKey.trim(),
+          key: requestIdempotencyKey,
           responseStatus: 500,
           responseJson: { error: error.message, code: "VIDEO_RENDER_FAILED" },
           status: "failed",
@@ -336,29 +342,29 @@ async function handleWeeklyPromoPost(request: Request) {
         debugMode,
         extra: {
           errorName: error.name,
-          idempotencyKeyPrefix: idempotencyKey.trim().slice(0, 12),
-          idempotencyCleanupRan: idem.kind === "new",
+          idempotencyKeyPrefix: requestIdempotencyKey.slice(0, 12),
+          idempotencyCleanupRan: idem?.kind === "new",
         },
       });
       return NextResponse.json(body, { status: 500 });
     }
-    if (idem.kind === "new") {
+    if (idem?.kind === "new") {
       await completeIdempotentRequest({
-        userId: identity.userId,
+        userId: authenticatedUserId,
         path,
-        key: idempotencyKey.trim(),
+        key: requestIdempotencyKey,
         responseStatus: 500,
         responseJson: { error: error instanceof Error ? error.message : "Request failed", code: "REQUEST_FAILED" },
         status: "failed",
       });
     }
     logWeeklyPromoError({
-      idempotencyKey: idempotencyKey.trim(),
+      idempotencyKey: requestIdempotencyKey,
       errorName: error instanceof Error ? error.name : "Error",
       code: "REQUEST_FAILED",
       status: 500,
       message: error instanceof Error ? error.message : "Request failed",
-      idempotencyCleanupRan: idem.kind === "new",
+      idempotencyCleanupRan: idem?.kind === "new",
     });
     const message = error instanceof Error ? error.message : "Request failed";
     const body = buildErrorBody({
@@ -367,8 +373,8 @@ async function handleWeeklyPromoPost(request: Request) {
       debugMode,
       extra: {
         errorName: error instanceof Error ? error.name : "Error",
-        idempotencyKeyPrefix: idempotencyKey.trim().slice(0, 12),
-        idempotencyCleanupRan: idem.kind === "new",
+        idempotencyKeyPrefix: requestIdempotencyKey.slice(0, 12),
+        idempotencyCleanupRan: idem?.kind === "new",
       },
     });
     return NextResponse.json(body, { status: 500 });
