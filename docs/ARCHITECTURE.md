@@ -215,6 +215,15 @@ The Next.js backend at root still serves the same routes (`/`, `/pricing`) along
 
 ---
 
+## Video pipeline architecture
+
+ClipLoop's promo video engine pipeline (ingest → plan → EDL → render → self-eval → publish → learn) is documented separately:
+
+- **[VIDEO_PIPELINE_ARCHITECTURE.md](./VIDEO_PIPELINE_ARCHITECTURE.md)** — structured perception pattern adapted from [video-use](https://github.com/browser-use/video-use)
+- Research notes live in LaunchPix: `docs/research/VIDEO_USE_ARCHITECTURE_NOTES.md`
+
+---
+
 ## TODO (Dev)
 
 - [ ] Remove `typescript.ignoreBuildErrors: true` from `next.config.ts` after all remaining TypeScript errors are fixed
