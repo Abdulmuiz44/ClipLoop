@@ -2,7 +2,7 @@
 
 Architecture for ClipLoop as a **short-form promo video engine for indie apps**, informed by [video-use](https://github.com/browser-use/video-use) patterns.  
 **Research reference:** LaunchPix `docs/research/VIDEO_USE_ARCHITECTURE_NOTES.md`  
-**Status:** Planning — docs only, no production implementation in this pass.
+**Status:** PR 2 shipped — `PromoBrief` schema is the first production contract.
 
 ---
 
@@ -121,8 +121,8 @@ Each generation run produces a versioned artifact bundle under `renders/<job_id>
 
 | Artifact | Purpose | Status |
 |----------|---------|--------|
-| `promo_brief.json` | Angle, hook, CTA, week theme, must-include | **PR 2** |
-| `promo_context.md` | Packed reading view for LLM (product + script + timing) | **PR 2** |
+| `promo_brief.json` | First contract after ingestion — product, message, creative, constraints | **Exists** (`src/domains/promo-brief/`) |
+| `promo_context.md` | Packed reading view for LLM via `promoBriefToPlanningContext()` | **Exists** (helper) |
 | `weekly_promo_script.json` | Hook, body, caption, CTA | **Exists** |
 | `scene_plan.json` | `SceneBlock[]` timing and overlays | **Exists** |
 | `edl.json` | Unified edit contract: segments, beats, asset refs | **PR 3** |
@@ -135,19 +135,54 @@ Each generation run produces a versioned artifact bundle under `renders/<job_id>
 
 ---
 
+## PromoBrief — first contract after ingestion
+
+`PromoBrief` is the gateway between raw product inputs and everything downstream. Ingestion may read changelogs, URLs, screenshots, or project memory — but **only the validated brief crosses into planning and render**.
+
+```
+product update / changelog / URL / brand memory
+  → PromoBrief (validated JSON)
+    → script + scene plan + EDL
+      → render
+```
+
+Module: `src/domains/promo-brief/`
+
+| Field group | Purpose |
+|-------------|---------|
+| `source` | Provenance: `product_update`, `changelog`, `url`, `manual`, `demo_clip` |
+| `product` | Name, one-liner, audience, category |
+| `message` | Promise, pain, feature highlights, proof, CTA |
+| `creative` | Tone, platform, duration, aspect ratio |
+| `constraints` | Must-include, must-avoid, brand terms |
+
+Helpers:
+
+- `createDraftPromoBrief(input)` — assign id + timestamps
+- `parsePromoBrief(input)` / `validatePromoBrief(input)` — Zod validation
+- `promoBriefToPlanningContext(brief)` — compact text for script/scene planning LLM calls
+
+Scene plan and EDL **must** be derived from a validated `PromoBrief` (or a later `ScenePlan` contract). They must never be built directly from raw changelog or product-update text.
+
+## Must-never rule
+
+> **Renderers must never consume raw changelog/product update input directly. They must consume a validated `PromoBrief` or later `ScenePlan` contract.**
+
+This keeps the render worker from becoming a god module that re-parses unstructured input at every stage.
+
 ## Processing stages
 
 ### 1. Create promo brief
 
-Deterministic + LLM: synthesize from project memory, website context, and optional changelog. Output `promo_brief.json` with angle, hook direction, CTA, and constraints (length, channel, tone).
+Deterministic + LLM: synthesize from project memory, website context, and optional changelog. Output validated `PromoBrief` via `createDraftPromoBrief()`.
 
 ### 2. Generate script
 
-Existing `weeklyPromoScriptSchema` flow in `src/domains/weekly-promo/service.ts`. Structured JSON output validated by schema.
+Consumes `promoBriefToPlanningContext(brief)` — not raw update text. Existing `weeklyPromoScriptSchema` flow in `src/domains/weekly-promo/service.ts` will wire to this in a follow-up PR.
 
 ### 3. Create scene plan
 
-Existing `generateScenePlan` → `SceneBlock[]`. Evolve toward EDL-compatible segment list with explicit `start`, `end`, `beat`, `assetRef`.
+Consumes validated brief + script. Existing `generateScenePlan` → `SceneBlock[]` evolves toward EDL-compatible segment list with explicit `start`, `end`, `beat`, `assetRef`.
 
 ### 4. Asset collection
 
@@ -243,6 +278,7 @@ Existing tracking domain: slug, clicks, conversions, `compute_performance_rollup
 | `rendering` | EDL → MP4 |
 | `publishing` | Schedule, platform publish |
 | `metrics` + `iterations` | Learn loop |
+| `promo-brief` | First pipeline contract — brief schema + validation |
 | `weekly-promo` | High-level orchestration (evolve to full pipeline) |
 | `job_queue` | Async stages: plan, render, eval, publish, rollup |
 
@@ -295,7 +331,7 @@ Creative freedom elsewhere: template choice, grade, pacing, hook style, animatio
 | PR | Deliverable |
 |----|-------------|
 | **PR 1** | This architecture doc |
-| PR 2 | `promo_brief.json` schema + `promo_context.md` packer |
+| **PR 2** | `PromoBrief` schema + `promoBriefToPlanningContext()` |
 | PR 3 | `edl.json` schema unified with `SceneBlock` |
 | PR 4 | Render worker: EDL in → FFmpeg/HyperFrames out |
 | PR 5 | Self-eval checks + `eval_report.json` |
