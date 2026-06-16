@@ -1,50 +1,59 @@
-export type WeeklyPromoChannel = "instagram" | "tiktok" | "whatsapp" | "x";
-export type WeeklyPromoInput = {
-    appName: string;
-    appWebsiteUrl?: string;
-    weeklyUpdate: string;
-    targetAudience?: string;
-    callToAction?: string;
-    channel: WeeklyPromoChannel;
-    tone: string;
-};
-export type WeeklyPromoResponse = {
-    artifactId: string;
-    previewUrl: string | null;
-    downloadUrl: string | null;
-    artifactUrl: string | null;
-    script: Record<string, unknown>;
-    scenePlan: unknown[];
-    creditsCharged: number;
-    renderStatus: string;
-    idempotencyKey: string;
-};
 export type ClipLoopClientOptions = {
     apiKey?: string;
     baseUrl?: string;
 };
-export type ClipLoopRequestOptions = {
-    idempotencyKey?: string;
+export type ProductUpdateInput = {
+    update: string;
+    product?: string;
+    audience?: string;
+    tone?: "builder" | "technical" | "launch" | "simple";
+    format?: string;
 };
-export declare class ClipLoopApiError extends Error {
-    readonly status: number;
-    readonly body: unknown;
-    readonly requestId?: string;
-    constructor(args: {
-        message: string;
-        status: number;
-        body?: unknown;
-    });
-    toJSON(): {
-        name: string;
-        message: string;
-        status: number;
-        requestId: string | undefined;
-    };
+export type ScriptResult = {
+    hook: string;
+    problem: string;
+    whatShipped: string;
+    whyItMatters: string;
+    cta: string;
+    fullScript: string;
+};
+export type StoryboardScene = {
+    type: "title" | "terminal" | "feature-list" | "caption" | "cta";
+    caption: string;
+    command?: string;
+    items?: string[];
+};
+export type StoryboardResult = {
+    title: string;
+    duration: number;
+    scenes: StoryboardScene[];
+};
+export type RenderJob = {
+    id: string;
+    status: "queued" | "running" | "completed" | "failed";
+    videoUrl?: string;
+    error?: string;
+};
+export type ExportXResult = {
+    post: string;
+    hook: string;
+    cta: string;
+    hashtags: string[];
+};
+export declare class ClipLoopLocal {
+    createScript(input: ProductUpdateInput): Promise<ScriptResult>;
+    createStoryboard(input: ProductUpdateInput): Promise<StoryboardResult>;
+    createRenderJob(input: ProductUpdateInput): Promise<RenderJob>;
+    getRenderJob(id: string): Promise<RenderJob>;
+    exportForX(input: ProductUpdateInput): Promise<ExportXResult>;
 }
-export declare class ClipLoopClient {
-    readonly apiKey: string;
-    readonly baseURL: string;
+export declare class ClipLoop extends ClipLoopLocal {
+    readonly apiKey?: string;
+    readonly baseUrl: string;
     constructor(options?: ClipLoopClientOptions);
-    generateWeeklyPromo(input: WeeklyPromoInput, options?: ClipLoopRequestOptions): Promise<WeeklyPromoResponse>;
+    createRenderJob(input: ProductUpdateInput): Promise<RenderJob>;
+    getRenderJob(id: string): Promise<RenderJob>;
+    createScript(input: ProductUpdateInput): Promise<ScriptResult>;
+    createStoryboard(input: ProductUpdateInput): Promise<StoryboardResult>;
+    exportForX(input: ProductUpdateInput): Promise<ExportXResult>;
 }

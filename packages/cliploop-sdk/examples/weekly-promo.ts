@@ -1,24 +1,18 @@
-import { ClipLoopClient } from "../src/index";
+import { ClipLoopLocal } from "../src/index";
 
-const client = new ClipLoopClient({
-  // apiKey: "your api key"
-});
+const client = new ClipLoopLocal();
 
 async function main() {
-  const result = await client.generateWeeklyPromo({
-    appName: "FounderOS",
-    appWebsiteUrl: "https://founderos.com",
-    weeklyUpdate: "Launched AI reminders.",
-    targetAudience: "Indie founders",
-    callToAction: "Try the beta",
-    channel: "x",
-    tone: "Professional"
+  const result = await client.createScript({
+    update: "Launched AI reminders.",
+    product: "FounderOS",
+    audience: "Indie founders",
+    tone: "launch",
   });
 
   console.log({
-    artifactId: result.artifactId,
-    downloadUrl: result.downloadUrl,
-    creditsCharged: result.creditsCharged
+    hook: result.hook,
+    fullScript: result.fullScript,
   });
 }
 
