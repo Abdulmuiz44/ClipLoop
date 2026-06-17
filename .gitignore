@@ -15,3 +15,17 @@ cliploop-vite/node_modules
 cliploop-vite/dist
 cliploop-vite/.env
 cliploop-vite/tsconfig.tsbuildinfo
+
+# Generated site and release artifacts
+docs-site/dist
+public/index.html
+public/_redirects
+public/assets/
+apps/cliploop-demo-video/dist
+apps/cliploop-sdk-demo-video/dist
+apps/cliploop-sdk-demo-video/.render-text
+packages/cliploop-cli/dist
+packages/cliploop-cli/.cliploop
+packages/cliploop-cli/*.tgz
+packages/cliploop-sdk/dist
+packages/cliploop-sdk/*.tgz
