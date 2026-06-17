@@ -1,106 +1,204 @@
-export class ClipLoopApiError extends Error {
-    status;
-    body;
-    requestId;
-    constructor(args) {
-        super(args.message);
-        this.name = "ClipLoopApiError";
-        this.status = args.status;
-        this.body = args.body ?? null;
-        const requestId = typeof this.body === "object" && this.body && "requestId" in this.body
-            ? this.body.requestId
-            : undefined;
-        this.requestId = requestId;
-    }
-    toJSON() {
-        return {
-            name: this.name,
-            message: this.message,
-            status: this.status,
-            requestId: this.requestId,
-        };
-    }
-}
-const DEFAULT_BASE_URL = "https://app.cliploop.site";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ClipLoop = exports.ClipLoopLocal = void 0;
+const DEFAULT_BASE_URL = "https://api.cliploop.site";
+const HOSTED_RENDER_KEY_ERROR = "ClipLoop API key required for hosted rendering. Get one at https://cliploop.site";
 function envApiKey() {
     if (typeof process !== "undefined" && process?.env) {
         return process.env.CLIPLOOP_API_KEY;
     }
     return undefined;
 }
-export class ClipLoopClient {
-    apiKey;
-    baseURL;
-    constructor(options = {}) {
-        if (!options.apiKey) {
-            const envKey = envApiKey();
-            if (!envKey) {
-                throw new Error("Missing API key. Pass apiKey or set CLIPLOOP_API_KEY.");
-            }
-            this.apiKey = envKey;
-        }
-        else {
-            this.apiKey = options.apiKey;
-        }
-        const baseUrl = (typeof options.baseUrl === "string" && options.baseUrl.trim()) ||
-            DEFAULT_BASE_URL;
-        this.baseURL = baseUrl.replace(/\/$/, "");
-    }
-    async generateWeeklyPromo(input, options = {}) {
-        const idempotencyKey = options.idempotencyKey ?? `cliploop-sdk-${crypto.randomUUID()}`;
-        const body = {
-            appName: input.appName,
-            weeklyUpdate: input.weeklyUpdate,
-            channel: input.channel,
-            tone: input.tone,
-        };
-        if (input.appWebsiteUrl !== undefined) {
-            body.appWebsiteUrl = input.appWebsiteUrl;
-        }
-        if (input.targetAudience !== undefined) {
-            body.targetAudience = input.targetAudience;
-        }
-        if (input.callToAction !== undefined) {
-            body.callToAction = input.callToAction;
-        }
-        const response = await fetch(`${this.baseURL}/api/public/weekly-promo`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${this.apiKey}`,
-                "Idempotency-Key": idempotencyKey,
+function normalizeBaseUrl(baseUrl) {
+    return (baseUrl?.trim() || DEFAULT_BASE_URL).replace(/\/$/, "");
+}
+function cleanText(value) {
+    return value.trim().replace(/\s+/g, " ");
+}
+function clipWord(value, fallback) {
+    const cleaned = cleanText(value);
+    return cleaned.length ? cleaned : fallback;
+}
+function toneLabel(tone) {
+    return tone ?? "builder";
+}
+function buildScript(input) {
+    const product = clipWord(input.product ?? "ClipLoop", "ClipLoop");
+    const audience = clipWord(input.audience ?? "builders", "builders");
+    const update = clipWord(input.update, "We shipped something new.");
+    const tone = toneLabel(input.tone);
+    const hook = tone === "launch"
+        ? `${product} just shipped a new workflow for ${audience}.`
+        : `Turn ${update.toLowerCase()} into a promo video workflow.`;
+    const problem = `Builders need a faster way to turn product updates into short-form promo videos.`;
+    const whatShipped = `${product} shipped: ${update}`;
+    const whyItMatters = tone === "technical"
+        ? "It gives developers a local-first way to turn product updates into scripts, storyboards, and render jobs."
+        : `It helps ${audience} move from product update to launch-ready video assets without closed tooling.`;
+    const cta = tone === "simple"
+        ? "Try the local workflow."
+        : `Use ClipLoop to draft the next launch video.`;
+    const fullScript = [
+        hook,
+        problem,
+        whatShipped,
+        whyItMatters,
+        cta,
+    ].join(" ");
+    return { hook, problem, whatShipped, whyItMatters, cta, fullScript };
+}
+function buildStoryboard(input) {
+    const script = buildScript(input);
+    const product = clipWord(input.product ?? "ClipLoop", "ClipLoop");
+    const audience = clipWord(input.audience ?? "builders", "builders");
+    return {
+        title: `${product} video workflow`,
+        duration: 42,
+        scenes: [
+            {
+                type: "title",
+                caption: `${product} v0.1.0\nOpen Video Workflow Layer`,
             },
-            body: JSON.stringify(body),
-        });
-        const text = await response.text();
-        const data = text.length ? safeJsonParse(text) : {};
-        if (!response.ok) {
-            throw new ClipLoopApiError({
-                message: buildMessage(response.status, data, idempotencyKey),
-                status: response.status,
-                body: data,
-            });
-        }
+            {
+                type: "terminal",
+                caption: "Install ClipLoop from npm.",
+                command: "npx @talocode/cliploop",
+            },
+            {
+                type: "terminal",
+                caption: `Create a local video workflow for ${audience}.`,
+                command: "cliploop init",
+            },
+            {
+                type: "caption",
+                caption: script.hook,
+            },
+            {
+                type: "feature-list",
+                caption: "Structured promo workflow",
+                items: ["Scripts", "Storyboards", "Render jobs", "X export"],
+            },
+            {
+                type: "cta",
+                caption: "Open-source and local-first, with optional hosted rendering.",
+            },
+        ],
+    };
+}
+function buildExportX(input) {
+    const script = buildScript(input);
+    const product = clipWord(input.product ?? "ClipLoop", "ClipLoop");
+    return {
+        post: `${script.hook} ${script.cta} #ClipLoop #OpenSource`,
+        hook: script.hook,
+        cta: `Part of Talocode. ${product} helps builders ship launch content faster.`,
+        hashtags: ["ClipLoop", "OpenSource", "VideoWorkflow"],
+    };
+}
+function makeId(prefix) {
+    const suffix = typeof crypto !== "undefined" && "randomUUID" in crypto
+        ? crypto.randomUUID().slice(0, 8)
+        : Math.random().toString(36).slice(2, 10);
+    return `${prefix}_${suffix}`;
+}
+async function hostedRequest(baseUrl, apiKey, path, init) {
+    if (!apiKey) {
+        throw new Error(HOSTED_RENDER_KEY_ERROR);
+    }
+    const response = await fetch(`${baseUrl}${path}`, {
+        ...init,
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${apiKey}`,
+            ...(init?.headers ?? {}),
+        },
+    });
+    const text = await response.text();
+    const data = text ? JSON.parse(text) : {};
+    if (!response.ok) {
+        const message = typeof data === "object" && data && "error" in data
+            ? String(data.error)
+            : `ClipLoop request failed with status ${response.status}`;
+        throw new Error(message);
+    }
+    return data;
+}
+class ClipLoopLocal {
+    async createScript(input) {
+        return buildScript(input);
+    }
+    async createStoryboard(input) {
+        return buildStoryboard(input);
+    }
+    async createRenderJob(input) {
         return {
-            ...data,
-            idempotencyKey,
+            id: makeId("local"),
+            status: "queued",
+            error: "Local render jobs require an installed renderer.",
         };
     }
-}
-function safeJsonParse(value) {
-    try {
-        return JSON.parse(value);
+    async getRenderJob(id) {
+        return {
+            id,
+            status: "failed",
+            error: "Local render jobs are not persisted by ClipLoopLocal.",
+        };
     }
-    catch {
-        return value;
+    async exportForX(input) {
+        return buildExportX(input);
     }
 }
-function buildMessage(status, body, idempotencyKey) {
-    const summary = typeof body === "object" && body && "error" in body
-        ? String(body.error)
-        : typeof body === "string"
-            ? body
-            : "Request failed.";
-    return `ClipLoop API error ${status}: ${summary} (idempotencyKey: ${idempotencyKey})`;
+exports.ClipLoopLocal = ClipLoopLocal;
+class ClipLoop extends ClipLoopLocal {
+    apiKey;
+    baseUrl;
+    constructor(options = {}) {
+        super();
+        this.apiKey = options.apiKey ?? envApiKey();
+        this.baseUrl = normalizeBaseUrl(options.baseUrl);
+    }
+    async createRenderJob(input) {
+        if (!this.apiKey) {
+            throw new Error(HOSTED_RENDER_KEY_ERROR);
+        }
+        return hostedRequest(this.baseUrl, this.apiKey, "/v1/renders", {
+            method: "POST",
+            body: JSON.stringify(input),
+        });
+    }
+    async getRenderJob(id) {
+        if (!this.apiKey) {
+            throw new Error(HOSTED_RENDER_KEY_ERROR);
+        }
+        return hostedRequest(this.baseUrl, this.apiKey, `/v1/renders/${encodeURIComponent(id)}`);
+    }
+    async createScript(input) {
+        if (!this.apiKey) {
+            return super.createScript(input);
+        }
+        return hostedRequest(this.baseUrl, this.apiKey, "/v1/scripts", {
+            method: "POST",
+            body: JSON.stringify(input),
+        });
+    }
+    async createStoryboard(input) {
+        if (!this.apiKey) {
+            return super.createStoryboard(input);
+        }
+        return hostedRequest(this.baseUrl, this.apiKey, "/v1/storyboards", {
+            method: "POST",
+            body: JSON.stringify(input),
+        });
+    }
+    async exportForX(input) {
+        if (!this.apiKey) {
+            return super.exportForX(input);
+        }
+        return hostedRequest(this.baseUrl, this.apiKey, "/v1/exports/x", {
+            method: "POST",
+            body: JSON.stringify(input),
+        });
+    }
 }
+exports.ClipLoop = ClipLoop;
 //# sourceMappingURL=index.js.map
