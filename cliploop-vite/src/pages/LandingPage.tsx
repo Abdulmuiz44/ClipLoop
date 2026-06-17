@@ -32,10 +32,10 @@ const codeLines = [
 export default function LandingPage() {
   return (
     <div className="space-y-8 md:space-y-10">
-      <section className="overflow-hidden rounded-3xl border border-[#202020] bg-[#090909] px-5 py-6 shadow-[0_30px_120px_rgba(0,0,0,0.35)] md:px-8 md:py-8">
-        <div className="flex items-center justify-between gap-4 border-b border-[#1B1B1B] pb-5">
+      <section className="overflow-hidden rounded-[2rem] border border-[#202020] bg-[#090909] px-5 py-6 shadow-[0_30px_120px_rgba(0,0,0,0.35)] md:px-8 md:py-8">
+        <div className="flex flex-col gap-4 border-b border-[#1B1B1B] pb-5 sm:flex-row sm:items-center sm:justify-between">
           <ClipLoopLogo href="/" />
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <a
               href="https://github.com/talocode/cliploop"
               className="rounded-full border border-[#272727] px-3 py-1.5 text-xs font-medium text-[#D4D4D4] transition hover:border-[#3A3A3A] hover:text-white"
@@ -106,6 +106,21 @@ export default function LandingPage() {
             </p>
           </div>
         </div>
+
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#1B1B1B] pt-5 text-xs text-[#737373]">
+          <p>Built by Talocode for open video workflows.</p>
+          <div className="flex flex-wrap items-center gap-4">
+            <a href="https://github.com/talocode/cliploop" className="transition hover:text-white">
+              GitHub
+            </a>
+            <a href="https://cliploop.site" className="transition hover:text-white">
+              Main site
+            </a>
+            <a href="https://app.cliploop.site/app" className="transition hover:text-white">
+              App
+            </a>
+          </div>
+        </div>
       </section>
 
       <section className="grid gap-4 md:grid-cols-3">
@@ -120,7 +135,7 @@ export default function LandingPage() {
         ))}
       </section>
 
-      <section className="grid gap-4 rounded-3xl border border-[#1E1E1E] bg-[#090909] p-5 md:grid-cols-[0.9fr_1.1fr] md:p-8">
+      <section className="grid gap-4 rounded-[2rem] border border-[#1E1E1E] bg-[#090909] p-5 md:grid-cols-[0.9fr_1.1fr] md:p-8">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#8B8B8B]">
             What shipped
