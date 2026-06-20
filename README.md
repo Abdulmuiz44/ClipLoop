@@ -1,6 +1,6 @@
 # ClipLoop
 
-ClipLoop is an open-source workflow for turning product updates into short-form promo videos.
+ClipLoop is an open-source video workflow for builders. One engine that turns product updates, raw clips, screen recordings, terminal demos, images, and scripts into edited videos for every channel. Local-first.
 
 ## What’s here
 
