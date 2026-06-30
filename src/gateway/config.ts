@@ -7,10 +7,11 @@ export type GatewayConfig = {
 
 export function getGatewayConfig(): GatewayConfig {
   const mode = process.env.CLIPLOOP_GATEWAY_MODE === "hosted" ? "hosted" : "local_app";
+  const hasTalocodeKey = !!process.env.TALOCODE_API_KEY || !!process.env.CLIPLOOP_API_KEY;
   return {
-    enabled: process.env.CLIPLOOP_GATEWAY_ENABLED === "true",
+    enabled: process.env.CLIPLOOP_GATEWAY_ENABLED === "true" || mode === "hosted",
     mode,
-    requireApiKey: process.env.CLIPLOOP_GATEWAY_REQUIRE_API_KEY === "true",
+    requireApiKey: process.env.CLIPLOOP_GATEWAY_REQUIRE_API_KEY === "true" || (mode === "hosted" && hasTalocodeKey),
     defaultRateLimitPerMinute: Number(process.env.CLIPLOOP_GATEWAY_RATE_LIMIT_PER_MINUTE ?? 60),
   };
 }
