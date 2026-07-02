@@ -54,14 +54,19 @@
 <h2 id="installation">Installation</h2>
 <pre><code>npm install @cliploop/sdk</code></pre>
 <h2 id="usage">Usage</h2>
-<p class="callout"><span style="color:var(--accent)">Server-side only</span> Use this SDK from Node.js, backend jobs, or secure workers. Do not call it from browser apps that ship to end users, and never expose <code>CLIPLOOP_API_KEY</code> in frontend code.</p>
+<p class="callout"><span style="color:var(--accent)">Server-side only</span> Use this SDK from Node.js, backend jobs, or secure workers. Do not call it from browser apps that ship to end users, and never expose API keys in frontend code.</p>
 <p>Set your API key in your environment:</p>
-<pre><code>export CLIPLOOP_API_KEY="your-dashboard-api-key"</code></pre>
+<pre><code># Primary: use Talocode Cloud API key
+export TALOCODE_API_KEY="your-talocode-cloud-key"
+export TALOCODE_BASE_URL="https://api.talocode.site"
+
+# Legacy (deprecated — use TALOCODE_API_KEY instead)
+# export CLIPLOOP_API_KEY="your-dashboard-api-key"</code></pre>
 <p>Then call the client:</p>
 <pre><code>import { ClipLoopClient } from "@cliploop/sdk";
 
 const client = new ClipLoopClient({
-  apiKey: process.env.CLIPLOOP_API_KEY
+  apiKey: process.env.TALOCODE_API_KEY
 });
 
 const result = await client.generateWeeklyPromo({

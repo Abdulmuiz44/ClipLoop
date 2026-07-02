@@ -27,7 +27,7 @@ export interface TalocodeChargeResult {
 function getTalocodeBaseUrl(): string {
   return process.env.TALOCODE_BASE_URL
     ?? process.env.STACKLANE_API_BASE_URL
-    ?? 'https://api.talocode.xyz'
+    ?? 'https://api.talocode.site'
 }
 
 export async function chargeCredits(

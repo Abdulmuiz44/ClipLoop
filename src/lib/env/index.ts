@@ -50,6 +50,18 @@ const envSchema = z.object({
   ENCRYPTION_SECRET: z.string().optional(),
   HYPERFRAMES_ENABLED: z.coerce.boolean().default(false),
   HYPERFRAMES_BIN: z.string().default("hyperframes"),
+
+  // Talocode Cloud API auth (primary)
+  TALOCODE_API_KEY: z.string().optional(),
+  TALOCODE_BASE_URL: z
+    .preprocess((v) => {
+      if (typeof v !== "string") return v
+      return v.trim().replace(/\/+$/, "")
+    }, z.string().url())
+    .default("https://api.talocode.site"),
+
+  // Legacy ClipLoop API key (deprecated — use TALOCODE_API_KEY instead)
+  CLIPLOOP_API_KEY: z.string().optional(),
 });
 
 export const env = envSchema.parse({
@@ -86,4 +98,8 @@ export const env = envSchema.parse({
   ENCRYPTION_SECRET: process.env.ENCRYPTION_SECRET,
   HYPERFRAMES_ENABLED: process.env.HYPERFRAMES_ENABLED,
   HYPERFRAMES_BIN: process.env.HYPERFRAMES_BIN,
+
+  TALOCODE_API_KEY: process.env.TALOCODE_API_KEY,
+  TALOCODE_BASE_URL: process.env.TALOCODE_BASE_URL,
+  CLIPLOOP_API_KEY: process.env.CLIPLOOP_API_KEY,
 });

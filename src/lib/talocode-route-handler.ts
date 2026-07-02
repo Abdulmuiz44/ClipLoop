@@ -33,14 +33,7 @@ export async function handleRoute(
   }
 
   if (auth.keyType === 'cliploop_legacy') {
-    console.warn('[talocode-auth] CLIPLOOP_API_KEY is deprecated. Use TALOCODE_API_KEY.')
-  }
-
-  if (!apiKey) {
-    return Response.json(
-      { ok: false, error: { code: 'missing_api_key', message: 'Missing API key.' } },
-      { status: 401 },
-    )
+    console.warn('[talocode-auth] CLIPLOOP_API_KEY is deprecated. Use TALOCODE_API_KEY for hosted ClipLoop API access.')
   }
 
   const requestId = getRequestId()
@@ -53,6 +46,7 @@ export async function handleRoute(
     idempotencyKey: requestId,
     metadata: {
       route: `/v1/cliploop/${options.action.replace('.', '/')}`,
+      mode: 'hosted',
     },
   })
 

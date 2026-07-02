@@ -12,9 +12,17 @@ export interface TalocodeAuthResult {
 
 /**
  * Resolve the effective API key from env, preferring TALOCODE_API_KEY.
+ * Logs a deprecation warning when falling back to CLIPLOOP_API_KEY.
  */
 export function getEffectiveApiKey(): string | undefined {
-  return process.env.TALOCODE_API_KEY ?? process.env.CLIPLOOP_API_KEY
+  if (process.env.TALOCODE_API_KEY) {
+    return process.env.TALOCODE_API_KEY
+  }
+  if (process.env.CLIPLOOP_API_KEY) {
+    console.warn('[talocode-auth] CLIPLOOP_API_KEY is deprecated. Use TALOCODE_API_KEY for hosted ClipLoop API access.')
+    return process.env.CLIPLOOP_API_KEY
+  }
+  return undefined
 }
 
 /**

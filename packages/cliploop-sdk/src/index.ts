@@ -63,10 +63,22 @@ export class ClipLoopApiError extends Error {
 }
 
 const DEFAULT_BASE_URL = "https://app.cliploop.site";
+const TALOCODE_CLOUD_URL = "https://api.talocode.site";
 
 function envApiKey(): string | undefined {
   if (typeof process !== "undefined" && process?.env) {
-    return process.env.CLIPLOOP_API_KEY;
+    if (process.env.TALOCODE_API_KEY) {
+      return process.env.TALOCODE_API_KEY;
+    }
+    if (process.env.CLIPLOOP_API_KEY) {
+      if (typeof process.emitWarning === "function") {
+        process.emitWarning(
+          "CLIPLOOP_API_KEY is deprecated. Use TALOCODE_API_KEY for hosted ClipLoop API access.",
+          "DeprecationWarning"
+        );
+      }
+      return process.env.CLIPLOOP_API_KEY;
+    }
   }
   return undefined;
 }
@@ -74,13 +86,14 @@ function envApiKey(): string | undefined {
 export class ClipLoopClient {
   readonly apiKey: string;
   readonly baseURL: string;
+  readonly talocodeBaseURL: string;
 
   constructor(options: ClipLoopClientOptions = {}) {
     if (!options.apiKey) {
       const envKey = envApiKey();
       if (!envKey) {
         throw new Error(
-          "Missing API key. Pass apiKey or set CLIPLOOP_API_KEY."
+          "Missing API key. Pass apiKey or set TALOCODE_API_KEY (or legacy CLIPLOOP_API_KEY)."
         );
       }
       this.apiKey = envKey;
@@ -93,6 +106,10 @@ export class ClipLoopClient {
       DEFAULT_BASE_URL;
 
     this.baseURL = baseUrl.replace(/\/$/, "");
+    this.talocodeBaseURL =
+      (typeof process !== "undefined" &&
+        process.env?.TALOCODE_BASE_URL) ||
+      TALOCODE_CLOUD_URL;
   }
 
   async generateWeeklyPromo(
@@ -149,6 +166,149 @@ export class ClipLoopClient {
       ...data,
       idempotencyKey,
     } as WeeklyPromoResponse;
+  }
+}
+
+  // ─── Talocode Cloud hosted API methods ──────────────────────────────
+
+  async generateBrief(
+    input: { prompt: string; channel?: string; tone?: string; duration?: number; cta?: string },
+    options: ClipLoopRequestOptions = {}
+  ): Promise<Record<string, unknown>> {
+    const idempotencyKey = options.idempotencyKey ?? `clp-sdk-${crypto.randomUUID()}`
+    const response = await fetch(
+      `${this.talocodeBaseURL}/v1/cliploop/brief/generate`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${this.apiKey}`,
+          "Idempotency-Key": idempotencyKey,
+        },
+        body: JSON.stringify(input),
+      }
+    )
+    const data = await response.json()
+    if (!response.ok) {
+      throw new ClipLoopApiError({
+        message: `ClipLoop Cloud API error ${response.status}: ${data?.error?.message ?? "Request failed."}`,
+        status: response.status,
+        body: data,
+      })
+    }
+    return { ...data, idempotencyKey }
+  }
+
+  async generateScript(
+    input: { briefId: string; style?: string },
+    options: ClipLoopRequestOptions = {}
+  ): Promise<Record<string, unknown>> {
+    const idempotencyKey = options.idempotencyKey ?? `clp-sdk-${crypto.randomUUID()}`
+    const response = await fetch(
+      `${this.talocodeBaseURL}/v1/cliploop/script/generate`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${this.apiKey}`,
+          "Idempotency-Key": idempotencyKey,
+        },
+        body: JSON.stringify(input),
+      }
+    )
+    const data = await response.json()
+    if (!response.ok) {
+      throw new ClipLoopApiError({
+        message: `ClipLoop Cloud API error ${response.status}: ${data?.error?.message ?? "Request failed."}`,
+        status: response.status,
+        body: data,
+      })
+    }
+    return { ...data, idempotencyKey }
+  }
+
+  async renderVideo(
+    input: { scriptId: string; format?: string; quality?: string },
+    options: ClipLoopRequestOptions = {}
+  ): Promise<Record<string, unknown>> {
+    const idempotencyKey = options.idempotencyKey ?? `clp-sdk-${crypto.randomUUID()}`
+    const response = await fetch(
+      `${this.talocodeBaseURL}/v1/cliploop/video/render`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${this.apiKey}`,
+          "Idempotency-Key": idempotencyKey,
+        },
+        body: JSON.stringify(input),
+      }
+    )
+    const data = await response.json()
+    if (!response.ok) {
+      throw new ClipLoopApiError({
+        message: `ClipLoop Cloud API error ${response.status}: ${data?.error?.message ?? "Request failed."}`,
+        status: response.status,
+        body: data,
+      })
+    }
+    return { ...data, idempotencyKey }
+  }
+
+  async createCampaign(
+    input: { name: string; platform: string; schedule?: string },
+    options: ClipLoopRequestOptions = {}
+  ): Promise<Record<string, unknown>> {
+    const idempotencyKey = options.idempotencyKey ?? `clp-sdk-${crypto.randomUUID()}`
+    const response = await fetch(
+      `${this.talocodeBaseURL}/v1/cliploop/campaign/create`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${this.apiKey}`,
+          "Idempotency-Key": idempotencyKey,
+        },
+        body: JSON.stringify(input),
+      }
+    )
+    const data = await response.json()
+    if (!response.ok) {
+      throw new ClipLoopApiError({
+        message: `ClipLoop Cloud API error ${response.status}: ${data?.error?.message ?? "Request failed."}`,
+        status: response.status,
+        body: data,
+      })
+    }
+    return { ...data, idempotencyKey }
+  }
+
+  async packageCampaign(
+    input: { campaignId: string },
+    options: ClipLoopRequestOptions = {}
+  ): Promise<Record<string, unknown>> {
+    const idempotencyKey = options.idempotencyKey ?? `clp-sdk-${crypto.randomUUID()}`
+    const response = await fetch(
+      `${this.talocodeBaseURL}/v1/cliploop/campaign/package`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${this.apiKey}`,
+          "Idempotency-Key": idempotencyKey,
+        },
+        body: JSON.stringify(input),
+      }
+    )
+    const data = await response.json()
+    if (!response.ok) {
+      throw new ClipLoopApiError({
+        message: `ClipLoop Cloud API error ${response.status}: ${data?.error?.message ?? "Request failed."}`,
+        status: response.status,
+        body: data,
+      })
+    }
+    return { ...data, idempotencyKey }
   }
 }
 

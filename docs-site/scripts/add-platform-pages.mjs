@@ -154,14 +154,18 @@ write('sdks', shell('SDKs', `<h1>SDKs</h1>
 <h2 id="installation">Installation</h2>
 <pre><code>npm install @cliploop/sdk</code></pre>
 <h2 id="usage">Usage</h2>
-<p class="callout"><span style="color:var(--accent)">Server-side only</span> Use this SDK from Node.js, backend jobs, or secure workers. Do not call it from browser apps that ship to end users, and never expose <code>CLIPLOOP_API_KEY</code> in frontend code.</p>
+<p class="callout"><span style="color:var(--accent)">Server-side only</span> Use this SDK from Node.js, backend jobs, or secure workers. Do not call it from browser apps that ship to end users, and never expose API keys in frontend code.</p>
 <p>Set your API key in your environment:</p>
-<pre><code>export CLIPLOOP_API_KEY="your-dashboard-api-key"</code></pre>
+<pre><code>export TALOCODE_API_KEY="your-talocode-cloud-key"
+export TALOCODE_BASE_URL="https://api.talocode.site"
+
+# Legacy (deprecated)
+# export CLIPLOOP_API_KEY="your-dashboard-api-key"</code></pre>
 <p>Then call the client:</p>
 <pre><code>import { ClipLoopClient } from "@cliploop/sdk";
 
 const client = new ClipLoopClient({
-  apiKey: process.env.CLIPLOOP_API_KEY
+  apiKey: process.env.TALOCODE_API_KEY
 });
 
 const result = await client.generateWeeklyPromo({
@@ -197,7 +201,8 @@ write('cli', shell('CLI', `<h1>CLI</h1>
 <li><code>cliploop download</code></li>
 </ul>
 <h2 id="server-and-ci">Server and CI usage</h2>
-<p>For automation, set <code>CLIPLOOP_API_KEY</code> in your environment instead of interactive login. This works for backend jobs, CI pipelines, and short release workflows.</p>
+<p>For automation, set <code>TALOCODE_API_KEY</code> in your environment instead of interactive login. This works for backend jobs, CI pipelines, and short release workflows.</p>
+<p><strong>Deprecation note:</strong> <code>CLIPLOOP_API_KEY</code> is deprecated. Use <code>TALOCODE_API_KEY</code> for all hosted ClipLoop API access.</p>
 <h2 id="useful-for">Useful for</h2>
 <ul>
 <li>Indie builders iterating in terminals.</li>
