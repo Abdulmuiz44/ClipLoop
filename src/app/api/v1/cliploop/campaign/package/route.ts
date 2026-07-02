@@ -1,4 +1,5 @@
 import { handleRoute } from '@/lib/talocode-route-handler'
+import { packageCampaign, campaignPackageInputSchema } from '@/lib/cliploop-cloud-engine'
 
 export const runtime = 'nodejs'
 
@@ -8,25 +9,28 @@ export async function POST(request: Request) {
     { action: 'campaign.package', credits: 400 },
     async () => {
       const body = await request.json().catch(() => ({}))
-      const { campaignId } = body as { campaignId?: string }
-
-      if (!campaignId || typeof campaignId !== 'string') {
+      const parsed = campaignPackageInputSchema.safeParse(body)
+      if (!parsed.success) {
         return Response.json(
-          { ok: false, error: { code: 'validation_error', message: 'campaignId is required and must be a string.' } },
+          { ok: false, error: { code: 'validation_error', message: parsed.error.issues[0]?.message ?? 'Invalid input.' } },
           { status: 400 },
         )
       }
 
-      // TODO: implement actual campaign packaging
+      const result = await packageCampaign(parsed.data, {
+        requestId: `cliploop_req_${Date.now()}`,
+        keyType: 'talocode',
+        action: 'campaign.package',
+        credits: 400,
+        mode: 'hosted',
+        idempotencyKey: `idem_${Date.now()}`,
+      })
+
       return Response.json({
-        ok: true,
-        data: {
-          packageId: `pkg_${Date.now()}`,
-          campaignId,
-          status: 'packaged',
-          downloadUrl: null,
-        },
-        usage: { action: 'campaign.package', credits: 400 },
+        id: `cliploop_req_${Date.now()}`,
+        object: 'cliploop.campaign_package',
+        result,
+        usage: { credits: 400, action: 'cliploop.campaign.package' },
       })
     },
   )

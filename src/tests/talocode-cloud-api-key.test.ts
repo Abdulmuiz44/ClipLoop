@@ -279,3 +279,73 @@ test("talocode-route-handler: idempotency key is generated", async () => {
   // Since billing will fail (no service), we expect 502
   assert.equal(response.status, 502);
 });
+
+// ─── Engine NOT called when auth/billing fails ───────────────────────────
+
+test("talocode-route-handler: engine not called on missing auth", async () => {
+  process.env.TALOCODE_API_KEY = "tk_abc123";
+  let engineCalled = false;
+  const request = new Request("http://localhost/v1/cliploop/brief/generate", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ productName: "Test", update: "test" }),
+  });
+  const response = await handleRoute(
+    request,
+    { action: "brief.generate", credits: 15 },
+    async () => {
+      engineCalled = true;
+      return Response.json({ ok: true });
+    },
+  );
+  assert.equal(response.status, 401);
+  assert.equal(engineCalled, false);
+});
+
+test("talocode-route-handler: engine not called on invalid auth", async () => {
+  process.env.TALOCODE_API_KEY = "tk_abc123";
+  let engineCalled = false;
+  const request = new Request("http://localhost/v1/cliploop/brief/generate", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      authorization: "Bearer wrong_key",
+    },
+    body: JSON.stringify({ productName: "Test", update: "test" }),
+  });
+  const response = await handleRoute(
+    request,
+    { action: "brief.generate", credits: 15 },
+    async () => {
+      engineCalled = true;
+      return Response.json({ ok: true });
+    },
+  );
+  assert.equal(response.status, 401);
+  assert.equal(engineCalled, false);
+});
+
+test("talocode-route-handler: engine not called on billing failure", async () => {
+  process.env.TALOCODE_API_KEY = "tk_abc123";
+  process.env.TALOCODE_BASE_URL = "http://localhost:1";
+  let engineCalled = false;
+  const request = new Request("http://localhost/v1/cliploop/brief/generate", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      authorization: "Bearer tk_abc123",
+    },
+    body: JSON.stringify({ productName: "Test", update: "test" }),
+  });
+  const response = await handleRoute(
+    request,
+    { action: "brief.generate", credits: 15, getRequestId: () => "test-id" },
+    async () => {
+      engineCalled = true;
+      return Response.json({ ok: true });
+    },
+  );
+  // Billing unreachable -> 502
+  assert.equal(response.status, 502);
+  assert.equal(engineCalled, false);
+});

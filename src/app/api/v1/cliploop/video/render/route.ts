@@ -1,4 +1,5 @@
 import { handleRoute } from '@/lib/talocode-route-handler'
+import { renderVideo, renderInputSchema } from '@/lib/cliploop-cloud-engine'
 
 export const runtime = 'nodejs'
 
@@ -8,31 +9,38 @@ export async function POST(request: Request) {
     { action: 'video.render', credits: 200 },
     async () => {
       const body = await request.json().catch(() => ({}))
-      const { scriptId, format, quality } = body as {
-        scriptId?: string
-        format?: string
-        quality?: string
-      }
-
-      if (!scriptId || typeof scriptId !== 'string') {
+      const parsed = renderInputSchema.safeParse(body)
+      if (!parsed.success) {
         return Response.json(
-          { ok: false, error: { code: 'validation_error', message: 'scriptId is required and must be a string.' } },
+          { ok: false, error: { code: 'validation_error', message: parsed.error.issues[0]?.message ?? 'Invalid input.' } },
           { status: 400 },
         )
       }
 
-      // TODO: implement actual video rendering
+      const result = await renderVideo(parsed.data, {
+        requestId: `cliploop_req_${Date.now()}`,
+        keyType: 'talocode',
+        action: 'video.render',
+        credits: 200,
+        mode: 'hosted',
+        idempotencyKey: `idem_${Date.now()}`,
+      })
+
+      if (result.status === 'provider_required') {
+        return Response.json({
+          id: `cliploop_req_${Date.now()}`,
+          object: 'cliploop.video_render',
+          result,
+          usage: { credits: 200, action: 'cliploop.video.render' },
+          warnings: [{ code: 'provider_required', message: result.message }],
+        })
+      }
+
       return Response.json({
-        ok: true,
-        data: {
-          renderId: `render_${Date.now()}`,
-          scriptId,
-          format: format ?? 'landscape',
-          quality: quality ?? 'standard',
-          status: 'queued',
-          estimatedDuration: 120,
-        },
-        usage: { action: 'video.render', credits: 200 },
+        id: `cliploop_req_${Date.now()}`,
+        object: 'cliploop.video_render',
+        result,
+        usage: { credits: 200, action: 'cliploop.video.render' },
       })
     },
   )

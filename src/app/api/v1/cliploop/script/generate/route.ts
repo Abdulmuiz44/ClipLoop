@@ -1,4 +1,5 @@
 import { handleRoute } from '@/lib/talocode-route-handler'
+import { generateScript, scriptInputSchema } from '@/lib/cliploop-cloud-engine'
 
 export const runtime = 'nodejs'
 
@@ -8,29 +9,28 @@ export async function POST(request: Request) {
     { action: 'script.generate', credits: 15 },
     async () => {
       const body = await request.json().catch(() => ({}))
-      const { briefId, style } = body as {
-        briefId?: string
-        style?: string
-      }
-
-      if (!briefId || typeof briefId !== 'string') {
+      const parsed = scriptInputSchema.safeParse(body)
+      if (!parsed.success) {
         return Response.json(
-          { ok: false, error: { code: 'validation_error', message: 'briefId is required and must be a string.' } },
+          { ok: false, error: { code: 'validation_error', message: parsed.error.issues[0]?.message ?? 'Invalid input.' } },
           { status: 400 },
         )
       }
 
-      // TODO: implement actual script generation
+      const result = await generateScript(parsed.data, {
+        requestId: `cliploop_req_${Date.now()}`,
+        keyType: 'talocode',
+        action: 'script.generate',
+        credits: 15,
+        mode: 'hosted',
+        idempotencyKey: `idem_${Date.now()}`,
+      })
+
       return Response.json({
-        ok: true,
-        data: {
-          scriptId: `script_${Date.now()}`,
-          briefId,
-          style: style ?? 'standard',
-          scenes: [],
-          status: 'draft',
-        },
-        usage: { action: 'script.generate', credits: 15 },
+        id: `cliploop_req_${Date.now()}`,
+        object: 'cliploop.script',
+        result,
+        usage: { credits: 15, action: 'cliploop.script.generate' },
       })
     },
   )

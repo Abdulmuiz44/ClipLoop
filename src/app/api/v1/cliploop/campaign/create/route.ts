@@ -1,4 +1,5 @@
 import { handleRoute } from '@/lib/talocode-route-handler'
+import { createCampaign, campaignCreateInputSchema } from '@/lib/cliploop-cloud-engine'
 
 export const runtime = 'nodejs'
 
@@ -8,37 +9,28 @@ export async function POST(request: Request) {
     { action: 'campaign.create', credits: 50 },
     async () => {
       const body = await request.json().catch(() => ({}))
-      const { name, platform, schedule } = body as {
-        name?: string
-        platform?: string
-        schedule?: string
-      }
-
-      if (!name || typeof name !== 'string') {
+      const parsed = campaignCreateInputSchema.safeParse(body)
+      if (!parsed.success) {
         return Response.json(
-          { ok: false, error: { code: 'validation_error', message: 'name is required and must be a string.' } },
+          { ok: false, error: { code: 'validation_error', message: parsed.error.issues[0]?.message ?? 'Invalid input.' } },
           { status: 400 },
         )
       }
 
-      if (!platform || typeof platform !== 'string') {
-        return Response.json(
-          { ok: false, error: { code: 'validation_error', message: 'platform is required and must be a string.' } },
-          { status: 400 },
-        )
-      }
+      const result = await createCampaign(parsed.data, {
+        requestId: `cliploop_req_${Date.now()}`,
+        keyType: 'talocode',
+        action: 'campaign.create',
+        credits: 50,
+        mode: 'hosted',
+        idempotencyKey: `idem_${Date.now()}`,
+      })
 
-      // TODO: implement actual campaign creation
       return Response.json({
-        ok: true,
-        data: {
-          campaignId: `camp_${Date.now()}`,
-          name,
-          platform,
-          schedule: schedule ?? null,
-          status: 'draft',
-        },
-        usage: { action: 'campaign.create', credits: 50 },
+        id: `cliploop_req_${Date.now()}`,
+        object: 'cliploop.campaign',
+        result,
+        usage: { credits: 50, action: 'cliploop.campaign.create' },
       })
     },
   )

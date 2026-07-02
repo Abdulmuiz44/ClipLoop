@@ -62,6 +62,13 @@ const envSchema = z.object({
 
   // Legacy ClipLoop API key (deprecated — use TALOCODE_API_KEY instead)
   CLIPLOOP_API_KEY: z.string().optional(),
+
+  // ClipLoop cloud engine providers (optional)
+  CLIPLOOP_PROVIDER: z.string().optional(),
+  CLIPLOOP_RENDER_PROVIDER: z.string().optional(),
+  REMOTION_RENDER_ENABLED: z.coerce.boolean().default(false),
+  STORAGE_BUCKET: z.string().optional(),
+  STORAGE_PUBLIC_URL: z.string().optional(),
 });
 
 export const env = envSchema.parse({
@@ -102,4 +109,10 @@ export const env = envSchema.parse({
   TALOCODE_API_KEY: process.env.TALOCODE_API_KEY,
   TALOCODE_BASE_URL: process.env.TALOCODE_BASE_URL,
   CLIPLOOP_API_KEY: process.env.CLIPLOOP_API_KEY,
+
+  CLIPLOOP_PROVIDER: process.env.CLIPLOOP_PROVIDER,
+  CLIPLOOP_RENDER_PROVIDER: process.env.CLIPLOOP_RENDER_PROVIDER,
+  REMOTION_RENDER_ENABLED: process.env.REMOTION_RENDER_ENABLED,
+  STORAGE_BUCKET: process.env.STORAGE_BUCKET,
+  STORAGE_PUBLIC_URL: process.env.STORAGE_PUBLIC_URL,
 });
