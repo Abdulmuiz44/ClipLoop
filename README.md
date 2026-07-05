@@ -632,6 +632,17 @@ LEMON_SQUEEZY_WEBHOOK_SECRET=
 - The app uses Lemon Squeezy hosted checkout and customer-portal links rather than a custom in-app billing portal.
 - Real auth is still minimal, so in non-mock environments the checkout launcher relies on the email entered at checkout start to create or match the account record.
 
+## Talocode Domains
+
+| Domain | Purpose |
+|--------|---------|
+| [talocode.site](https://talocode.site) | Main site / homepage |
+| [docs.talocode.site](https://docs.talocode.site) | Documentation |
+| [api.talocode.site](https://api.talocode.site) | API endpoint |
+| [cloud.talocode.site](https://cloud.talocode.site) | Cloud dashboard |
+| [stacklane.talocode.site](https://stacklane.talocode.site) | Stacklane platform |
+| [dashboard.talocode.site](https://dashboard.talocode.site) | Dashboard |
+
 ## Developer docs site
 
 The ClipLoop developer documentation lives in `docs-site/` and is served at https://docs.cliploop.site.
