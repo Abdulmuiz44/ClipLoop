@@ -2,8 +2,8 @@
 <p class="lead">Copy and adapt these examples to call the Weekly Promo API from your backend or scripts.</p>
 
 <h2 id="curl">cURL</h2>
-<div class="code-block"><code>curl -X POST https://app.cliplane.site/api/public/weekly-promo \
-  -H "Authorization: Bearer $CLIPLANE_API_KEY" \
+<div class="code-block"><code>curl -X POST https://api.talocode.site/v1/cliplane/weekly-promo \
+  -H "Authorization: Bearer $TALOCODE_API_KEY" \
   -H "Idempotency-Key: $IDEMPOTENCY_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -17,10 +17,10 @@
   }'</code></div>
 
 <h2 id="javascript">JavaScript (fetch)</h2>
-<div class="code-block"><code>const response = await fetch("https://app.cliplane.site/api/public/weekly-promo", {
+<div class="code-block"><code>const response = await fetch("https://api.talocode.site/v1/cliplane/weekly-promo", {
   method: "POST",
   headers: {
-    Authorization: `Bearer ${process.env.CLIPLANE_API_KEY}`,
+    Authorization: `Bearer ${process.env.TALOCODE_API_KEY}`,
     "Idempotency-Key": `promo-${Date.now()}`,
     "Content-Type": "application/json"
   },
@@ -38,10 +38,10 @@ const data = await response.json();
 if (!response.ok) throw new Error(data.error?.message || `HTTP ${response.status}`);</code></div>
 
 <h2 id="node">Node.js</h2>
-<div class="code-block"><code>const response = await fetch("https://app.cliplane.site/api/public/weekly-promo", {
+<div class="code-block"><code>const response = await fetch("https://api.talocode.site/v1/cliplane/weekly-promo", {
   method: "POST",
   headers: {
-    Authorization: `Bearer ${process.env.CLIPLANE_API_KEY}`,
+    Authorization: `Bearer ${process.env.TALOCODE_API_KEY}`,
     "Idempotency-Key": `promo-${Date.now()}`,
     "Content-Type": "application/json"
   },
@@ -59,6 +59,6 @@ const data = await response.json();
 if (!response.ok) throw new Error(data.error?.message || `HTTP ${response.status}`);</code></div>
 
 <h2 id="environment-variables">Environment variables</h2>
-<div class="code-block"><code>CLIPLANE_API_KEY=clp_li...
+<div class="code-block"><code>TALOCODE_API_KEY=...
 IDEMPOTENCY_KEY=promo-2026-05-30-cliplane</code></div>
 <div class="callout">⚠️ Never commit real API keys to source control. Store them in environment variables or a secrets manager.</div>

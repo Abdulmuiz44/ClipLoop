@@ -305,7 +305,7 @@ test("debug response does not include Authorization, API key, DATABASE_URL, stac
   const serialized = JSON.stringify(body);
   assert.ok(!serialized.includes("Authorization"));
   assert.ok(!serialized.includes("DATABASE_URL"));
-  assert.ok(!serialized.includes("CLIPLANE_API_KEY"));
+  assert.ok(!serialized.includes("TALOCODE_API_KEY"));
   assert.ok(!serialized.includes("stack"));
   assert.ok(!serialized.includes("raw body"));
   assert.ok(!serialized.includes("api-key"));

@@ -69,7 +69,7 @@ That future hosted surface would accept authenticated render, scheduling, and pu
 
 Local workflow data stays under `.cliplane/` by default. The CLI and local SDK require no account or API key. Schedule plans contain IDs, optional titles and content IDs, timestamps, and status only; they do not contain credentials and cannot trigger publishing. Treat rendered media and scripts as project content and use your normal source-control and access policies.
 
-For the future hosted boundary, use `TALOCODE_API_KEY` only in server-side or secret-management environments and send it as `Authorization: Bearer $TALOCODE_API_KEY` (or `X-Api-Key`). Never expose it in browser bundles or commit it to a repository. `TALOCODE_BASE_URL` defaults to `https://api.talocode.site` in deployment configuration; the current published SDK retains legacy hosted-client behavior and must not be treated as an implementation of the target `/v1/cliplane` API.
+For hosted requests, use `TALOCODE_API_KEY` only in server-side or secret-management environments and send it as `Authorization: Bearer $TALOCODE_API_KEY` (or `X-Api-Key`). Never expose it in browser bundles or commit it to a repository. `TALOCODE_BASE_URL` defaults to `https://api.talocode.site`, and hosted ClipLane requests use `/v1/cliplane`.
 
 ## Development And Testing
 

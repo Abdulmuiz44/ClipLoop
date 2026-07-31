@@ -20,7 +20,7 @@ Hosted rendering is optional.
 
 ## Hosted API
 
-If you provide `apiKey`, the SDK can call the hosted ClipLane API at `https://api.cliplane.site` by default.
+If you provide `apiKey` (or set `TALOCODE_API_KEY`), the SDK calls the hosted ClipLane API at `https://api.talocode.site` by default, using `/v1/cliplane/*`.
 
 You can override the base URL for local development or private deployments.
 
@@ -31,4 +31,3 @@ You can override the base URL for local development or private deployments.
 - `createRenderJob(input)`
 - `getRenderJob(id)`
 - `exportForX(input)`
-

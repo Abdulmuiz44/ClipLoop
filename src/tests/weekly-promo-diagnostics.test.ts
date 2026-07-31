@@ -27,7 +27,7 @@ test("diagnostics response does not include secrets", async () => {
   const serialized = JSON.stringify(json);
   assert.ok(!serialized.includes("Authorization"));
   assert.ok(!serialized.includes("DATABASE_URL"));
-  assert.ok(!serialized.includes("CLIPLANE_API_KEY"));
+  assert.ok(!serialized.includes("TALOCODE_API_KEY"));
   assert.ok(!serialized.includes("stack"));
   assert.ok(!serialized.includes("raw body"));
   assert.ok(!serialized.includes("api-key"));

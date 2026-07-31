@@ -83,13 +83,13 @@ export type CancelScheduleResult = {
   cancelledJobId: string;
 };
 
-const DEFAULT_BASE_URL = "https://api.cliplane.site";
+const DEFAULT_BASE_URL = "https://api.talocode.site";
 const HOSTED_RENDER_KEY_ERROR =
-  "ClipLane API key required for hosted rendering. Get one at https://cliplane.site";
+  "TALOCODE_API_KEY required for hosted ClipLane requests.";
 
 function envApiKey(): string | undefined {
   if (typeof process !== "undefined" && process?.env) {
-    return process.env.CLIPLANE_API_KEY;
+    return process.env.TALOCODE_API_KEY;
   }
   return undefined;
 }
@@ -336,7 +336,7 @@ export class ClipLaneLocal {
   }
 }
 
-/** Legacy hosted ClipLane client retained for the existing hosted API. */
+/** Hosted ClipLane client. */
 export class ClipLane extends ClipLaneLocal {
   readonly apiKey?: string;
   readonly baseUrl: string;
@@ -354,7 +354,7 @@ export class ClipLane extends ClipLaneLocal {
       throw new Error(HOSTED_RENDER_KEY_ERROR);
     }
 
-    return hostedRequest<RenderJob>(this.baseUrl, this.apiKey, "/v1/renders", {
+    return hostedRequest<RenderJob>(this.baseUrl, this.apiKey, "/v1/cliplane/renders", {
       method: "POST",
       body: JSON.stringify(input),
     });
@@ -368,7 +368,7 @@ export class ClipLane extends ClipLaneLocal {
     return hostedRequest<RenderJob>(
       this.baseUrl,
       this.apiKey,
-      `/v1/renders/${encodeURIComponent(id)}`
+      `/v1/cliplane/renders/${encodeURIComponent(id)}`
     );
   }
 
@@ -377,7 +377,7 @@ export class ClipLane extends ClipLaneLocal {
       return super.createScript(input);
     }
 
-    return hostedRequest<ScriptResult>(this.baseUrl, this.apiKey, "/v1/scripts", {
+    return hostedRequest<ScriptResult>(this.baseUrl, this.apiKey, "/v1/cliplane/scripts", {
       method: "POST",
       body: JSON.stringify(input),
     });
@@ -393,7 +393,7 @@ export class ClipLane extends ClipLaneLocal {
     return hostedRequest<StoryboardResult>(
       this.baseUrl,
       this.apiKey,
-      "/v1/storyboards",
+      "/v1/cliplane/storyboards",
       {
         method: "POST",
         body: JSON.stringify(input),
@@ -406,33 +406,33 @@ export class ClipLane extends ClipLaneLocal {
       return super.exportForX(input);
     }
 
-    return hostedRequest<ExportXResult>(this.baseUrl, this.apiKey, "/v1/exports/x", {
+    return hostedRequest<ExportXResult>(this.baseUrl, this.apiKey, "/v1/cliplane/exports/x", {
       method: "POST",
       body: JSON.stringify(input),
     });
   }
 
   async scheduleContentItem(contentItemId: string, input: ScheduleInput): Promise<ScheduleResult> {
-    return hostedRequest<ScheduleResult>(this.baseUrl, this.apiKey, `/api/public/content-items/${encodeURIComponent(contentItemId)}/schedule`, {
+    return hostedRequest<ScheduleResult>(this.baseUrl, this.apiKey, `/v1/cliplane/content-items/${encodeURIComponent(contentItemId)}/schedule`, {
       method: "POST",
       body: scheduleBody(input),
     });
   }
 
   async rescheduleContentItem(contentItemId: string, input: ScheduleInput): Promise<ScheduleResult> {
-    return hostedRequest<ScheduleResult>(this.baseUrl, this.apiKey, `/api/public/content-items/${encodeURIComponent(contentItemId)}/schedule`, {
+    return hostedRequest<ScheduleResult>(this.baseUrl, this.apiKey, `/v1/cliplane/content-items/${encodeURIComponent(contentItemId)}/schedule`, {
       method: "PATCH",
       body: scheduleBody(input),
     });
   }
 
   async cancelScheduledContentItem(contentItemId: string): Promise<CancelScheduleResult> {
-    return hostedRequest<CancelScheduleResult>(this.baseUrl, this.apiKey, `/api/public/content-items/${encodeURIComponent(contentItemId)}/schedule`, {
+    return hostedRequest<CancelScheduleResult>(this.baseUrl, this.apiKey, `/v1/cliplane/content-items/${encodeURIComponent(contentItemId)}/schedule`, {
       method: "DELETE",
     });
   }
 
   async getScheduleStatus(contentItemId: string): Promise<ScheduleStatus> {
-    return hostedRequest<ScheduleStatus>(this.baseUrl, this.apiKey, `/api/public/content-items/${encodeURIComponent(contentItemId)}/schedule`);
+    return hostedRequest<ScheduleStatus>(this.baseUrl, this.apiKey, `/v1/cliplane/content-items/${encodeURIComponent(contentItemId)}/schedule`);
   }
 }

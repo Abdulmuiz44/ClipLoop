@@ -36,9 +36,15 @@ CLIPLANE_SCHEDULE_STORE=/workspace/my-project/.cliplane/schedules.json cliplane-
 
 The store contains job IDs, optional titles and content IDs, timestamps, and status. It does not contain API keys or account credentials. Creating a plan does not run at the selected time, trigger a worker, render media, publish media, or contact any service. Review plans before using them in a publishing workflow.
 
-## Hosted Target Architecture
+## MCP Transports
 
-The future Talocode hosted surface is planned at `TALOCODE_BASE_URL=https://api.talocode.site` under `/v1/cliplane/*`, with `TALOCODE_API_KEY` supplied in an authorization header. That future service would be distinct from this local server and could use hosted workers for rendering, scheduling, and publishing. It is not a shipped MCP capability and this package does not send requests to it.
+### Local stdio MCP
+
+This package is a local stdio server. Start `cliplane-mcp` from your project to use the schedule-planning tools and local `.cliplane/schedules.json` store. It does not make network requests or require `TALOCODE_API_KEY`.
+
+### Hosted MCP
+
+The hosted MCP endpoint is `https://api.talocode.site/mcp`. Authenticate it with `Authorization: Bearer $TALOCODE_API_KEY`. Hosted MCP is separate from this local stdio server; this package does not proxy requests to the hosted endpoint.
 
 ## Development And Testing
 

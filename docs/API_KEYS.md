@@ -11,6 +11,5 @@ Hosted rendering and other remote workflows require an API key.
 ## Important
 
 - Do not hardcode secrets into source files.
-- Prefer environment variables such as `CLIPLANE_API_KEY`.
+- Prefer environment variables such as `TALOCODE_API_KEY`.
 - Keep keys server-side.
-

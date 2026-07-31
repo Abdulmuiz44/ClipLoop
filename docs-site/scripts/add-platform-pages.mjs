@@ -154,14 +154,14 @@ write('sdks', shell('SDKs', `<h1>SDKs</h1>
 <h2 id="installation">Installation</h2>
 <pre><code>npm install @cliplane/sdk</code></pre>
 <h2 id="usage">Usage</h2>
-<p class="callout"><span style="color:var(--accent)">Server-side only</span> Use this SDK from Node.js, backend jobs, or secure workers. Do not call it from browser apps that ship to end users, and never expose <code>CLIPLANE_API_KEY</code> in frontend code.</p>
+<p class="callout"><span style="color:var(--accent)">Server-side only</span> Use this SDK from Node.js, backend jobs, or secure workers. Do not call it from browser apps that ship to end users, and never expose <code>TALOCODE_API_KEY</code> in frontend code.</p>
 <p>Set your API key in your environment:</p>
-<pre><code>export CLIPLANE_API_KEY="your-dashboard-api-key"</code></pre>
+<pre><code>export TALOCODE_API_KEY="your-api-key"</code></pre>
 <p>Then call the client:</p>
 <pre><code>import { ClipLaneClient } from "@cliplane/sdk";
 
 const client = new ClipLaneClient({
-  apiKey: process.env.CLIPLANE_API_KEY
+  apiKey: process.env.TALOCODE_API_KEY
 });
 
 const result = await client.generateWeeklyPromo({
@@ -181,7 +181,7 @@ console.log(result.artifactId);</code></pre>
 <li><code>tone</code> is required.</li>
 <li><code>appWebsiteUrl</code> is optional. Omitted optional fields are not sent as <code>null</code>.</li>
 <li>Idempotency is handled automatically unless you pass <code>idempotencyKey</code>.</li>
-<li>The SDK calls <code>POST https://app.cliplane.site/api/public/weekly-promo</code>.</li>
+<li>The SDK calls the <code>https://api.talocode.site/v1/cliplane/*</code> namespace.</li>
 </ul>
 <h2 id="related">Related</h2>
 <p><a href="/cli/">CLI</a> · <a href="/quickstart/">Quickstart</a> · <a href="/weekly-promo-api/">Weekly Promo API</a> · <a href="/api-keys/">API Keys</a></p>`));
@@ -197,7 +197,7 @@ write('cli', shell('CLI', `<h1>CLI</h1>
 <li><code>cliplane download</code></li>
 </ul>
 <h2 id="server-and-ci">Server and CI usage</h2>
-<p>For automation, set <code>CLIPLANE_API_KEY</code> in your environment instead of interactive login. This works for backend jobs, CI pipelines, and short release workflows.</p>
+<p>For automation, set <code>TALOCODE_API_KEY</code> in your environment instead of interactive login. This works for backend jobs, CI pipelines, and short release workflows.</p>
 <h2 id="useful-for">Useful for</h2>
 <ul>
 <li>Indie builders iterating in terminals.</li>

@@ -75,9 +75,7 @@ Authorization: Bearer $TALOCODE_API_KEY
 /v1/cliplane/*
 ```
 
-The target namespace is intended for hosted render, scheduling, and publishing work handled by a hosted worker. It is not currently a shipped public API. Do not configure this SDK expecting `/v1/cliplane` to be available.
-
-The package still exports `ClipLane`, a legacy compatibility client for existing hosted routes. It uses `CLIPLANE_API_KEY` and legacy defaults/routes in the current source. This is not the target Talocode API configuration and should not be used as evidence that target hosted rendering, scheduling, or publishing is available.
+`ClipLane` uses `TALOCODE_API_KEY` (or its `apiKey` option) and calls the `/v1/cliplane` namespace. Hosted render, scheduling, and publishing availability depends on the Talocode API deployment.
 
 ## Development And Testing
 

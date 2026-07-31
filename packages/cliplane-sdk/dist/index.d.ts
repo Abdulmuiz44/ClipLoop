@@ -96,7 +96,7 @@ export declare class ClipLaneLocal {
     listSchedules(): Promise<LocalScheduleJob[]>;
     cancelSchedule(id: string): Promise<LocalScheduleJob>;
 }
-/** Legacy hosted ClipLane client retained for the existing hosted API. */
+/** Hosted ClipLane client. */
 export declare class ClipLane extends ClipLaneLocal {
     readonly apiKey?: string;
     readonly baseUrl: string;

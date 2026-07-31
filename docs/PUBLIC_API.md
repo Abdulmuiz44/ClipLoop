@@ -1,6 +1,6 @@
 # ClipLane Public API
 
-Base URL: `https://app.cliplane.site/api`
+Base URL: `https://api.talocode.site/v1/cliplane`
 
 ---
 
@@ -20,7 +20,7 @@ API keys are managed in the [dashboard](https://app.cliplane.site/dashboard/sett
 
 See [Scheduled Publishing](./SCHEDULING.md) for the `content:schedule` API scope, endpoints, SDK methods, worker setup, and current direct-publisher limitations.
 
-### POST /api/public/weekly-promo
+### POST /v1/cliplane/weekly-promo
 
 Generate a weekly promo video script + scene plan for your app. Ingest your app's website for brand-aligned content, produce a platform-optimized script and scene plan.
 
@@ -134,8 +134,8 @@ Error response shape:
 ### curl
 
 ```bash
-curl -X POST https://app.cliplane.site/api/public/weekly-promo \
-  -H "Authorization: Bearer clp_YOUR_API_KEY" \
+curl -X POST https://api.talocode.site/v1/cliplane/weekly-promo \
+  -H "Authorization: Bearer $TALOCODE_API_KEY" \
   -H "Idempotency-Key: my-unique-key-abc123" \
   -H "Content-Type: application/json" \
   -d '{
@@ -150,10 +150,10 @@ curl -X POST https://app.cliplane.site/api/public/weekly-promo \
 ### JavaScript (fetch)
 
 ```javascript
-const response = await fetch("https://app.cliplane.site/api/public/weekly-promo", {
+const response = await fetch("https://api.talocode.site/v1/cliplane/weekly-promo", {
   method: "POST",
   headers: {
-    "Authorization": "Bearer clp_YOUR_API_KEY",
+    "Authorization": `Bearer ${process.env.TALOCODE_API_KEY}`,
     "Idempotency-Key": "my-unique-key-abc123",
     "Content-Type": "application/json",
   },
@@ -179,7 +179,7 @@ console.log(data.renderStatus);       // "renderer_unavailable" or "rendered"
 import axios from "axios";
 
 const { data } = await axios.post(
-  "https://app.cliplane.site/api/public/weekly-promo",
+  "https://api.talocode.site/v1/cliplane/weekly-promo",
   {
     appName: "MyApp",
     appWebsiteUrl: "https://myapp.com",
@@ -189,7 +189,7 @@ const { data } = await axios.post(
   },
   {
     headers: {
-      Authorization: "Bearer clp_YOUR_API_KEY",
+      Authorization: `Bearer ${process.env.TALOCODE_API_KEY}`,
       "Idempotency-Key": "my-unique-key-abc123",
     },
   },

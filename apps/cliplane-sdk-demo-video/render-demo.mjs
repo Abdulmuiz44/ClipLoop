@@ -44,7 +44,7 @@ const scenes = [
     start: 30,
     end: 36,
     title: "import { ClipLane } from \"@talocode/cliplane-sdk\";",
-    body: "const cliplane = new ClipLane({ apiKey: process.env.CLIPLANE_API_KEY });\nHosted rendering is optional.\nGet API keys at cliplane.site.",
+    body: "const cliplane = new ClipLane({ apiKey: process.env.TALOCODE_API_KEY });\nHosted requests use api.talocode.site/v1/cliplane.",
   },
   {
     start: 36,

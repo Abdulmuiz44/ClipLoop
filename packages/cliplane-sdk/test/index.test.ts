@@ -57,7 +57,7 @@ test("hosted client requires api key for render", async () => {
         update: "We shipped Codra v0.1.5",
         product: "Codra",
       }),
-    /ClipLane API key required for hosted rendering/
+    /TALOCODE_API_KEY required for hosted ClipLane requests/
   );
 });
 
@@ -101,14 +101,14 @@ test("hosted client uses baseUrl override", async () => {
     });
 
     assert.equal(job.id, "render_123");
-    assert.equal(requests[0]?.url, "http://localhost:3000/v1/renders");
+    assert.equal(requests[0]?.url, "http://localhost:3000/v1/cliplane/renders");
     assert.match(requests[0]?.body ?? "", /Codra/);
   } finally {
     globalThis.fetch = originalFetch;
   }
 });
 
-test("hosted scheduling methods use the public scheduling endpoint", async () => {
+test("hosted scheduling methods use the ClipLane scheduling endpoint", async () => {
   const requests: Array<{ url: string; method: string; body: string }> = [];
   const originalFetch = globalThis.fetch;
   globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
@@ -127,10 +127,10 @@ test("hosted scheduling methods use the public scheduling endpoint", async () =>
   }
 
   assert.deepEqual(requests.map(({ url, method }) => ({ url, method })), [
-    { url: "http://localhost:3000/api/public/content-items/item%2F123/schedule", method: "POST" },
-    { url: "http://localhost:3000/api/public/content-items/item%2F123/schedule", method: "PATCH" },
-    { url: "http://localhost:3000/api/public/content-items/item%2F123/schedule", method: "DELETE" },
-    { url: "http://localhost:3000/api/public/content-items/item%2F123/schedule", method: "GET" },
+    { url: "http://localhost:3000/v1/cliplane/content-items/item%2F123/schedule", method: "POST" },
+    { url: "http://localhost:3000/v1/cliplane/content-items/item%2F123/schedule", method: "PATCH" },
+    { url: "http://localhost:3000/v1/cliplane/content-items/item%2F123/schedule", method: "DELETE" },
+    { url: "http://localhost:3000/v1/cliplane/content-items/item%2F123/schedule", method: "GET" },
   ]);
   assert.match(requests[0]?.body ?? "", /2027-01-01T00:00:00.000Z/);
 });
