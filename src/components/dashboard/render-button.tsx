@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 
 type TemplateId = "clean_dark" | "bold_light" | "hf_promo_v1";
 type RenderBackend = "legacy" | "hyperframes";
-type TargetChannel = "instagram" | "tiktok" | "whatsapp";
+type TargetChannel = "instagram" | "tiktok" | "whatsapp" | "telegram";
 
 export function RenderButton({
   endpoint,

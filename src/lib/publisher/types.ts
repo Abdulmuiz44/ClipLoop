@@ -4,7 +4,7 @@ export type PublishResult = {
   externalPostId: string;
   externalPostUrl?: string | null;
   publishedAt: Date;
-  mode: "mock" | "instagram";
+  mode: "mock" | "instagram" | "telegram";
   metadataJson?: Record<string, unknown> | null;
 };
 

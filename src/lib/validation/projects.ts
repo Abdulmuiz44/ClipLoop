@@ -3,7 +3,7 @@ import { z } from "zod";
 export const goalTypeSchema = z.enum(["clicks", "signups", "revenue"]);
 export const projectTypeSchema = z.enum(["business", "creator", "app"]);
 export const languageStyleSchema = z.enum(["english", "pidgin", "mixed"]);
-export const projectChannelSchema = z.enum(["instagram", "tiktok", "whatsapp"]);
+export const projectChannelSchema = z.enum(["instagram", "tiktok", "whatsapp", "telegram"]);
 
 export const createProjectInputSchema = z.object({
   name: z.string().min(2),

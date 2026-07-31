@@ -27,7 +27,7 @@ export function ProjectForm() {
     const preferredChannels = formData
       .getAll("preferredChannels")
       .map((value) => String(value))
-      .filter((value): value is "instagram" | "tiktok" | "whatsapp" =>
+      .filter((value): value is "instagram" | "tiktok" | "whatsapp" | "telegram" =>
         SUPPORTED_PROJECT_CHANNELS.includes(value as (typeof SUPPORTED_PROJECT_CHANNELS)[number]),
       );
 

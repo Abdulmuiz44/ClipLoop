@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
-type TargetChannel = "instagram" | "tiktok" | "whatsapp";
+type TargetChannel = "instagram" | "tiktok" | "whatsapp" | "telegram";
 
 export function TargetChannelControl({
   contentItemId,
@@ -48,6 +48,7 @@ export function TargetChannelControl({
         <option value="instagram">Instagram</option>
         <option value="tiktok">TikTok</option>
         <option value="whatsapp">WhatsApp</option>
+        <option value="telegram">Telegram</option>
       </select>
       <Button type="button" onClick={save} disabled={loading}>
         {loading ? "Updating..." : "Set target channel"}

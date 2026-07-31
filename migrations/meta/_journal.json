@@ -22,6 +22,7 @@
     { "idx": 17, "version": "7", "when": 1719792170000, "tag": "0018_api_keys", "breakpoints": true },
     { "idx": 18, "version": "7", "when": 1719792180000, "tag": "0019_idempotency_keys", "breakpoints": true },
     { "idx": 19, "version": "7", "when": 1719792190000, "tag": "0020_usage_events", "breakpoints": true },
-    { "idx": 20, "version": "7", "when": 1719792200000, "tag": "0021_rate_limit_counters", "breakpoints": true }
+    { "idx": 20, "version": "7", "when": 1719792200000, "tag": "0021_rate_limit_counters", "breakpoints": true },
+    { "idx": 21, "version": "7", "when": 1785456000000, "tag": "0023_telegram_publishing", "breakpoints": true }
   ]
 }

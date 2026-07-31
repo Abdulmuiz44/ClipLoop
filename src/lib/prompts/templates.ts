@@ -32,7 +32,7 @@ export type ProjectPromptContext = {
   whatsappNumber?: string | null;
   websiteUrl?: string | null;
   ctaUrl: string;
-  preferredChannels?: Array<"instagram" | "tiktok" | "whatsapp">;
+  preferredChannels?: Array<"instagram" | "tiktok" | "whatsapp" | "telegram">;
   languageStyle?: "english" | "pidgin" | "mixed" | null;
   goalType: "clicks" | "signups" | "revenue";
   voiceStyleNotes?: string | null;
@@ -173,7 +173,7 @@ export function iterationNextPackPrompt(input: {
   primaryOffer?: string | null;
   tone?: string | null;
   callToAction?: string | null;
-  preferredChannels?: Array<"instagram" | "tiktok" | "whatsapp">;
+  preferredChannels?: Array<"instagram" | "tiktok" | "whatsapp" | "telegram">;
   languageStyle?: "english" | "pidgin" | "mixed" | null;
 }) {
   const channels = channelsInstruction(input.preferredChannels);

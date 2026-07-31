@@ -1,4 +1,4 @@
-export type PublishStrategy = "direct_instagram" | "manual_export";
+export type PublishStrategy = "direct_instagram" | "direct_telegram" | "manual_export";
 
 export type SchedulePublishRequest = {
   contentItemId: string;
@@ -10,4 +10,3 @@ export type PublishExecutionRequest = {
   contentItemId: string;
   userId: string;
 };
-

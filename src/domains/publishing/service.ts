@@ -8,6 +8,7 @@ import { env } from "@/lib/env";
 import { getChannelHealth, getProjectChannel } from "@/domains/channels/service";
 import { resolveContentItemTargetChannel } from "@/lib/utils/channels";
 import { assertFutureSchedule, JOB_LEASE_MS, retryDelayMs } from "@/domains/publishing/scheduling";
+import { isTelegramPublishingConfigured } from "@/lib/publisher/telegram";
 
 type PublishJobPayload = { contentItemId: string };
 
@@ -107,8 +108,14 @@ export async function scheduleContentItem(contentItemId: string, scheduledFor: D
   }
 
   const targetChannel = resolveContentItemTargetChannel(item.targetChannel, item.platform);
-  if (item.publishStrategy !== "direct_instagram" || targetChannel !== "instagram") {
-    throw new Error(`This item is set to manual export flow. Direct scheduling/publishing is only supported for Instagram direct items.`);
+  const supportsDirectSchedule =
+    (item.publishStrategy === "direct_instagram" && targetChannel === "instagram") ||
+    (item.publishStrategy === "direct_telegram" && targetChannel === "telegram");
+  if (!supportsDirectSchedule) {
+    throw new Error("This item is set to manual export flow. Direct scheduling requires a supported direct-publish strategy.");
+  }
+  if (targetChannel === "telegram" && !isTelegramPublishingConfigured()) {
+    throw new Error("Telegram publishing is not configured. Set TELEGRAM_BOT_TOKEN and TELEGRAM_CHANNEL_ID.");
   }
 
   const { job, mode } = await enqueuePublishJob(contentItemId, scheduledFor);
@@ -244,14 +251,55 @@ async function processClaimedJob(running: typeof schema.jobQueue.$inferSelect) {
     if (!project) throw new Error("Project not found");
 
     const targetChannel = resolveContentItemTargetChannel(item.targetChannel, item.platform);
-    if (item.publishStrategy !== "direct_instagram" || targetChannel !== "instagram") {
-      throw new Error(`Item is manual export or non-Instagram channel. Direct publish is blocked.`);
+    const isInstagram = item.publishStrategy === "direct_instagram" && targetChannel === "instagram";
+    const isTelegram = item.publishStrategy === "direct_telegram" && targetChannel === "telegram";
+    if (!isInstagram && !isTelegram) {
+      throw new Error("Item is manual export or has an unsupported direct-publish configuration.");
     }
 
     await db
       .update(schema.contentItems)
       .set({ publishStatus: "publishing", updatedAt: new Date() })
       .where(eq(schema.contentItems.id, item.id));
+
+    if (isTelegram) {
+      const publisher = getPublisher(null, "telegram");
+      await publisher.validateContentItemReady(item, null);
+      const publishResult = await publisher.publishContentItem(item, null);
+
+      await db
+        .update(schema.contentItems)
+        .set({
+          publishStatus: "published",
+          publishedAt: publishResult.publishedAt,
+          externalPostId: publishResult.externalPostId,
+          externalPostUrl: publishResult.externalPostUrl,
+          updatedAt: new Date(),
+        })
+        .where(eq(schema.contentItems.id, item.id));
+
+      await db
+        .update(schema.jobQueue)
+        .set({
+          payloadJson: {
+            ...(running.payloadJson as Record<string, unknown>),
+            publishMode: publishResult.mode,
+            publishedExternalPostId: publishResult.externalPostId,
+          },
+        })
+        .where(eq(schema.jobQueue.id, running.id));
+
+      await incrementUsageCounter({
+        userId: project.userId,
+        projectId: project.id,
+        period: "month",
+        field: "postsPublished",
+        amount: 1,
+      });
+
+      const job = await markJobCompleted(running.id);
+      return { skipped: false, success: true, job, contentItemId: item.id };
+    }
 
     const channel = await getProjectChannel(project.id, "instagram");
     const normalizedChannel = channel ?? null;

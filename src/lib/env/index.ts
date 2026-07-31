@@ -51,6 +51,8 @@ const envSchema = z.object({
   HYPERFRAMES_ENABLED: z.coerce.boolean().default(false),
   HYPERFRAMES_BIN: z.string().default("hyperframes"),
   SCHEDULER_SECRET: z.string().min(1).optional(),
+  TELEGRAM_BOT_TOKEN: z.string().min(1).optional(),
+  TELEGRAM_CHANNEL_ID: z.string().min(1).optional(),
 });
 
 export const env = envSchema.parse({
@@ -88,4 +90,6 @@ export const env = envSchema.parse({
   HYPERFRAMES_ENABLED: process.env.HYPERFRAMES_ENABLED,
   HYPERFRAMES_BIN: process.env.HYPERFRAMES_BIN,
   SCHEDULER_SECRET: process.env.SCHEDULER_SECRET,
+  TELEGRAM_BOT_TOKEN: process.env.TELEGRAM_BOT_TOKEN,
+  TELEGRAM_CHANNEL_ID: process.env.TELEGRAM_CHANNEL_ID,
 });

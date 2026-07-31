@@ -1,2 +1,1 @@
-export type CoreChannel = "instagram" | "tiktok" | "whatsapp";
-
+export type CoreChannel = "instagram" | "tiktok" | "whatsapp" | "telegram";

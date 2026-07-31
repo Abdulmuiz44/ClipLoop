@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
-type PublishStrategy = "direct_instagram" | "manual_export";
+type PublishStrategy = "direct_instagram" | "direct_telegram" | "manual_export";
 
 export function PublishStrategyControl({
   contentItemId,
@@ -12,7 +12,7 @@ export function PublishStrategyControl({
   value,
 }: {
   contentItemId: string;
-  targetChannel: "instagram" | "tiktok" | "whatsapp";
+  targetChannel: "instagram" | "tiktok" | "whatsapp" | "telegram";
   value: PublishStrategy;
 }) {
   const router = useRouter();
@@ -21,6 +21,7 @@ export function PublishStrategyControl({
   const [error, setError] = useState<string | null>(null);
 
   const canUseDirectInstagram = targetChannel === "instagram";
+  const canUseDirectTelegram = targetChannel === "telegram";
 
   async function save() {
     setLoading(true);
@@ -50,12 +51,13 @@ export function PublishStrategyControl({
         className="w-full rounded border px-2 py-1 text-sm"
       >
         {canUseDirectInstagram ? <option value="direct_instagram">Direct Instagram</option> : null}
+        {canUseDirectTelegram ? <option value="direct_telegram">Direct Telegram</option> : null}
         <option value="manual_export">Manual Export</option>
       </select>
       <Button type="button" onClick={save} disabled={loading}>
         {loading ? "Updating..." : "Set publish strategy"}
       </Button>
-      {!canUseDirectInstagram ? <p className="text-xs text-slate-600">Non-Instagram channels are manual export-only.</p> : null}
+      {!canUseDirectInstagram && !canUseDirectTelegram ? <p className="text-xs text-slate-600">This channel is manual export-only.</p> : null}
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
     </div>
   );

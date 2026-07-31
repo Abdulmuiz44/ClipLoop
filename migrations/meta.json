@@ -127,6 +127,12 @@
       "version": "0021",
       "tag": "0021_rate_limit_counters",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "0023",
+      "tag": "0023_telegram_publishing",
+      "breakpoints": true
     }
   ]
 }

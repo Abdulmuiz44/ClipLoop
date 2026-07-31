@@ -12,8 +12,8 @@ type Search = {
   sort?: string;
 };
 
-function normalizeChannel(value: string | undefined): "all" | "instagram" | "tiktok" | "whatsapp" {
-  if (value === "instagram" || value === "tiktok" || value === "whatsapp") return value;
+function normalizeChannel(value: string | undefined): "all" | "instagram" | "tiktok" | "whatsapp" | "telegram" {
+  if (value === "instagram" || value === "tiktok" || value === "whatsapp" || value === "telegram") return value;
   return "all";
 }
 

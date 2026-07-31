@@ -1,5 +1,5 @@
-export const SUPPORTED_PROJECT_CHANNELS = ["instagram", "tiktok", "whatsapp"] as const;
-export const SUPPORTED_PUBLISH_STRATEGIES = ["direct_instagram", "manual_export"] as const;
+export const SUPPORTED_PROJECT_CHANNELS = ["instagram", "tiktok", "whatsapp", "telegram"] as const;
+export const SUPPORTED_PUBLISH_STRATEGIES = ["direct_instagram", "direct_telegram", "manual_export"] as const;
 export const SUPPORTED_MANUAL_PUBLISH_STATUSES = ["ready_for_export", "exported", "posted"] as const;
 
 export type ProjectChannel = (typeof SUPPORTED_PROJECT_CHANNELS)[number];
@@ -17,6 +17,7 @@ export function parseLegacyPreferredChannelsText(text: string | null | undefined
   if (normalized.includes("instagram")) channels.push("instagram");
   if (normalized.includes("tiktok") || normalized.includes("tik tok")) channels.push("tiktok");
   if (normalized.includes("whatsapp") || normalized.includes("whats app")) channels.push("whatsapp");
+  if (normalized.includes("telegram")) channels.push("telegram");
   return channels;
 }
 
@@ -46,5 +47,6 @@ export function resolveContentItemTargetChannel(value: unknown, fallbackPlatform
 
 export function defaultPublishStrategyForChannel(channel: ProjectChannel): PublishStrategy {
   if (channel === "instagram") return "direct_instagram";
+  if (channel === "telegram") return "direct_telegram";
   return "manual_export";
 }

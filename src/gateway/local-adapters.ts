@@ -64,7 +64,7 @@ class LocalGatewayProviderAccess implements GatewayProviderAccess {
 }
 
 class LocalGatewayRenderExecutor implements GatewayRenderExecutor {
-  async execute(input: { contentItemId: string; renderer?: "legacy" | "hyperframes"; targetChannel?: "instagram" | "tiktok" | "whatsapp" }) {
+  async execute(input: { contentItemId: string; renderer?: "legacy" | "hyperframes"; targetChannel?: "instagram" | "tiktok" | "whatsapp" | "telegram" }) {
     const { renderContentItem } = await import("@/domains/rendering/service");
     try {
       const result = await renderContentItem(input.contentItemId, {

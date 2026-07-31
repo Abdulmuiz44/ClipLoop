@@ -18,8 +18,8 @@ export const planEnum = pgEnum("plan_type", ["free", "starter", "beta"]);
 export const goalTypeEnum = pgEnum("project_goal_type", ["clicks", "signups", "revenue"]);
 export const projectTypeEnum = pgEnum("project_type", ["business", "creator", "app"]);
 export const projectLanguageStyleEnum = pgEnum("project_language_style", ["english", "pidgin", "mixed"]);
-export const projectChannelEnum = pgEnum("project_channel_type", ["instagram", "tiktok", "whatsapp"]);
-export const publishStrategyEnum = pgEnum("content_publish_strategy", ["direct_instagram", "manual_export"]);
+export const projectChannelEnum = pgEnum("project_channel_type", ["instagram", "tiktok", "whatsapp", "telegram"]);
+export const publishStrategyEnum = pgEnum("content_publish_strategy", ["direct_instagram", "direct_telegram", "manual_export"]);
 export const manualPublishStatusEnum = pgEnum("content_manual_publish_status", ["ready_for_export", "exported", "posted"]);
 export const strategySourceEnum = pgEnum("strategy_cycle_source", ["initial", "iteration", "manual_regeneration"]);
 export const renderStatusEnum = pgEnum("render_status", ["pending", "queued", "rendering", "completed", "failed"]);
@@ -32,7 +32,7 @@ export const publishStatusEnum = pgEnum("publish_status", [
   "failed",
   "skipped",
 ]);
-export const platformEnum = pgEnum("platform_type", ["instagram", "tiktok"]);
+export const platformEnum = pgEnum("platform_type", ["instagram", "tiktok", "telegram"]);
 export const contentTypeEnum = pgEnum("content_type", ["slideshow_video"]);
 export const assetTypeEnum = pgEnum("asset_type", ["video", "thumbnail"]);
 export const jobStatusEnum = pgEnum("job_status", ["pending", "running", "completed", "failed", "dead"]);

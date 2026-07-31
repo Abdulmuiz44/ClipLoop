@@ -51,8 +51,8 @@ export function ProjectSettingsForm({
     const preferredChannels = formData
       .getAll("preferredChannels")
       .map((value) => String(value).toLowerCase().trim())
-      .filter((value): value is "instagram" | "tiktok" | "whatsapp" =>
-        ["instagram", "tiktok", "whatsapp"].includes(value),
+      .filter((value): value is "instagram" | "tiktok" | "whatsapp" | "telegram" =>
+        ["instagram", "tiktok", "whatsapp", "telegram"].includes(value),
       );
     const res = await fetch(`/api/projects/${project.id}/settings`, {
       method: "PATCH",

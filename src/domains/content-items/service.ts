@@ -97,6 +97,9 @@ export async function updateContentItemPublishStrategy(contentItemId: string, pu
   if (targetChannel !== "instagram" && publishStrategy === "direct_instagram") {
     throw new Error(`direct_instagram strategy is only allowed for instagram target channel.`);
   }
+  if (targetChannel !== "telegram" && publishStrategy === "direct_telegram") {
+    throw new Error(`direct_telegram strategy is only allowed for telegram target channel.`);
+  }
 
   const [updated] = await db
     .update(schema.contentItems)
@@ -153,7 +156,7 @@ export async function markContentItemManualPosted(contentItemId: string) {
 export async function listManualQueueItemsForUser(
   userId: string,
   input?: {
-    targetChannel?: "instagram" | "tiktok" | "whatsapp" | "all";
+    targetChannel?: "instagram" | "tiktok" | "whatsapp" | "telegram" | "all";
     manualStatus?: "ready_for_export" | "exported" | "posted" | "all";
     sort?: "newest" | "oldest";
   },

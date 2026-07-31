@@ -1,12 +1,13 @@
 import { z } from "zod";
 
-export const outputChannelSchema = z.enum(["instagram", "tiktok", "whatsapp"]);
-export const publishStrategySchema = z.enum(["direct_instagram", "manual_export"]);
+export const outputChannelSchema = z.enum(["instagram", "tiktok", "whatsapp", "telegram"]);
+export const publishStrategySchema = z.enum(["direct_instagram", "direct_telegram", "manual_export"]);
 export const manualPublishStatusSchema = z.enum(["ready_for_export", "exported", "posted"]);
 export const channelCopyMapSchema = z.object({
   instagram: z.string().optional(),
   tiktok: z.string().optional(),
   whatsapp: z.string().optional(),
+  telegram: z.string().optional(),
 });
 
 export const generatedPostSchema = z.object({

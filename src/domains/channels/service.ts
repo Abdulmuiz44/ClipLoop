@@ -185,7 +185,7 @@ export async function connectInstagramFromCallback(input: { code: string; state:
   return created;
 }
 
-export async function getProjectChannel(projectId: string, platform: "instagram" | "tiktok" = "instagram") {
+export async function getProjectChannel(projectId: string, platform: "instagram" | "tiktok" | "telegram" = "instagram") {
   return db.query.connectedChannels.findFirst({
     where: and(eq(schema.connectedChannels.projectId, projectId), eq(schema.connectedChannels.platform, platform)),
     orderBy: [desc(schema.connectedChannels.updatedAt)],
@@ -224,7 +224,7 @@ export async function getProjectChannelStatus(projectId: string) {
   };
 }
 
-export async function disconnectProjectChannel(projectId: string, platform: "instagram" | "tiktok" = "instagram") {
+export async function disconnectProjectChannel(projectId: string, platform: "instagram" | "tiktok" | "telegram" = "instagram") {
   const channel = await getProjectChannel(projectId, platform);
   if (!channel) return null;
 
