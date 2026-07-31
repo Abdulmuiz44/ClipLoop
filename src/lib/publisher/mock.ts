@@ -27,7 +27,7 @@ export const mockPublisher: PublisherAdapter = {
     const externalPostId = deterministicExternalId(contentItem.id);
     return {
       externalPostId,
-      externalPostUrl: `https://cliploop.local/mock/${externalPostId}`,
+      externalPostUrl: `https://cliplane.local/mock/${externalPostId}`,
       publishedAt: new Date(),
       mode: "mock",
       metadataJson: { provider: "mockPublisher" },

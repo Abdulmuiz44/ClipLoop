@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 import {
-  ClipLoop,
+  ClipLane,
   ClipLaneLocal,
 } from "../src/index.js";
 
@@ -49,15 +49,15 @@ test("x export generation", async () => {
 });
 
 test("hosted client requires api key for render", async () => {
-  const cliploop = new ClipLoop({ baseUrl: "http://localhost:3000" });
+  const cliplane = new ClipLane({ baseUrl: "http://localhost:3000" });
 
   await assert.rejects(
     () =>
-      cliploop.createRenderJob({
+      cliplane.createRenderJob({
         update: "We shipped Codra v0.1.5",
         product: "Codra",
       }),
-    /ClipLoop API key required for hosted rendering/
+    /ClipLane API key required for hosted rendering/
   );
 });
 
@@ -90,12 +90,12 @@ test("hosted client uses baseUrl override", async () => {
   }) as typeof fetch;
 
   try {
-    const cliploop = new ClipLoop({
-      apiKey: "cliploop_test_key",
+    const cliplane = new ClipLane({
+      apiKey: "cliplane_test_key",
       baseUrl: "http://localhost:3000",
     });
 
-    const job = await cliploop.createRenderJob({
+    const job = await cliplane.createRenderJob({
       update: "We shipped Codra v0.1.5",
       product: "Codra",
     });
@@ -117,11 +117,11 @@ test("hosted scheduling methods use the public scheduling endpoint", async () =>
   }) as typeof fetch;
 
   try {
-    const cliploop = new ClipLoop({ apiKey: "cliploop_test_key", baseUrl: "http://localhost:3000" });
-    await cliploop.scheduleContentItem("item/123", { scheduledFor: new Date("2027-01-01T00:00:00.000Z") });
-    await cliploop.rescheduleContentItem("item/123", { scheduledFor: "2027-01-02T00:00:00.000Z" });
-    await cliploop.cancelScheduledContentItem("item/123");
-    await cliploop.getScheduleStatus("item/123");
+    const cliplane = new ClipLane({ apiKey: "cliplane_test_key", baseUrl: "http://localhost:3000" });
+    await cliplane.scheduleContentItem("item/123", { scheduledFor: new Date("2027-01-01T00:00:00.000Z") });
+    await cliplane.rescheduleContentItem("item/123", { scheduledFor: "2027-01-02T00:00:00.000Z" });
+    await cliplane.cancelScheduledContentItem("item/123");
+    await cliplane.getScheduleStatus("item/123");
   } finally {
     globalThis.fetch = originalFetch;
   }
@@ -137,7 +137,7 @@ test("hosted scheduling methods use the public scheduling endpoint", async () =>
 
 test("package exports work", async () => {
   const sdk = await import("../src/index.js");
-  assert.equal(typeof sdk.ClipLoop, "function");
+  assert.equal(typeof sdk.ClipLane, "function");
   assert.equal(typeof sdk.ClipLaneLocal, "function");
 });
 
@@ -163,10 +163,10 @@ test("api key is not printed or logged", async () => {
   }) as typeof fetch;
 
   try {
-    const cliploop = new ClipLoop({ apiKey: "super-secret-key" });
+    const cliplane = new ClipLane({ apiKey: "super-secret-key" });
     await assert.rejects(
       () =>
-        cliploop.createRenderJob({
+        cliplane.createRenderJob({
           update: "We shipped Codra v0.1.5",
         }),
       /network unavailable/

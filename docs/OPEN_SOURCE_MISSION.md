@@ -1,6 +1,6 @@
-# ClipLoop Open Source Mission
+# ClipLane Open Source Mission
 
-ClipLoop is an open-source video workflow layer for builders and developers.
+ClipLane is an open-source video workflow layer for builders and developers.
 
 ## Principles
 
@@ -14,8 +14,8 @@ ClipLoop is an open-source video workflow layer for builders and developers.
 
 ## Product shape
 
-- CLI: `@talocode/cliploop`
-- SDK: `@talocode/cliploop-sdk`
+- CLI: `@talocode/cliplane`
+- SDK: `@talocode/cliplane-sdk`
 
-The SDK is meant to help teams integrate ClipLoop into their own apps, dashboards, agents, and automation workflows.
+The SDK is meant to help teams integrate ClipLane into their own apps, dashboards, agents, and automation workflows.
 

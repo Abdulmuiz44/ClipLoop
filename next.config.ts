@@ -13,7 +13,7 @@ const nextConfig: NextConfig = {
       },
       // Serve Vite SPA for all non-API, non-Next.js-internal routes
       {
-        source: "/:path((?!api/|_next/|favicon|generated/|assets/|cliploop-logo).*)",
+        source: "/:path((?!api/|_next/|favicon|generated/|assets/|cliplane-logo).*)",
         destination: "/index.html",
       },
     ];

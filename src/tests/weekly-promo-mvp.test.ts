@@ -6,11 +6,11 @@ import { runWeeklyPromoMvp } from "@/domains/weekly-promo/service";
 import type { SceneBlock } from "@/lib/render/hyperframes/types";
 
 const baseInput = {
-  appName: "ClipLoop",
-  appWebsiteUrl: "https://cliploop.ai",
+  appName: "ClipLane",
+  appWebsiteUrl: "https://cliplane.ai",
   weeklyUpdate: "We shipped AI storyboard drafts for weekly promos.",
   targetAudience: "Indie SaaS founders",
-  callToAction: "Try ClipLoop this week",
+  callToAction: "Try ClipLane this week",
   channel: "instagram" as const,
   tone: "direct and optimistic",
 };
@@ -69,19 +69,19 @@ test("weekly promo script prompt keeps weekly update as primary topic and includ
 
   await runWeeklyPromoMvp(baseInput, {
     extractWebsiteTextFn: async () => ({
-      websiteUrl: "https://cliploop.ai",
-      extractedText: "ClipLoop helps teams create weekly short videos.",
+      websiteUrl: "https://cliplane.ai",
+      extractedText: "ClipLane helps teams create weekly short videos.",
     }),
     generateStructuredObjectFn: (async ({ schema, prompt }: { schema: { parse: (value: unknown) => any }; prompt: string }) => {
       prompts.push(prompt);
       if (prompt.includes("Extract structured product context")) {
         return schema.parse({
-          productName: "ClipLoop",
+          productName: "ClipLane",
           oneLineDescription: "Create weekly promo videos quickly",
           targetUsers: ["Founders"],
           mainBenefits: ["Speed"],
           keyFeatures: ["Storyboard AI"],
-          ctaLanguage: ["Try ClipLoop this week"],
+          ctaLanguage: ["Try ClipLane this week"],
           toneHints: ["direct"],
         });
       }
@@ -89,7 +89,7 @@ test("weekly promo script prompt keeps weekly update as primary topic and includ
         hook: "Weekly update is live",
         body: ["Storyboard AI shipped", "Faster weekly promo loop"],
         caption: "Weekly update",
-        cta: "Try ClipLoop this week",
+        cta: "Try ClipLane this week",
         sceneOutline: ["1. Hook: Weekly update", "2. Feature: Storyboard", "3. CTA: Try now"],
       });
     }) as any,
@@ -131,18 +131,18 @@ test("weekly promo builds scene plan, returns render preview, and saves artifact
 
   const result = await runWeeklyPromoMvp({ ...baseInput, channel: "x" }, {
     extractWebsiteTextFn: async () => ({
-      websiteUrl: "https://cliploop.ai",
-      extractedText: "ClipLoop helps teams create weekly short videos.",
+      websiteUrl: "https://cliplane.ai",
+      extractedText: "ClipLane helps teams create weekly short videos.",
     }),
     generateStructuredObjectFn: (async ({ schema, prompt }: { schema: { parse: (value: unknown) => any }; prompt: string }) => {
       if (prompt.includes("Extract structured product context")) {
         return schema.parse({
-          productName: "ClipLoop",
+          productName: "ClipLane",
           oneLineDescription: "Create weekly promo videos quickly",
           targetUsers: ["Founders"],
           mainBenefits: ["Speed"],
           keyFeatures: ["Storyboard AI"],
-          ctaLanguage: ["Try ClipLoop this week"],
+          ctaLanguage: ["Try ClipLane this week"],
           toneHints: ["direct"],
         });
       }
@@ -150,7 +150,7 @@ test("weekly promo builds scene plan, returns render preview, and saves artifact
         hook: "Weekly update is live",
         body: ["Storyboard AI shipped", "Faster weekly promo loop"],
         caption: "Weekly update",
-        cta: "Try ClipLoop this week",
+        cta: "Try ClipLane this week",
         sceneOutline: ["1. Hook: Weekly update", "2. Feature: Storyboard", "3. CTA: Try now"],
       });
     }) as any,
@@ -158,7 +158,7 @@ test("weekly promo builds scene plan, returns render preview, and saves artifact
       seen.sceneOutline = brief.sceneOutline;
       return [
         { type: "hook", purpose: "Weekly", timing: { startMs: 0, durationMs: 3000 }, primaryText: "Weekly update is live" },
-        { type: "cta", purpose: "CTA", timing: { startMs: 3000, durationMs: 3000 }, primaryText: "Try ClipLoop this week" },
+        { type: "cta", purpose: "CTA", timing: { startMs: 3000, durationMs: 3000 }, primaryText: "Try ClipLane this week" },
       ];
     },
     prepareRenderOutputFn: async (contentItemId) => ({

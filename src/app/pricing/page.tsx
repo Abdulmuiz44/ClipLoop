@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { StarterCheckoutForm } from "@/components/marketing/starter-checkout-form";
-import { ClipLoopLogo } from "@/components/ui/cliploop-logo";
+import { ClipLaneLogo } from "@/components/ui/cliplane-logo";
 
 export const metadata: Metadata = {
-  title: "Pricing | ClipLoop",
+  title: "Pricing | ClipLane",
   description: "Free chat for everyone. Credits are consumed for generation and rendering. Upgrade to Pro for higher limits.",
   alternates: { canonical: "/pricing" },
 };
@@ -22,11 +22,11 @@ export default function PricingPage() {
   return (
     <div className="space-y-6 md:space-y-8">
       <section className="cl-card p-6 md:p-8">
-        <ClipLoopLogo href="/" />
+        <ClipLaneLogo href="/" />
         <p className="cl-kicker">Pricing</p>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900 md:text-4xl">Free chat. Pay for generation and render capacity.</h1>
         <p className="mt-3 max-w-3xl text-base leading-7 text-slate-600">
-          ClipLoop chat stays free. Credits are consumed when you run promo copy generation and video rendering operations.
+          ClipLane chat stays free. Credits are consumed when you run promo copy generation and video rendering operations.
         </p>
       </section>
 
@@ -36,7 +36,7 @@ export default function PricingPage() {
           <h2 className="mt-2 text-3xl font-semibold text-slate-900">
             $0<span className="text-base font-medium text-slate-500">/month</span>
           </h2>
-          <p className="mt-4 text-sm text-slate-600">Best for testing ClipLoop with one business profile and light monthly output.</p>
+          <p className="mt-4 text-sm text-slate-600">Best for testing ClipLane with one business profile and light monthly output.</p>
           <ul className="mt-5 space-y-3 text-sm">
             <Feature>Unlimited chat messages</Feature>
             <Feature>1 active project</Feature>

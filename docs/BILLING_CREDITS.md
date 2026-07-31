@@ -2,7 +2,7 @@
 
 ## Credit Types
 
-ClipLoop uses a dual-credit system:
+ClipLane uses a dual-credit system:
 
 | Bucket | Purpose | Used By |
 |--------|---------|---------|

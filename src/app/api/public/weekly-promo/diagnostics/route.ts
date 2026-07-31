@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 function assertDebugHeader(request: Request) {
-  const header = request.headers.get("x-cliploop-debug");
+  const header = request.headers.get("x-cliplane-debug");
   if (!header || header !== "safe") {
     return NextResponse.json(
       { error: "Debug access denied.", code: "DEBUG_ACCESS_DENIED", secretsExposed: false },

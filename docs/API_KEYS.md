@@ -1,6 +1,6 @@
-# ClipLoop API Keys
+# ClipLane API Keys
 
-Get your ClipLoop API key at [https://cliploop.site](https://cliploop.site).
+Get your ClipLane API key at [https://cliplane.site](https://cliplane.site).
 
 ## What you need a key for
 
@@ -11,6 +11,6 @@ Hosted rendering and other remote workflows require an API key.
 ## Important
 
 - Do not hardcode secrets into source files.
-- Prefer environment variables such as `CLIPLOOP_API_KEY`.
+- Prefer environment variables such as `CLIPLANE_API_KEY`.
 - Keep keys server-side.
 

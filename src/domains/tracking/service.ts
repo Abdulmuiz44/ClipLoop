@@ -15,7 +15,7 @@ export function buildTrackedDestinationUrl(input: {
   clickId: string;
 }) {
   const url = new URL(input.destinationUrl);
-  url.searchParams.set("utm_source", "cliploop");
+  url.searchParams.set("utm_source", "cliplane");
   url.searchParams.set("utm_medium", "short_form");
   url.searchParams.set("utm_campaign", input.trackingSlug);
   url.searchParams.set("clp_post", input.contentItemId);
@@ -41,7 +41,7 @@ export async function logTrackedClick(input: {
     trackingSlug: contentItem.trackingSlug,
     clickId,
     referrer: input.referrer ?? null,
-    utmSource: "cliploop",
+    utmSource: "cliplane",
     utmMedium: "short_form",
     utmCampaign: contentItem.trackingSlug,
     ipHash: hashIp(input.ip),

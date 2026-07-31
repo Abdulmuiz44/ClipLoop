@@ -129,7 +129,7 @@ export default function BusinessPage() {
       <section className="cl-card p-6">
         <p className="cl-kicker">Business Context Engine</p>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-100">Turn your website into a promo content engine.</h1>
-        <p className="mt-2 text-sm text-slate-400">Paste your website and ClipLoop extracts your offer, audience, and positioning into reusable content context.</p>
+        <p className="mt-2 text-sm text-slate-400">Paste your website and ClipLane extracts your offer, audience, and positioning into reusable content context.</p>
       </section>
 
       <section className="cl-card p-5">

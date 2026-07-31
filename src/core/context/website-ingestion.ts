@@ -57,7 +57,7 @@ async function fetchPage(url: string, timeoutMs = 7000): Promise<{ html: string;
     const response = await fetch(url, {
       signal: controller.signal,
       headers: {
-        "User-Agent": "ClipLoopBot/1.0 (+https://cliploop.app)",
+        "User-Agent": "ClipLaneBot/1.0 (+https://cliplane.app)",
         Accept: "text/html,application/xhtml+xml",
       },
     });

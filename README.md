@@ -1,33 +1,33 @@
-# ClipLoop
+# ClipLane
 
-ClipLoop is an open-source video workflow for builders. One engine that turns product updates, raw clips, screen recordings, terminal demos, images, and scripts into edited videos for every channel. Local-first.
+ClipLane is an open-source video workflow for builders. One engine that turns product updates, raw clips, screen recordings, terminal demos, images, and scripts into edited videos for every channel. Local-first.
 
 ## What’s here
 
-- `packages/cliploop-sdk` - the published SDK, `@talocode/cliploop-sdk`
-- `packages/cliploop-cli` - the local CLI for script, storyboard, export, and render workflows
+- `packages/cliplane-sdk` - the published SDK, `@talocode/cliplane-sdk`
+- `packages/cliplane-cli` - the local CLI for script, storyboard, export, and render workflows
 - `src` - the Next.js app and backend
 - `docs` - product, API, billing, and architecture notes
-- `apps/cliploop-sdk-demo-video` - the release demo video generator
+- `apps/cliplane-sdk-demo-video` - the release demo video generator
 
 ## SDK quick start
 
 ```bash
-npm install @talocode/cliploop-sdk
+npm install @talocode/cliplane-sdk
 ```
 
 ```ts
-import { ClipLoopLocal, ClipLoop } from "@talocode/cliploop-sdk";
+import { ClipLaneLocal, ClipLane } from "@talocode/cliplane-sdk";
 
-const local = new ClipLoopLocal();
+const local = new ClipLaneLocal();
 const script = await local.createScript({
-  update: "We shipped ClipLoop SDK v0.1.0",
-  product: "ClipLoop",
+  update: "We shipped ClipLane SDK v0.1.0",
+  product: "ClipLane",
   audience: "builders",
 });
 
-const hosted = new ClipLoop({
-  apiKey: process.env.CLIPLOOP_API_KEY,
+const hosted = new ClipLane({
+  apiKey: process.env.CLIPLANE_API_KEY,
 });
 ```
 
@@ -59,5 +59,5 @@ Other useful commands:
 
 Release videos are generated locally and attached to GitHub Releases. The current SDK release demo lives at:
 
-- `apps/cliploop-sdk-demo-video/dist/cliploop-sdk-v0.1.0-demo.mp4`
+- `apps/cliplane-sdk-demo-video/dist/cliplane-sdk-v0.1.0-demo.mp4`
 

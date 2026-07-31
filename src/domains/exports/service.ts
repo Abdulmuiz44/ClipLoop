@@ -26,7 +26,7 @@ function buildReadme(params: {
   files: string[];
 }) {
   return [
-    "ClipLoop Manual Export Bundle",
+    "ClipLane Manual Export Bundle",
     "",
     `Business: ${params.businessName}`,
     `Target channel: ${params.targetChannel}`,

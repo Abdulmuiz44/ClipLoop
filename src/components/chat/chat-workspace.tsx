@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ClipLoopLogo } from "@/components/ui/cliploop-logo";
+import { ClipLaneLogo } from "@/components/ui/cliplane-logo";
 
 type Conversation = {
   id: string;
@@ -168,7 +168,7 @@ export function ChatWorkspace(props: {
         } ${embedded ? "hidden md:block" : ""}`}
       >
         <div className="flex items-center justify-between gap-2 border-b pb-4 cl-divider">
-          <ClipLoopLogo compact={false} />
+          <ClipLaneLogo compact={false} />
           <button className="rounded-md border border-slate-300 px-2.5 py-1.5 text-xs text-slate-700 transition md:hidden" onClick={() => setSidebarOpen(false)} type="button">
             Close
           </button>
@@ -223,7 +223,7 @@ export function ChatWorkspace(props: {
               Menu
             </button>
             <div className="min-w-0">
-              <p className="cl-kicker">ClipLoop Operator</p>
+              <p className="cl-kicker">ClipLane Operator</p>
               <h1 className="truncate text-base font-semibold tracking-tight text-slate-900">{activeConversation?.title ?? "Chat workspace"}</h1>
             </div>
             <Link href="/pricing" className="rounded-md border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:border-slate-400 hover:text-slate-900">
@@ -238,7 +238,7 @@ export function ChatWorkspace(props: {
               <div className="cl-card space-y-6 p-6 text-sm text-slate-700 md:p-8">
                 <div className="space-y-2 text-center">
                   <p className="cl-kicker">New conversation</p>
-                  <h2 className="text-xl font-semibold tracking-tight text-slate-900">How can ClipLoop help today?</h2>
+                  <h2 className="text-xl font-semibold tracking-tight text-slate-900">How can ClipLane help today?</h2>
                   <p className="mx-auto max-w-lg text-slate-600">Ask strategy questions, generate copy, or render a short-form promo video from your saved business context.</p>
                 </div>
 
@@ -263,7 +263,7 @@ export function ChatWorkspace(props: {
                 }`}
               >
                 <p className={`mb-1.5 text-[11px] uppercase tracking-[0.14em] ${message.role === "user" ? "text-emerald-100" : "text-slate-500"}`}>
-                  {message.role === "user" ? "You" : message.kind === "status" ? "Status" : "ClipLoop"}
+                  {message.role === "user" ? "You" : message.kind === "status" ? "Status" : "ClipLane"}
                 </p>
                 <p className="whitespace-pre-wrap leading-6">{message.content}</p>
                 {message.kind === "result" ? <ResultCard metadata={message.metadataJson ?? {}} /> : null}

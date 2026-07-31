@@ -1,11 +1,11 @@
 # Release Demo Video
 
-ClipLoop release videos are kept as generated assets, not committed binaries.
+ClipLane release videos are kept as generated assets, not committed binaries.
 
 ## SDK demo
 
-- Source: `apps/cliploop-sdk-demo-video/render-demo.mjs`
-- Output: `apps/cliploop-sdk-demo-video/dist/cliploop-sdk-v0.1.0-demo.mp4`
+- Source: `apps/cliplane-sdk-demo-video/render-demo.mjs`
+- Output: `apps/cliplane-sdk-demo-video/dist/cliplane-sdk-v0.1.0-demo.mp4`
 
 ## Notes
 

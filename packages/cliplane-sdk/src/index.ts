@@ -1,4 +1,4 @@
-export type ClipLoopClientOptions = {
+export type ClipLaneClientOptions = {
   apiKey?: string;
   baseUrl?: string;
 };
@@ -83,13 +83,13 @@ export type CancelScheduleResult = {
   cancelledJobId: string;
 };
 
-const DEFAULT_BASE_URL = "https://api.cliploop.site";
+const DEFAULT_BASE_URL = "https://api.cliplane.site";
 const HOSTED_RENDER_KEY_ERROR =
-  "ClipLoop API key required for hosted rendering. Get one at https://cliploop.site";
+  "ClipLane API key required for hosted rendering. Get one at https://cliplane.site";
 
 function envApiKey(): string | undefined {
   if (typeof process !== "undefined" && process?.env) {
-    return process.env.CLIPLOOP_API_KEY;
+    return process.env.CLIPLANE_API_KEY;
   }
   return undefined;
 }
@@ -260,7 +260,7 @@ async function hostedRequest<T>(
     const message =
       typeof data === "object" && data && "error" in data
         ? String((data as Record<string, unknown>).error)
-        : `ClipLoop request failed with status ${response.status}`;
+        : `ClipLane request failed with status ${response.status}`;
     throw new Error(message);
   }
 
@@ -336,12 +336,12 @@ export class ClipLaneLocal {
   }
 }
 
-/** Legacy hosted ClipLoop client retained for the existing hosted API. */
-export class ClipLoop extends ClipLaneLocal {
+/** Legacy hosted ClipLane client retained for the existing hosted API. */
+export class ClipLane extends ClipLaneLocal {
   readonly apiKey?: string;
   readonly baseUrl: string;
 
-  constructor(options: ClipLoopClientOptions = {}) {
+  constructor(options: ClipLaneClientOptions = {}) {
     super();
     this.apiKey = options.apiKey ?? envApiKey();
     this.baseUrl = normalizeBaseUrl(options.baseUrl);

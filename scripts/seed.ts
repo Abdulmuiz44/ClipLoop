@@ -13,7 +13,7 @@ async function main() {
     .insert(schema.users)
     .values({
       email: env.DEMO_USER_EMAIL,
-      fullName: "ClipLoop Demo User",
+      fullName: "ClipLane Demo User",
       plan: "free",
     })
     .returning();

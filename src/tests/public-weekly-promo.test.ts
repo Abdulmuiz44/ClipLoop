@@ -6,18 +6,18 @@ import { weeklyPromoInputSchema } from "@/lib/validation/weekly-promo";
 // --- Schema validation (no DB needed) ---
 
 const validPayload = {
-  appName: "ClipLoop",
-  appWebsiteUrl: "https://cliploop.ai",
+  appName: "ClipLane",
+  appWebsiteUrl: "https://cliplane.ai",
   weeklyUpdate: "We shipped AI storyboard drafts for weekly promos.",
   targetAudience: "Indie SaaS founders",
-  callToAction: "Try ClipLoop this week",
+  callToAction: "Try ClipLane this week",
   channel: "instagram" as const,
   tone: "direct and optimistic",
 };
 
 test("valid payload passes weeklyPromoInputSchema", () => {
   const result = weeklyPromoInputSchema.parse({ ...validPayload });
-  assert.equal(result.appName, "ClipLoop");
+  assert.equal(result.appName, "ClipLane");
   assert.equal(result.channel, "instagram");
   assert.equal(result.targetAudience, "Indie SaaS founders");
 });
@@ -110,7 +110,7 @@ test("public endpoint response shape matches spec", () => {
     id: "weekly-promo-abc-123",
     websiteContextUsed: true,
     scrapeError: null,
-    productContext: { productName: "ClipLoop" },
+    productContext: { productName: "ClipLane" },
     script: {
       hook: "Big update this week",
       body: ["We shipped storyboard drafts", "You can now create faster"],
@@ -270,14 +270,14 @@ test("without debug header: generic response unchanged", () => {
   assert.ok(!("debug" in body));
 });
 
-test("with X-ClipLoop-Debug: safe: sanitized debug fields included", () => {
+test("with X-ClipLane-Debug: safe: sanitized debug fields included", () => {
   const body = buildTestErrorBody({
     code: "VIDEO_RENDER_FAILED",
     message: "Rendered video output is missing.",
     debugMode: true,
     extra: {
       errorName: "VideoRenderFailedError",
-      idempotencyKeyPrefix: "cliploop-real",
+      idempotencyKeyPrefix: "cliplane-real",
       idempotencyCleanupRan: true,
     },
   });
@@ -287,7 +287,7 @@ test("with X-ClipLoop-Debug: safe: sanitized debug fields included", () => {
   assert.equal(body.debug.code, "VIDEO_RENDER_FAILED");
   assert.equal(body.debug.safeMessage, "Rendered video output is missing.");
   assert.equal(body.debug.errorName, "VideoRenderFailedError");
-  assert.equal(body.debug.idempotencyKeyPrefix, "cliploop-real");
+  assert.equal(body.debug.idempotencyKeyPrefix, "cliplane-real");
   assert.equal(body.debug.idempotencyCleanupRan, true);
 });
 
@@ -297,7 +297,7 @@ test("debug response does not include Authorization, API key, DATABASE_URL, stac
     message: "Video renderer is unavailable.",
     debugMode: true,
     extra: {
-      idempotencyKeyPrefix: "cliploop-real",
+      idempotencyKeyPrefix: "cliplane-real",
       idempotencyCleanupRan: false,
     },
   });
@@ -305,7 +305,7 @@ test("debug response does not include Authorization, API key, DATABASE_URL, stac
   const serialized = JSON.stringify(body);
   assert.ok(!serialized.includes("Authorization"));
   assert.ok(!serialized.includes("DATABASE_URL"));
-  assert.ok(!serialized.includes("CLIPLOOP_API_KEY"));
+  assert.ok(!serialized.includes("CLIPLANE_API_KEY"));
   assert.ok(!serialized.includes("stack"));
   assert.ok(!serialized.includes("raw body"));
   assert.ok(!serialized.includes("api-key"));

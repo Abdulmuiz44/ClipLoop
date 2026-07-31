@@ -75,7 +75,7 @@ export async function POST(request: Request) {
   try {
     return await handleWeeklyPromoPost(request);
   } catch (error) {
-    const debugMode = request.headers.get("x-cliploop-debug") === "safe";
+    const debugMode = request.headers.get("x-cliplane-debug") === "safe";
     const idempotencyKey = request.headers.get("Idempotency-Key") || request.headers.get("idempotency-key");
     const trimmedIdempotencyKey = idempotencyKey?.trim() ?? "";
     if (trimmedIdempotencyKey.length >= 8) {
@@ -107,7 +107,7 @@ export async function POST(request: Request) {
 }
 
 async function handleWeeklyPromoPost(request: Request) {
-  const debugMode = request.headers.get("x-cliploop-debug") === "safe";
+  const debugMode = request.headers.get("x-cliplane-debug") === "safe";
   let idempotencyKeyForDebug: string | null = null;
   let idempotencyKey: string | null = null;
   let requestIdempotencyKey = "";

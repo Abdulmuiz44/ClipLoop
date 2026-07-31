@@ -1,10 +1,10 @@
 {
-  "name": "cliploop",
+  "name": "cliplane",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "cd cliploop-vite && npm install --silent && npm run build && mkdir -p ../public && cp -r dist/* ../public/",
+    "prebuild": "cd cliplane-vite && npm install --silent && npm run build && mkdir -p ../public && cp -r dist/* ../public/",
     "build": "next build",
     "start": "node scripts/db-fix.js && next start",
     "lint": "next lint",

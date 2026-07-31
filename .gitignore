@@ -11,21 +11,21 @@ tsconfig.tsbuildinfo
 .netlify
 
 # Vite frontend
-cliploop-vite/node_modules
-cliploop-vite/dist
-cliploop-vite/.env
-cliploop-vite/tsconfig.tsbuildinfo
+cliplane-vite/node_modules
+cliplane-vite/dist
+cliplane-vite/.env
+cliplane-vite/tsconfig.tsbuildinfo
 
 # Generated site and release artifacts
 docs-site/dist
 public/index.html
 public/_redirects
 public/assets/
-apps/cliploop-demo-video/dist
-apps/cliploop-sdk-demo-video/dist
-apps/cliploop-sdk-demo-video/.render-text
-packages/cliploop-cli/dist
-packages/cliploop-cli/.cliploop
-packages/cliploop-cli/*.tgz
-packages/cliploop-sdk/dist
-packages/cliploop-sdk/*.tgz
+apps/cliplane-demo-video/dist
+apps/cliplane-sdk-demo-video/dist
+apps/cliplane-sdk-demo-video/.render-text
+packages/cliplane-cli/dist
+packages/cliplane-cli/.cliplane
+packages/cliplane-cli/*.tgz
+packages/cliplane-sdk/dist
+packages/cliplane-sdk/*.tgz

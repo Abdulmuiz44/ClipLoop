@@ -16,7 +16,7 @@ type StarterCheckoutFormProps = {
 export function StarterCheckoutForm({
   email = "",
   name = "",
-  title = "Upgrade to ClipLoop Pro",
+  title = "Upgrade to ClipLane Pro",
   description = "Unlock higher generation limits and video renders for your brands. Pro access is activated immediately after checkout.",
   showFields = true,
   submitLabel = "Start Pro checkout",

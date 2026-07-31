@@ -1,6 +1,6 @@
-# ClipLoop Video Pipeline Architecture
+# ClipLane Video Pipeline Architecture
 
-Architecture for ClipLoop as a **short-form promo video engine for indie apps**, informed by [video-use](https://github.com/browser-use/video-use) patterns.  
+Architecture for ClipLane as a **short-form promo video engine for indie apps**, informed by [video-use](https://github.com/browser-use/video-use) patterns.
 **Research reference:** LaunchPix `docs/research/VIDEO_USE_ARCHITECTURE_NOTES.md`  
 **Status:** PR 2 shipped — `PromoBrief` schema is the first production contract.
 
@@ -20,7 +20,7 @@ This mirrors Agent Browser (DOM over screenshots) and video-use (transcript over
 
 ---
 
-## What ClipLoop is becoming
+## What ClipLane is becoming
 
 | Was (wedge) | Becomes (engine) |
 |-------------|------------------|
@@ -28,7 +28,7 @@ This mirrors Agent Browser (DOM over screenshots) and video-use (transcript over
 | Slideshow-style renders | Scene-plan + EDL-driven composition |
 | Fire-and-forget API | Plan → render → self-eval → publish → learn |
 
-ClipLoop is **not** a browser-based NLE. It is an API-first promo engine with a dashboard operator surface.
+ClipLane is **not** a browser-based NLE. It is an API-first promo engine with a dashboard operator surface.
 
 ---
 
@@ -311,7 +311,7 @@ Existing tracking domain: slug, clicks, conversions, `compute_performance_rollup
 
 ## Hard rules (from video-use, adapted)
 
-Production correctness for ClipLoop renders:
+Production correctness for ClipLane renders:
 
 1. Subtitles applied **last** in filter chain (after overlays)
 2. Per-segment extract → lossless concat when mixing footage

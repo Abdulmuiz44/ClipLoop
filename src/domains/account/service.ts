@@ -82,7 +82,7 @@ const PLAN_LIMITS: Record<PlanType, PlanLimits> = {
 };
 
 export class ProductAccessError extends Error {
-  constructor(message = "ClipLoop access is currently unavailable for this account.") {
+  constructor(message = "ClipLane access is currently unavailable for this account.") {
     super(message);
   }
 }
@@ -98,7 +98,7 @@ function buildOfflineMockPlanState(userId: string) {
     user: {
       id: userId || OFFLINE_DEMO_USER_ID,
       email: env.DEMO_USER_EMAIL,
-      fullName: "ClipLoop Demo User",
+      fullName: "ClipLane Demo User",
       plan: "beta" as const,
       billingStatus: "offline_mock",
       stripeCustomerId: null,

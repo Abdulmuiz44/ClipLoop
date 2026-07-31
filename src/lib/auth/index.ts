@@ -27,7 +27,7 @@ export async function getOrCreateDemoUser() {
       .insert(schema.users)
       .values({
         email: env.DEMO_USER_EMAIL,
-        fullName: "ClipLoop Demo User",
+        fullName: "ClipLane Demo User",
         plan: "beta",
         isBetaApproved: true,
         betaApprovedAt: new Date(),
@@ -44,7 +44,7 @@ export async function getOrCreateDemoUser() {
     return {
       id: OFFLINE_DEMO_USER_ID,
       email: env.DEMO_USER_EMAIL,
-      fullName: "ClipLoop Demo User",
+      fullName: "ClipLane Demo User",
       plan: "beta",
       billingStatus: "offline_mock",
       stripeCustomerId: null,

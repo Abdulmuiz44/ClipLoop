@@ -1,4 +1,4 @@
-# ClipLoop API Platform Roadmap
+# ClipLane API Platform Roadmap
 
 ## Current State (v0 — Weekly Promo)
 
@@ -12,15 +12,15 @@
 
 ## v0.1 — Developer Experience
 
-- SDK `@cliploop/sdk` (TypeScript)
+- SDK `@cliplane/sdk` (TypeScript)
   - `generateWeeklyPromo(input)`
   - `getJob(id)`
   - `downloadVideo(id)`
-- CLI `cliploop`
-  - `cliploop generate weekly-promo <url>`
-  - `cliploop jobs`
-  - `cliploop download <id>`
-- docs.cliploop.site live with 8-page docs (home, quickstart, API ref, auth, credits/billing, errors, examples, changelog)
+- CLI `cliplane`
+  - `cliplane generate weekly-promo <url>`
+  - `cliplane jobs`
+  - `cliplane download <id>`
+- docs.cliplane.site live with 8-page docs (home, quickstart, API ref, auth, credits/billing, errors, examples, changelog)
 
 ## v0.2 — Generic Video Generation
 

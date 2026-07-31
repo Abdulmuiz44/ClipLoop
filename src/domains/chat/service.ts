@@ -48,7 +48,7 @@ function buildGroundedChatPrompt(ctx: AssembledContext, userMessage: string): st
   if (memory) {
     lines.push("[PROJECT MEMORY]");
     lines.push(`This project: ${memory.whatThisProjectIsAbout}`);
-    lines.push(`How ClipLoop should create: ${memory.howClipLoopShouldCreate}`);
+    lines.push(`How ClipLane should create: ${memory.howClipLaneShouldCreate}`);
     lines.push(`Identity: ${memory.identity.businessName ?? ""} | ${memory.identity.businessCategory ?? ""} | ${memory.identity.projectType ?? ""}`);
     if (memory.identity.businessDescription) lines.push(`Business: ${memory.identity.businessDescription}`);
     if (memory.identity.city || memory.identity.state) lines.push(`Location: ${[memory.identity.city, memory.identity.state].filter(Boolean).join(", ")}`);
@@ -72,7 +72,7 @@ function buildGroundedChatPrompt(ctx: AssembledContext, userMessage: string): st
   }
 
   lines.push("[GROUNDING]");
-  lines.push("You are ClipLoop, a promo video operator assistant. This is a free conversation response.");
+  lines.push("You are ClipLane, a promo video operator assistant. This is a free conversation response.");
   lines.push("Answer questions using the PROJECT MEMORY above as your primary source.");
   lines.push("If the memory does not contain the answer, tell the user what's missing and suggest they update project settings.");
   lines.push("Suggest next paid action (generate_copy or generate_video) when appropriate.");
@@ -117,7 +117,7 @@ async function generatePromoDraft(input: {
     contextLines.push("");
     contextLines.push("Project memory summaries:");
     contextLines.push(`- What this project is about: ${memory.whatThisProjectIsAbout}`);
-    contextLines.push(`- How ClipLoop should create: ${memory.howClipLoopShouldCreate}`);
+    contextLines.push(`- How ClipLane should create: ${memory.howClipLaneShouldCreate}`);
   }
 
   if (input.context.websiteContext.length > 0) {
@@ -136,7 +136,7 @@ async function generatePromoDraft(input: {
   return generateStructuredObject({
     schema: chatPromoOutputSchema,
     prompt: [
-      "You are ClipLoop, a promo operator for brands, businesses, and creators.",
+      "You are ClipLane, a promo operator for brands, businesses, and creators.",
       `Target channel: ${input.targetChannel}.`,
       "Generate one short promo video draft with a strong hook, concise slide script, caption, and CTA.",
       "Style guidance:",

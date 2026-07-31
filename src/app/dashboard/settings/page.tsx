@@ -23,7 +23,7 @@ export default async function SettingsPage() {
         <p className="cl-kicker">Account & Billing</p>
         <h1 className="text-3xl font-semibold tracking-tight md:text-[2.5rem] text-slate-950">Manage your workspace</h1>
         <p className="text-base leading-7 text-slate-600 max-w-2xl">
-          ClipLoop provides a free chat-first workspace for all users. Upgrade to Pro for higher generation and render limits for your brands.
+          ClipLane provides a free chat-first workspace for all users. Upgrade to Pro for higher generation and render limits for your brands.
         </p>
       </div>
 

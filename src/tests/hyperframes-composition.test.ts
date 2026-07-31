@@ -8,7 +8,7 @@ import { buildHyperframesComposition } from "@/lib/render/hyperframes/compositio
 import { renderTemplates } from "@/lib/render/templates";
 
 test("hyperframes composition applies template styling and scene plan summary", async () => {
-  const runDir = await fs.mkdtemp(path.join(os.tmpdir(), "cliploop-hf-"));
+  const runDir = await fs.mkdtemp(path.join(os.tmpdir(), "cliplane-hf-"));
 
   const result = await buildHyperframesComposition({
     runDir,
@@ -62,7 +62,7 @@ test("hyperframes composition applies template styling and scene plan summary", 
 });
 
 test("hyperframes composition falls back to caption when no scene plan", async () => {
-  const runDir = await fs.mkdtemp(path.join(os.tmpdir(), "cliploop-hf-"));
+  const runDir = await fs.mkdtemp(path.join(os.tmpdir(), "cliplane-hf-"));
 
   const result = await buildHyperframesComposition({
     runDir,

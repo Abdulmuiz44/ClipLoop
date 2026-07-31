@@ -8,7 +8,7 @@ export function AccessGate({ email }: { email: string }) {
     <div className="cl-card mx-auto max-w-3xl space-y-6 p-6 md:p-8">
       <div className="space-y-3">
         <p className="cl-kicker uppercase tracking-widest text-slate-500 font-bold">Invite-only beta</p>
-        <h1 className="text-3xl font-semibold tracking-tight text-slate-950">ClipLoop is currently in limited access</h1>
+        <h1 className="text-3xl font-semibold tracking-tight text-slate-950">ClipLane is currently in limited access</h1>
         <p className="max-w-2xl text-base leading-7 text-slate-600">
           We are manually onboarding brands, businesses, and creators to ensure the content engine and rendering pipeline remain high-quality for every user.
         </p>

@@ -29,7 +29,7 @@ export function ExportBundleButton({
     const url = window.URL.createObjectURL(blob);
     const fileName =
       response.headers.get("Content-Disposition")?.match(/filename="(.+)"/)?.[1] ??
-      `cliploop-export-${contentItemId.slice(0, 8)}.zip`;
+      `cliplane-export-${contentItemId.slice(0, 8)}.zip`;
 
     const anchor = document.createElement("a");
     anchor.href = url;

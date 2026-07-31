@@ -1,6 +1,6 @@
 ### `TASKLIST.md`
 ```md
-# ClipLoop Tasklist
+# ClipLane Tasklist
 
 ## Week 1: Single-user content generation loop
 
@@ -125,7 +125,7 @@ Close the loop by tracking outcomes and generating the next week from winners.
 - Show reasons why winning posts worked
 
 #### Billing and limits
-- Add Stripe billing for ClipLoop subscriptions
+- Add Stripe billing for ClipLane subscriptions
 - Enforce one project for base plan
 - Enforce weekly generation limits
 - Enforce regeneration limits
@@ -169,7 +169,7 @@ If needed, defer these without breaking MVP:
 
 ## Final MVP checkpoint
 
-ClipLoop MVP is ready when one founder can:
+ClipLane MVP is ready when one founder can:
 
 - onboard their product
 - generate a weekly pack

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-<title>Rate Limits · ClipLoop Developer Docs</title>
+<title>Rate Limits · ClipLane Developer Docs</title>
 <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
@@ -13,7 +13,7 @@
 <nav class="sidebar" id="sidebar" aria-label="Docs navigation">
   <div class="logo">
     <div class="logo-mark">CL</div>
-    <div class="logo-text">ClipLoop<small>Developer Docs</small></div>
+    <div class="logo-text">ClipLane<small>Developer Docs</small></div>
   </div>
   <div class="nav-section">
     <div class="nav-section-title">Getting Started</div>
@@ -40,8 +40,8 @@
     <div class="nav-section-title">More</div>
     <a href="/roadmap/" class="nav-link ">Roadmap</a>
     <a href="/changelog/" class="nav-link ">Changelog</a>
-    <a href="https://app.cliploop.site" class="nav-link">App Dashboard →</a>
-    <a href="https://cliploop.site" class="nav-link">Marketing Site →</a>
+    <a href="https://app.cliplane.site" class="nav-link">App Dashboard →</a>
+    <a href="https://cliplane.site" class="nav-link">Marketing Site →</a>
   </div>
 </nav>
 <main class="main" id="content">
@@ -49,7 +49,7 @@
     <h1>Rate Limits</h1>
 <p class="lead">Rate limits protect rendering credits, queue capacity, and platform stability.</p>
 <h2 id="current-model">Current model</h2>
-<p>ClipLoop applies rate limits at the account and key scope level to prevent runaway usage, render bursts, and abuse. Safe usage patterns still work well for normal builders and automation workflows.</p>
+<p>ClipLane applies rate limits at the account and key scope level to prevent runaway usage, render bursts, and abuse. Safe usage patterns still work well for normal builders and automation workflows.</p>
 <h2 id="429-behavior">429 behavior</h2>
 <p>When you exceed a limit, the API returns <code>429 Too Many Requests</code>. Retry only after the indicated retry window, or use exponential backoff.</p>
 <h2 id="safe-retries">Safe retries</h2>
@@ -66,11 +66,11 @@
 <p><a href="/weekly-promo-api/">Weekly Promo API</a> · <a href="/idempotency/">Idempotency</a></p>
     <footer>
       <p style="display:flex; flex-wrap:wrap; gap:14px; align-items:center; justify-content:space-between">
-        <span>© 2026 ClipLoop · Built by <a href="https://talocode.com" style="color:var(--text3)">Talocode</a></span>
+        <span>© 2026 ClipLane · Built by <a href="https://talocode.com" style="color:var(--text3)">Talocode</a></span>
         <span style="display:flex; gap:14px">
-          <a href="https://cliploop.site">Marketing</a>
-          <a href="https://app.cliploop.site">Dashboard</a>
-          <a href="https://github.com/talocode/cliploop">GitHub</a>
+          <a href="https://cliplane.site">Marketing</a>
+          <a href="https://app.cliplane.site">Dashboard</a>
+          <a href="https://github.com/talocode/cliplane">GitHub</a>
         </span>
       </p>
     </footer>

@@ -1,6 +1,6 @@
-# ClipLoop Public API
+# ClipLane Public API
 
-Base URL: `https://app.cliploop.site/api`
+Base URL: `https://app.cliplane.site/api`
 
 ---
 
@@ -10,7 +10,7 @@ All public API endpoints require a bearer API key.
 
 **Header:** `Authorization: Bearer <your_api_key>`
 
-API keys are managed in the [dashboard](https://app.cliploop.site/dashboard/settings/api-keys). The raw key is shown **once** at creation — copy it immediately. Only the prefix is stored server-side.
+API keys are managed in the [dashboard](https://app.cliplane.site/dashboard/settings/api-keys). The raw key is shown **once** at creation — copy it immediately. Only the prefix is stored server-side.
 
 ---
 
@@ -134,7 +134,7 @@ Error response shape:
 ### curl
 
 ```bash
-curl -X POST https://app.cliploop.site/api/public/weekly-promo \
+curl -X POST https://app.cliplane.site/api/public/weekly-promo \
   -H "Authorization: Bearer clp_YOUR_API_KEY" \
   -H "Idempotency-Key: my-unique-key-abc123" \
   -H "Content-Type: application/json" \
@@ -150,7 +150,7 @@ curl -X POST https://app.cliploop.site/api/public/weekly-promo \
 ### JavaScript (fetch)
 
 ```javascript
-const response = await fetch("https://app.cliploop.site/api/public/weekly-promo", {
+const response = await fetch("https://app.cliplane.site/api/public/weekly-promo", {
   method: "POST",
   headers: {
     "Authorization": "Bearer clp_YOUR_API_KEY",
@@ -179,7 +179,7 @@ console.log(data.renderStatus);       // "renderer_unavailable" or "rendered"
 import axios from "axios";
 
 const { data } = await axios.post(
-  "https://app.cliploop.site/api/public/weekly-promo",
+  "https://app.cliplane.site/api/public/weekly-promo",
   {
     appName: "MyApp",
     appWebsiteUrl: "https://myapp.com",

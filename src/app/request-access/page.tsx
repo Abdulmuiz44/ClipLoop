@@ -1,20 +1,20 @@
 import type { Metadata } from "next";
 import { AccessRequestForm } from "@/components/marketing/access-request-form";
-import { ClipLoopLogo } from "@/components/ui/cliploop-logo";
+import { ClipLaneLogo } from "@/components/ui/cliplane-logo";
 
 export const metadata: Metadata = {
-  title: "Request Beta Access | ClipLoop",
-  description: "Request product access support for ClipLoop, the chat-first promo operator for businesses and creators.",
+  title: "Request Beta Access | ClipLane",
+  description: "Request product access support for ClipLane, the chat-first promo operator for businesses and creators.",
   alternates: { canonical: "/request-access" },
   openGraph: {
-    title: "Request Beta Access | ClipLoop",
-    description: "Join ClipLoop and get reviewed for Pro if you need higher generation and render capacity.",
+    title: "Request Beta Access | ClipLane",
+    description: "Join ClipLane and get reviewed for Pro if you need higher generation and render capacity.",
     url: "/request-access",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Request Beta Access | ClipLoop",
+    title: "Request Beta Access | ClipLane",
     description: "Invite-only beta for a narrow weekly short-form growth loop.",
   },
 };
@@ -23,11 +23,11 @@ export default function RequestAccessPage() {
   return (
     <div className="mx-auto max-w-4xl space-y-6 md:space-y-8">
       <section className="cl-card p-6 md:p-8">
-        <ClipLoopLogo href="/" />
+        <ClipLaneLogo href="/" />
         <p className="cl-kicker">Access requests</p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900 md:text-4xl">Request access to ClipLoop</h1>
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900 md:text-4xl">Request access to ClipLane</h1>
         <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600">
-          ClipLoop is opening carefully. We prioritize indie apps, solo builders, and small SaaS products that want one simple weekly content loop instead of a bloated social media suite.
+          ClipLane is opening carefully. We prioritize indie apps, solo builders, and small SaaS products that want one simple weekly content loop instead of a bloated social media suite.
         </p>
       </section>
 

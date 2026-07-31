@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 const pillars = [
   {
     title: "One project",
-    body: "ClipLoop starts with a single active workspace so every strategy cycle stays tied to one product story.",
+    body: "ClipLane starts with a single active workspace so every strategy cycle stays tied to one product story.",
   },
   {
     title: "One channel",
@@ -37,10 +37,10 @@ export default function HomePage() {
         <div className="absolute -bottom-20 left-0 h-56 w-56 rounded-full bg-emerald-200/40 blur-3xl" />
         <div className="relative grid gap-8 md:grid-cols-[1.1fr_0.9fr]">
           <div className="space-y-5">
-            <p className="cl-kicker">ClipLoop Platform</p>
+            <p className="cl-kicker">ClipLane Platform</p>
             <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-slate-900 md:text-5xl">Run one focused weekly promo loop from a single project.</h1>
             <p className="max-w-2xl text-base leading-7 text-slate-600">
-              ClipLoop starts with one active workspace, one Instagram channel, and one five-post pack so you can ship, measure, and improve without extra setup.
+              ClipLane starts with one active workspace, one Instagram channel, and one five-post pack so you can ship, measure, and improve without extra setup.
             </p>
             <div className="flex flex-wrap gap-3">
               <Link href="/app" className="inline-flex rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-500">
@@ -85,7 +85,7 @@ export default function HomePage() {
             <p className="cl-kicker">Open Core Direction</p>
             <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">First-party app now, open engine plus hosted gateway next.</h2>
             <p className="mt-3 text-sm leading-6 text-slate-600">
-              ClipLoop is being split into app UX, reusable engine logic, and managed hosted execution for production reliability and credits.
+              ClipLane is being split into app UX, reusable engine logic, and managed hosted execution for production reliability and credits.
             </p>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
@@ -107,7 +107,7 @@ export default function HomePage() {
 
       <AccessRequestForm
         title="Request Access"
-        description="ClipLoop is still invite-only for production operators. Share your product use case and we will review for fit."
+        description="ClipLane is still invite-only for production operators. Share your product use case and we will review for fit."
       />
     </div>
   );

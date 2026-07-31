@@ -6,7 +6,7 @@ const envSchema = z.object({
       if (typeof v !== "string") return v;
       return v.trim().replace(/^"|"$/g, "").replace(/^'|'$/g, "");
     }, z.string().min(1))
-    .default("postgres://postgres:***@localhost:5432/cliploop"),
+    .default("postgres://postgres:***@localhost:5432/cliplane"),
   // NOTE: z.coerce.boolean() treats any non-empty string (including "false") as true.
   // We need explicit string parsing for env vars.
   MOCK_MODE: z
@@ -19,7 +19,7 @@ const envSchema = z.object({
       return v;
     }, z.boolean())
     .default(true),
-  DEMO_USER_EMAIL: z.string().email().default("cliploopapp@gmail.com"),
+  DEMO_USER_EMAIL: z.string().email().default("cliplaneapp@gmail.com"),
   MOCK_LLM: z.coerce.boolean().default(false),
   INVITE_ONLY_MODE: z.coerce.boolean().default(true),
   AUTH_SECRET: z.string().optional(),
@@ -58,7 +58,7 @@ const envSchema = z.object({
 export const env = envSchema.parse({
   DATABASE_URL: process.env.DATABASE_URL,
   MOCK_MODE: process.env.MOCK_MODE,
-  DEMO_USER_EMAIL: "cliploopapp@gmail.com",
+  DEMO_USER_EMAIL: "cliplaneapp@gmail.com",
   MOCK_LLM: process.env.MOCK_LLM,
   INVITE_ONLY_MODE: process.env.INVITE_ONLY_MODE,
   AUTH_SECRET: process.env.AUTH_SECRET,

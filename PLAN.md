@@ -1,4 +1,4 @@
-# ClipLoop MVP Plan
+# ClipLane MVP Plan
 
 ## Product goal
 
@@ -8,7 +8,7 @@ generate, render, schedule, track, and improve.
 
 ## MVP thesis
 
-If ClipLoop can help one founder with one product on one channel generate measurable clicks or signups from a weekly pack of short-form videos, the core product is validated.
+If ClipLane can help one founder with one product on one channel generate measurable clicks or signups from a weekly pack of short-form videos, the core product is validated.
 
 ## v1 scope
 
@@ -179,7 +179,7 @@ Done when:
 
 ## Success criteria
 
-ClipLoop MVP is done when a user can:
+ClipLane MVP is done when a user can:
 
 1. sign up
 2. create a project

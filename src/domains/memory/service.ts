@@ -12,7 +12,7 @@ export interface ProjectMemorySnapshot {
   generatedAt: string;
   source: SnapshotSource;
   whatThisProjectIsAbout: string;
-  howClipLoopShouldCreate: string;
+  howClipLaneShouldCreate: string;
   identity: {
     businessName: string | null;
     businessCategory: string | null;
@@ -63,14 +63,14 @@ function buildSnapshotJson(project: typeof schema.projects.$inferSelect, docs: A
 
   const whatThisProjectIsAbout = `${businessName} is a ${businessCategory} that serves ${targetAudience}. They offer ${primaryOffer}. ${project.businessDescription ?? project.description}`;
 
-  const howClipLoopShouldCreate = `Create ${languageStyle} content for ${channelsList}. Use ${tone} tone. Focus on CTA: ${callToAction}. Target audience: ${targetAudience}. Key offering: ${primaryOffer}.`;
+  const howClipLaneShouldCreate = `Create ${languageStyle} content for ${channelsList}. Use ${tone} tone. Focus on CTA: ${callToAction}. Target audience: ${targetAudience}. Key offering: ${primaryOffer}.`;
 
   return {
     version: CURRENT_SNAPSHOT_VERSION,
     generatedAt: new Date().toISOString(),
     source,
     whatThisProjectIsAbout,
-    howClipLoopShouldCreate,
+    howClipLaneShouldCreate,
     identity: {
       businessName: project.businessName,
       businessCategory: project.businessCategory,

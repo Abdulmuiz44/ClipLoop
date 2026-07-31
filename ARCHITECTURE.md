@@ -1,10 +1,10 @@
-# ClipLoop Architecture (Open Core + Hosted Gateway Direction)
+# ClipLane Architecture (Open Core + Hosted Gateway Direction)
 
 ## Product Direction
 
-ClipLoop is evolving into three layers:
+ClipLane is evolving into three layers:
 
-1. First-party app (ClipLoop UX for brands/businesses/creators)
+1. First-party app (ClipLane UX for brands/businesses/creators)
 2. Open core engine (reusable creative video operating system logic)
 3. Paid hosted gateway (managed API key platform, orchestration, rendering, provider access, and credit controls)
 
@@ -307,7 +307,7 @@ Flow:
 - user clicks tracked URL
 - redirect service logs click and redirects to CTA URL with UTMs
 - optional site snippet stores click id on landing
-- signup or purchase event posts click id back to ClipLoop
+- signup or purchase event posts click id back to ClipLane
 - if click id is unavailable, attribute loosely at post level using UTM and recent click rules
 
 MVP attribution priority:
@@ -365,7 +365,7 @@ Stored in the `project_memory_snapshots` table (1 project → many versioned sna
 
 A snapshot captures the full project truth at a point in time:
 
-- **Summaries**: `whatThisProjectIsAbout` and `howClipLoopShouldCreate` — template-assembled from business fields
+- **Summaries**: `whatThisProjectIsAbout` and `howClipLaneShouldCreate` — template-assembled from business fields
 - **Identity block**: business name, category, type, description, location
 - **Audience block**: target audience, niche
 - **Offer block**: primary offer, pricing, CTA, goal type

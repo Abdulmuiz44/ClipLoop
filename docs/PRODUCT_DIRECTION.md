@@ -1,19 +1,19 @@
-# ClipLoop Product Direction
+# ClipLane Product Direction
 
 ## Vision
 
-ClipLoop is a **programmable video generation platform**.
+ClipLane is a **programmable video generation platform**.
 
-Developers, creators, businesses, and apps send structured inputs — prompts, code, product data, scene specs — and ClipLoop returns rendered video artifacts through an API. The dashboard is the operator surface for humans. The API is the programmable surface for machines.
+Developers, creators, businesses, and apps send structured inputs — prompts, code, product data, scene specs — and ClipLane returns rendered video artifacts through an API. The dashboard is the operator surface for humans. The API is the programmable surface for machines.
 
-## What ClipLoop Is
+## What ClipLane Is
 
 - An API-first video generation engine
 - A credit-backed platform: pay per generation, no subscriptions required
 - A dashboard for monitoring usage, managing API keys, and reviewing outputs
 - A foundation for SDKs and CLIs that make video generation scriptable
 
-## What ClipLoop Is Not Yet
+## What ClipLane Is Not Yet
 
 - A full render farm (coming later)
 - A browser-based editor
@@ -44,7 +44,7 @@ The public API is the long-lived contract. The dashboard is a consumer of that A
 
 ## Dashboard Role
 
-The dashboard (`app.cliploop.site/dashboard`) is:
+The dashboard (`app.cliplane.site/dashboard`) is:
 
 - the onboarding surface for new users
 - the API key management console
@@ -52,7 +52,7 @@ The dashboard (`app.cliploop.site/dashboard`) is:
 - the usage monitor (7d/30d spend, API call count)
 - the bridge between human operator and programmable API
 
-It is not the only way to use ClipLoop. The API is.
+It is not the only way to use ClipLane. The API is.
 
 ## Developer API Role
 
@@ -67,7 +67,7 @@ All endpoints return JSON. Video artifacts are accessed via temporary signed URL
 
 ## SDK and CLI Roadmap
 
-### SDK (`@cliploop/sdk`)
+### SDK (`@cliplane/sdk`)
 
 - TypeScript-first, with runtime support for Node and edge runtimes
 - Key methods:
@@ -77,12 +77,12 @@ All endpoints return JSON. Video artifacts are accessed via temporary signed URL
   - `downloadVideo(id)` — stream to file
 - Handles auth, idempotency, retries, and typed responses
 
-### CLI (`cliploop`)
+### CLI (`cliplane`)
 
-- `cliploop generate weekly-promo <url>` — quick one-liner
-- `cliploop generate video <spec.json>` — generic generation
-- `cliploop jobs` — list recent jobs
-- `cliploop download <jobId>` — save video to disk
+- `cliplane generate weekly-promo <url>` — quick one-liner
+- `cliplane generate video <spec.json>` — generic generation
+- `cliplane jobs` — list recent jobs
+- `cliplane download <jobId>` — save video to disk
 
 ## Video Generation Pipeline
 
@@ -133,13 +133,13 @@ Monthly generation and render grants are applied automatically per plan.
 ## Near-Term Roadmap
 
 1. Finish API key testing and wire top-up / credit pack checkout
-2. Ship public weekly promo API docs at docs.cliploop.site
+2. Ship public weekly promo API docs at docs.cliplane.site
 3. Usage dashboard with credit wallet and transaction history
 4. SDK v0 (TypeScript, `generateWeeklyPromo`, `generateVideo`)
-5. CLI v0 (`cliploop generate`, `cliploop jobs`, `cliploop download`)
+5. CLI v0 (`cliplane generate`, `cliplane jobs`, `cliplane download`)
 6. Generic video generation endpoint (`POST /api/public/videos/generate`)
 7. Render worker scaling (remote workers, queue-based processing)
 8. Expand credit packs and introduce render-specific packs
 9. Changelog and versioning strategy for the public API
 
-Weekly Promo is only the first API product. ClipLoop’s bigger mission is programmable video generation.
+Weekly Promo is only the first API product. ClipLane’s bigger mission is programmable video generation.

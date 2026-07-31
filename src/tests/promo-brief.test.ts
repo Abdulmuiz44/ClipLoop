@@ -16,7 +16,7 @@ const validDraftInput: CreatePromoBriefDraftInput = {
     rawText: "We shipped AI storyboard drafts for weekly promos.",
   },
   product: {
-    name: "ClipLoop",
+    name: "ClipLane",
     oneLine: "Create weekly promo videos without hiring an editor",
     targetAudience: "Indie SaaS founders",
     category: "Marketing automation",
@@ -26,7 +26,7 @@ const validDraftInput: CreatePromoBriefDraftInput = {
     painPoint: "Founders waste hours on video edits instead of building",
     featureHighlights: ["AI storyboard drafts", "One-click weekly promo"],
     proofPoints: ["Used by 200+ indie teams"],
-    callToAction: "Try ClipLoop this week",
+    callToAction: "Try ClipLane this week",
   },
   creative: {
     tone: "bold",
@@ -37,7 +37,7 @@ const validDraftInput: CreatePromoBriefDraftInput = {
   constraints: {
     mustInclude: ["storyboard drafts"],
     mustAvoid: ["generic stock footage"],
-    brandTerms: ["ClipLoop"],
+    brandTerms: ["ClipLane"],
   },
 };
 
@@ -50,7 +50,7 @@ test("valid promo brief passes validation", () => {
   assert.equal(parsed.projectId, "proj_abc123");
   assert.equal(validated.success, true);
   if (validated.success) {
-    assert.equal(validated.data.product.name, "ClipLoop");
+    assert.equal(validated.data.product.name, "ClipLane");
   }
 });
 
@@ -134,11 +134,11 @@ test("promoBriefToPlanningContext returns compact planning text", () => {
   const context = promoBriefToPlanningContext(brief);
 
   assert.match(context, /^# Promo Brief/);
-  assert.match(context, /Product: ClipLoop/);
+  assert.match(context, /Product: ClipLane/);
   assert.match(context, /Audience: Indie SaaS founders/);
   assert.match(context, /Promise: Ship social promos every week in minutes/);
   assert.match(context, /Features: AI storyboard drafts; One-click weekly promo/);
-  assert.match(context, /CTA: Try ClipLoop this week/);
+  assert.match(context, /CTA: Try ClipLane this week/);
   assert.match(context, /Platform: instagram_reels/);
   assert.match(context, /Duration: 30s/);
   assert.match(context, /Must include: storyboard drafts/);

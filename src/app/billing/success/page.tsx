@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ClipLoopLogo } from "@/components/ui/cliploop-logo";
+import { ClipLaneLogo } from "@/components/ui/cliplane-logo";
 
 export const metadata: Metadata = {
-  title: "Pro Checkout Submitted | ClipLoop",
-  description: "Your ClipLoop Pro checkout finished. We are waiting for Lemon Squeezy webhook confirmation to sync access.",
+  title: "Pro Checkout Submitted | ClipLane",
+  description: "Your ClipLane Pro checkout finished. We are waiting for Lemon Squeezy webhook confirmation to sync access.",
   alternates: { canonical: "/billing/success" },
 };
 
@@ -12,11 +12,11 @@ export default function BillingSuccessPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <section className="cl-card p-6 md:p-8">
-        <ClipLoopLogo href="/" />
+        <ClipLaneLogo href="/" />
         <p className="cl-kicker text-emerald-700">Pro checkout complete</p>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950 md:text-4xl">Payment received. Pro access should sync in a moment.</h1>
         <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600">
-          Lemon Squeezy webhooks are the source of truth for billing in ClipLoop. Once the subscription event lands, your account moves into
+          Lemon Squeezy webhooks are the source of truth for billing in ClipLane. Once the subscription event lands, your account moves into
           Pro access automatically.
         </p>
       </section>

@@ -5,11 +5,11 @@ const script = `(() => {
     const params = new URLSearchParams(window.location.search);
     const clickId = params.get('clp_click');
     if (clickId) {
-      localStorage.setItem('cliploop_click_id', clickId);
-      document.cookie = 'cliploop_click_id=' + encodeURIComponent(clickId) + ';path=/;max-age=' + 60*60*24*30;
+      localStorage.setItem('cliplane_click_id', clickId);
+      document.cookie = 'cliplane_click_id=' + encodeURIComponent(clickId) + ';path=/;max-age=' + 60*60*24*30;
     }
-    window.ClipLoopTracking = {
-      getClickId: () => localStorage.getItem('cliploop_click_id') || null
+    window.ClipLaneTracking = {
+      getClickId: () => localStorage.getItem('cliplane_click_id') || null
     };
   } catch (e) {}
 })();`;

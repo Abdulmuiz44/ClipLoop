@@ -33,12 +33,12 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ClipLoop = exports.ClipLaneLocal = void 0;
-const DEFAULT_BASE_URL = "https://api.cliploop.site";
-const HOSTED_RENDER_KEY_ERROR = "ClipLoop API key required for hosted rendering. Get one at https://cliploop.site";
+exports.ClipLane = exports.ClipLaneLocal = void 0;
+const DEFAULT_BASE_URL = "https://api.cliplane.site";
+const HOSTED_RENDER_KEY_ERROR = "ClipLane API key required for hosted rendering. Get one at https://cliplane.site";
 function envApiKey() {
     if (typeof process !== "undefined" && process?.env) {
-        return process.env.CLIPLOOP_API_KEY;
+        return process.env.CLIPLANE_API_KEY;
     }
     return undefined;
 }
@@ -182,7 +182,7 @@ async function hostedRequest(baseUrl, apiKey, path, init) {
     if (!response.ok) {
         const message = typeof data === "object" && data && "error" in data
             ? String(data.error)
-            : `ClipLoop request failed with status ${response.status}`;
+            : `ClipLane request failed with status ${response.status}`;
         throw new Error(message);
     }
     return data;
@@ -249,8 +249,8 @@ class ClipLaneLocal {
     }
 }
 exports.ClipLaneLocal = ClipLaneLocal;
-/** Legacy hosted ClipLoop client retained for the existing hosted API. */
-class ClipLoop extends ClipLaneLocal {
+/** Legacy hosted ClipLane client retained for the existing hosted API. */
+class ClipLane extends ClipLaneLocal {
     apiKey;
     baseUrl;
     constructor(options = {}) {
@@ -321,5 +321,5 @@ class ClipLoop extends ClipLaneLocal {
         return hostedRequest(this.baseUrl, this.apiKey, `/api/public/content-items/${encodeURIComponent(contentItemId)}/schedule`);
     }
 }
-exports.ClipLoop = ClipLoop;
+exports.ClipLane = ClipLane;
 //# sourceMappingURL=index.js.map

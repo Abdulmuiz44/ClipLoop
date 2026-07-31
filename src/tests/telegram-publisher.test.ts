@@ -4,7 +4,7 @@ import { createTelegramPublisher } from "@/lib/publisher/telegram";
 
 const readyItem = {
   caption: "A concise update",
-  destinationUrl: "https://cliploop.site/post",
+  destinationUrl: "https://cliplane.site/post",
   approvedAt: new Date("2026-01-01T00:00:00.000Z"),
   scheduledFor: new Date("2026-01-01T00:00:00.000Z"),
 };
@@ -18,16 +18,16 @@ test("Telegram publisher sends content text and returns a public message URL", a
   };
 
   try {
-    const publisher = createTelegramPublisher({ botToken: "test-token", channelId: "@cliploop_news" });
+    const publisher = createTelegramPublisher({ botToken: "test-token", channelId: "@cliplane_news" });
     const result = await publisher.publishContentItem(readyItem as any, null);
     assert.equal(request?.url, "https://api.telegram.org/bottest-token/sendMessage");
     assert.deepEqual(await request?.json(), {
-      chat_id: "@cliploop_news",
-      text: "A concise update\n\nhttps://cliploop.site/post",
+      chat_id: "@cliplane_news",
+      text: "A concise update\n\nhttps://cliplane.site/post",
       disable_web_page_preview: false,
     });
     assert.equal(result.externalPostId, "42");
-    assert.equal(result.externalPostUrl, "https://t.me/cliploop_news/42");
+    assert.equal(result.externalPostUrl, "https://t.me/cliplane_news/42");
   } finally {
     globalThis.fetch = originalFetch;
   }
@@ -37,7 +37,7 @@ test("Telegram publisher rejects invalid channel configuration and oversized tex
   const publisher = createTelegramPublisher({ botToken: "test-token", channelId: "invalid" });
   await assert.rejects(() => publisher.publishContentItem(readyItem as any, null), /Telegram channel/);
 
-  const oversized = createTelegramPublisher({ botToken: "test-token", channelId: "@cliploop_news" });
+  const oversized = createTelegramPublisher({ botToken: "test-token", channelId: "@cliplane_news" });
   await assert.rejects(
     () => oversized.publishContentItem({ ...readyItem, caption: "a".repeat(4097) } as any, null),
     /4096-character limit/,

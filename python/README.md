@@ -67,7 +67,7 @@ Use `--store path/to/schedules.json` before the command to select a different JS
 
 | Product | Package |
 | --- | --- |
-| [ClipLane](https://github.com/talocode/cliploop) | `pip install talocode-cliplane` (this package) |
+| [ClipLane](https://github.com/talocode/cliplane) | `pip install talocode-cliplane` (this package) |
 | [Tera](https://github.com/talocode/tera) | `pip install talocode-tera` |
 | [Codra](https://github.com/talocode/codra) | `pip install talocode-codra` |
 | [SearchLane](https://github.com/talocode/searchlane) | `pip install talocode-searchlane` |
@@ -81,7 +81,7 @@ More: [github.com/talocode](https://github.com/talocode) · [talocode.site](http
 
 ## Links
 
-[GitHub](https://github.com/talocode/cliploop) · [Docs](https://docs.talocode.site) · [PyPI](https://pypi.org/project/talocode-cliplane/) · [npm CLI](https://www.npmjs.com/package/@talocode/cliplane-cli) · [npm SDK](https://www.npmjs.com/package/@talocode/cliplane-sdk)
+[GitHub](https://github.com/talocode/cliplane) · [Docs](https://docs.talocode.site) · [PyPI](https://pypi.org/project/talocode-cliplane/) · [npm CLI](https://www.npmjs.com/package/@talocode/cliplane-cli) · [npm SDK](https://www.npmjs.com/package/@talocode/cliplane-sdk)
 
 ## License
 

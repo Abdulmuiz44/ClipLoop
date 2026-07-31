@@ -19,7 +19,7 @@ export default async function CreatePage() {
         <div className="cl-card space-y-4 p-6">
           <div>
             <p className="cl-kicker">Project required</p>
-            <h2 className="mt-1 text-xl font-semibold text-slate-950">ClipLoop runs the MVP loop from one project.</h2>
+            <h2 className="mt-1 text-xl font-semibold text-slate-950">ClipLane runs the MVP loop from one project.</h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">Create your workspace first so the brief, channel lock, and weekly content pack stay tied to one product story.</p>
           </div>
           <Link href="/dashboard/projects/new" className="inline-flex w-fit rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800">Create your project</Link>

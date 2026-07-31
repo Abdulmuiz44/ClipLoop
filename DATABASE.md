@@ -1,8 +1,8 @@
-# ClipLoop Database Spec
+# ClipLane Database Spec
 
 ## Goal
 
-Define the minimum viable database schema for ClipLoop so the full weekly loop can work:
+Define the minimum viable database schema for ClipLane so the full weekly loop can work:
 
 - onboarding
 - strategy generation
@@ -263,7 +263,7 @@ The product now uses a chat-first primary UX. New DB structures:
 
 ## Credit ledger additions
 
-ClipLoop billing-grade credit accounting is ledger-backed.
+ClipLane billing-grade credit accounting is ledger-backed.
 
 ### `credit_accounts`
 - one row per user

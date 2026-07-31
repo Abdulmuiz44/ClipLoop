@@ -15,7 +15,7 @@ type AccessRequestFormProps = {
 export function AccessRequestForm({
   email = "",
   title = "Request beta access",
-  description = "ClipLoop is invite-only in beta. We review requests manually and prioritize indie apps, solo builders, and small SaaS products that fit the current weekly loop.",
+  description = "ClipLane is invite-only in beta. We review requests manually and prioritize indie apps, solo builders, and small SaaS products that fit the current weekly loop.",
   showBackHome = false,
   className = "",
 }: AccessRequestFormProps) {
@@ -43,7 +43,7 @@ export function AccessRequestForm({
 
     if (response.ok) {
       setMessage(
-        "Request received. ClipLoop is invite-only in beta, and we review fit manually. Strong fits today are indie apps, solo builders, and small SaaS products running one narrow weekly growth loop.",
+        "Request received. ClipLane is invite-only in beta, and we review fit manually. Strong fits today are indie apps, solo builders, and small SaaS products running one narrow weekly growth loop.",
       );
     } else {
       setMessage(json.error ?? "Could not submit request.");
@@ -93,7 +93,7 @@ export function AccessRequestForm({
         <textarea
           name="notes"
           className="cl-textarea min-h-28"
-          placeholder="Tell us what your product does, who it serves, and what you want ClipLoop to help with."
+          placeholder="Tell us what your product does, who it serves, and what you want ClipLane to help with."
         />
       </label>
 

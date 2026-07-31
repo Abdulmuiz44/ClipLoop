@@ -291,7 +291,7 @@ export async function createStarterCheckout(input: BillingIdentityInput) {
         },
         product_options: {
           redirect_url: buildAppUrl("/billing/success"),
-          receipt_button_text: "Open ClipLoop",
+          receipt_button_text: "Open ClipLane",
           receipt_link_url: buildAppUrl("/dashboard/settings"),
         },
       },

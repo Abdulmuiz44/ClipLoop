@@ -52,7 +52,7 @@ async function createFixture(tag: string): Promise<Fixture> {
     .values({
       userId: user.id,
       name: `Project ${tag}`,
-      productName: "ClipLoop Test Product",
+      productName: "ClipLane Test Product",
       description: "Billing integration test project description",
       audience: "Founders",
       niche: "SaaS",

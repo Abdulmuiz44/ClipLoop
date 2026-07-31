@@ -1,4 +1,4 @@
-export type ClipLoopClientOptions = {
+export type ClipLaneClientOptions = {
     apiKey?: string;
     baseUrl?: string;
 };
@@ -96,11 +96,11 @@ export declare class ClipLaneLocal {
     listSchedules(): Promise<LocalScheduleJob[]>;
     cancelSchedule(id: string): Promise<LocalScheduleJob>;
 }
-/** Legacy hosted ClipLoop client retained for the existing hosted API. */
-export declare class ClipLoop extends ClipLaneLocal {
+/** Legacy hosted ClipLane client retained for the existing hosted API. */
+export declare class ClipLane extends ClipLaneLocal {
     readonly apiKey?: string;
     readonly baseUrl: string;
-    constructor(options?: ClipLoopClientOptions);
+    constructor(options?: ClipLaneClientOptions);
     createRenderJob(input: ProductUpdateInput): Promise<RenderJob>;
     getRenderJob(id: string): Promise<RenderJob>;
     createScript(input: ProductUpdateInput): Promise<ScriptResult>;

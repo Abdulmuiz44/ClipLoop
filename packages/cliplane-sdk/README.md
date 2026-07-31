@@ -42,7 +42,7 @@ Local schedules are stored in `.cliplane/schedules.json`. They are workflow plan
 
 ## Hosted Compatibility
 
-`ClipLoop` remains exported solely as a legacy compatibility client for the existing hosted ClipLoop API, including its hosted render and scheduling routes. It uses `CLIPLOOP_API_KEY` and `https://api.cliploop.site`; these are not ClipLane local-first interfaces.
+`ClipLane` remains exported solely as a legacy compatibility client for the existing hosted ClipLane API, including its hosted render and scheduling routes. It uses `CLIPLANE_API_KEY` and `https://api.cliplane.site`; these are not ClipLane local-first interfaces.
 
 ## Package
 

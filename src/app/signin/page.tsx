@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { ContinueWithGoogleButton } from "@/components/auth/continue-with-x-button";
-import { ClipLoopLogo } from "@/components/ui/cliploop-logo";
+import { ClipLaneLogo } from "@/components/ui/cliplane-logo";
 
 export const dynamic = "force-dynamic";
 
@@ -22,10 +22,10 @@ export default async function SignInPage({
     <div className="mx-auto flex min-h-[calc(100vh-9rem)] max-w-md items-center justify-center">
       <section className="w-full rounded-xl border border-slate-200 bg-white p-7">
         <div>
-          <ClipLoopLogo href="/" />
+          <ClipLaneLogo href="/" />
           <h1 className="mt-3 text-3xl font-semibold tracking-tight text-slate-900">Sign in</h1>
           <p className="mt-2 text-sm leading-6 text-slate-600">
-            Use Google to access your ClipLoop workspace.
+            Use Google to access your ClipLane workspace.
           </p>
         </div>
 

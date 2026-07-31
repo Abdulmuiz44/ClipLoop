@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode, useMemo, useState } from "react";
 import { MvpContractBanner } from "@/components/app/mvp-contract-banner";
-import { ClipLoopLogo } from "@/components/ui/cliploop-logo";
+import { ClipLaneLogo } from "@/components/ui/cliplane-logo";
 import { signOutUser } from "@/lib/auth/actions";
 
 type NavItem = { href: string; label: string; icon: ReactNode };
@@ -86,7 +86,7 @@ export function StudioShell({
   children,
   title,
   subtitle,
-  userName = "ClipLoop Studio",
+  userName = "ClipLane Studio",
   userEmail,
 }: {
   children: ReactNode;
@@ -99,7 +99,7 @@ export function StudioShell({
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const initials = useMemo(() => {
-    const source = userName || userEmail || "ClipLoop Studio";
+    const source = userName || userEmail || "ClipLane Studio";
     const parts = source.split(/[ @.]+/).filter(Boolean);
     return `${parts[0]?.[0] ?? "C"}${parts[1]?.[0] ?? "L"}`.toUpperCase();
   }, [userEmail, userName]);
@@ -113,7 +113,7 @@ export function StudioShell({
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <ClipLoopLogo href="/app" textClassName="text-white" />
+        <ClipLaneLogo href="/app" textClassName="text-white" />
 
         <Link
           href="/app/create"
@@ -177,7 +177,7 @@ export function StudioShell({
           <div className="flex items-center gap-3 rounded-2xl border border-slate-800 bg-slate-900 p-3">
             <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-slate-800 text-xs font-semibold text-white">CL</span>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium text-white">ClipLoop Studio</p>
+              <p className="truncate text-sm font-medium text-white">ClipLane Studio</p>
               <p className="truncate text-xs text-slate-400">Workspace</p>
             </div>
             <span className="text-slate-400">▾</span>
@@ -253,7 +253,7 @@ export function StudioShell({
           </div>
           {children}
           <footer className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-4 text-xs text-slate-500 dark:border-slate-800">
-            <p>© 2026 ClipLoop. All rights reserved.</p>
+            <p>© 2026 ClipLane. All rights reserved.</p>
             <div className="flex items-center gap-5">
               <Link href="/terms">Terms</Link>
               <Link href="/privacy">Privacy</Link>

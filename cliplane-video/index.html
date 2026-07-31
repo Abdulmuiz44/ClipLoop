@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: #050505;
+        font-family: Inter, system-ui, sans-serif;
+      }
+      [data-composition-id="main"] {
+        width: 1080px;
+        height: 1920px;
+        position: relative;
+        background: radial-gradient(circle at 80% 20%, #0f172a 0%, #050505 45%);
+        overflow: hidden;
+      }
+      .scene {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        padding: 140px 96px;
+        gap: 36px;
+        box-sizing: border-box;
+        opacity: 0;
+      }
+      .kicker {
+        color: #22d3ee;
+        font-size: 34px;
+        font-weight: 700;
+        letter-spacing: 0;
+        text-transform: uppercase;
+      }
+      .headline {
+        color: #ffffff;
+        font-size: 102px;
+        line-height: 0.94;
+        font-family: "Space Grotesk", Inter, system-ui, sans-serif;
+        font-weight: 700;
+        max-width: 860px;
+      }
+      .sub {
+        color: #9ca3af;
+        font-size: 42px;
+        line-height: 1.2;
+        max-width: 860px;
+      }
+      .chip-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+      .chip {
+        border: 2px solid #1f2937;
+        background: #111827;
+        color: #ffffff;
+        padding: 14px 22px;
+        border-radius: 14px;
+        font-size: 28px;
+        font-weight: 600;
+      }
+      .flash {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, #050505 0%, #22d3ee 50%, #050505 100%);
+        transform: translateX(-120%);
+        opacity: 0;
+        z-index: 30;
+      }
+      .grid-lines {
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(to right, rgba(34, 211, 238, 0.09) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(34, 211, 238, 0.09) 1px, transparent 1px);
+        background-size: 80px 80px;
+        opacity: 0.2;
+        z-index: 1;
+      }
+      .logo-mark {
+        position: absolute;
+        right: 86px;
+        top: 88px;
+        z-index: 15;
+        border: 2px solid #22d3ee;
+        color: #ffffff;
+        font-size: 34px;
+        font-weight: 700;
+        padding: 12px 22px;
+        border-radius: 12px;
+        background: rgba(17, 24, 39, 0.8);
+      }
+      .scene-content {
+        position: relative;
+        z-index: 10;
+      }
+      .final-band {
+        margin-top: 20px;
+        width: 100%;
+        height: 10px;
+        background: linear-gradient(90deg, #22d3ee 0%, #ffffff 50%, #22d3ee 100%);
+        border-radius: 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="15"
+      data-width="1080"
+      data-height="1920"
+    >
+      <div class="grid-lines"></div>
+      <div class="logo-mark">ClipLane</div>
+      <div id="transition-flash" class="flash"></div>
+
+      <section id="scene-1" class="scene">
+        <div class="scene-content">
+          <p id="s1-kicker" class="kicker">Create Fast</p>
+          <h1 id="s1-headline" class="headline">From Idea To Promo Video</h1>
+          <p id="s1-sub" class="sub">ClipLane turns rough prompts into business-ready short form content.</p>
+        </div>
+      </section>
+
+      <section id="scene-2" class="scene">
+        <div class="scene-content">
+          <p id="s2-kicker" class="kicker">Open Core Engine</p>
+          <h1 id="s2-headline" class="headline">Build On Top Of ClipLane</h1>
+          <div class="chip-row">
+            <div id="s2-chip-1" class="chip">Context Assembly</div>
+            <div id="s2-chip-2" class="chip">Render Abstractions</div>
+            <div id="s2-chip-3" class="chip">Provider Interfaces</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="scene-3" class="scene">
+        <div class="scene-content">
+          <p id="s3-kicker" class="kicker">Hosted Gateway</p>
+          <h1 id="s3-headline" class="headline">Scale With Managed Reliability</h1>
+          <p id="s3-sub" class="sub">API keys, orchestration, rendering, and credits for production execution.</p>
+          <div id="s3-band" class="final-band"></div>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      tl.set("#scene-1", { opacity: 1 }, 0);
+
+      tl.from("#s1-kicker", { x: -70, opacity: 0, duration: 0.6, ease: "expo.out" }, 0.25);
+      tl.from("#s1-headline", { y: 120, opacity: 0, duration: 0.85, ease: "power4.out" }, 0.38);
+      tl.from("#s1-sub", { scale: 0.92, opacity: 0, duration: 0.6, ease: "back.out(1.2)" }, 0.62);
+
+      tl.to("#transition-flash", { opacity: 0.9, x: 1300, duration: 0.55, ease: "power2.inOut" }, 4.9);
+      tl.set("#scene-1", { opacity: 0 }, 5.3);
+      tl.set("#scene-2", { opacity: 1 }, 5.3);
+      tl.set("#transition-flash", { x: -1200, opacity: 0 }, 5.45);
+
+      tl.from("#s2-kicker", { y: -70, opacity: 0, duration: 0.55, ease: "power3.out" }, 5.45);
+      tl.from("#s2-headline", { x: 90, opacity: 0, duration: 0.8, ease: "expo.out" }, 5.58);
+      tl.from("#s2-chip-1", { y: 80, opacity: 0, duration: 0.45, ease: "back.out(1.6)" }, 5.85);
+      tl.from("#s2-chip-2", { y: 80, opacity: 0, duration: 0.45, ease: "power2.out" }, 5.99);
+      tl.from("#s2-chip-3", { y: 80, opacity: 0, duration: 0.45, ease: "expo.out" }, 6.13);
+
+      tl.to("#transition-flash", { opacity: 0.9, x: 1300, duration: 0.55, ease: "power2.inOut" }, 10.1);
+      tl.set("#scene-2", { opacity: 0 }, 10.5);
+      tl.set("#scene-3", { opacity: 1 }, 10.5);
+      tl.set("#transition-flash", { x: -1200, opacity: 0 }, 10.66);
+
+      tl.from("#s3-kicker", { scale: 0.8, opacity: 0, duration: 0.48, ease: "back.out(1.8)" }, 10.65);
+      tl.from("#s3-headline", { y: 110, opacity: 0, duration: 0.82, ease: "power4.out" }, 10.78);
+      tl.from("#s3-sub", { x: -60, opacity: 0, duration: 0.55, ease: "expo.out" }, 11.05);
+      tl.from("#s3-band", { scaleX: 0, transformOrigin: "left center", duration: 0.5, ease: "power3.out" }, 11.28);
+
+      tl.to("#scene-3", { opacity: 0, duration: 0.55, ease: "power2.in" }, 14.35);
+      tl.to(".grid-lines", { opacity: 0, duration: 0.55, ease: "power2.in" }, 14.35);
+      tl.to(".logo-mark", { opacity: 0, duration: 0.45, ease: "power2.in" }, 14.35);
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
