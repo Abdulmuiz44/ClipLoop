@@ -1,0 +1,48 @@
+{
+  "name": "@talocode/cliplane-sdk",
+  "version": "0.1.0",
+  "type": "commonjs",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "package.json",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "prepack": "npm run build",
+    "test": "tsx --test test/**/*.test.ts",
+    "example:weekly-promo": "tsx examples/weekly-promo.ts"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  },
+  "engines": {
+    "node": ">=18.18"
+  },
+  "description": "Open-source ClipLane SDK for local-first video workflow generation.",
+  "keywords": [
+    "cliplane",
+    "video",
+    "sdk",
+    "open-source",
+    "workflow"
+  ],
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
+}

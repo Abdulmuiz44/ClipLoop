@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "talocode-cliplane"
+version = "0.1.0"
+description = "Local-first promo video workflow plans for ClipLane."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "Talocode" }]
+dependencies = []
+
+[project.scripts]
+cliplane = "cliplane.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["cliplane*"]
