@@ -47,6 +47,24 @@ export type ExportXResult = {
   hashtags: string[];
 };
 
+export type ScheduleInput = { scheduledFor: Date | string };
+
+export type ScheduleStatus = {
+  item: { id: string; publishStatus: string; scheduledFor: string | null };
+  job: { id: string; status: string; runAt: string; attempts: number; maxAttempts: number; lastError: string | null } | null;
+};
+
+export type ScheduleResult = {
+  item: ScheduleStatus["item"];
+  job: NonNullable<ScheduleStatus["job"]>;
+  mode: "created" | "updated";
+};
+
+export type CancelScheduleResult = {
+  item: ScheduleStatus["item"];
+  cancelledJobId: string;
+};
+
 const DEFAULT_BASE_URL = "https://api.cliploop.site";
 const HOSTED_RENDER_KEY_ERROR =
   "ClipLoop API key required for hosted rendering. Get one at https://cliploop.site";
@@ -166,6 +184,11 @@ function makeId(prefix: string) {
       ? crypto.randomUUID().slice(0, 8)
       : Math.random().toString(36).slice(2, 10);
   return `${prefix}_${suffix}`;
+}
+
+function scheduleBody(input: ScheduleInput) {
+  const scheduledFor = input.scheduledFor instanceof Date ? input.scheduledFor.toISOString() : input.scheduledFor;
+  return JSON.stringify({ scheduledFor });
 }
 
 async function hostedRequest<T>(
@@ -304,5 +327,29 @@ export class ClipLoop extends ClipLoopLocal {
       method: "POST",
       body: JSON.stringify(input),
     });
+  }
+
+  async scheduleContentItem(contentItemId: string, input: ScheduleInput): Promise<ScheduleResult> {
+    return hostedRequest<ScheduleResult>(this.baseUrl, this.apiKey, `/api/public/content-items/${encodeURIComponent(contentItemId)}/schedule`, {
+      method: "POST",
+      body: scheduleBody(input),
+    });
+  }
+
+  async rescheduleContentItem(contentItemId: string, input: ScheduleInput): Promise<ScheduleResult> {
+    return hostedRequest<ScheduleResult>(this.baseUrl, this.apiKey, `/api/public/content-items/${encodeURIComponent(contentItemId)}/schedule`, {
+      method: "PATCH",
+      body: scheduleBody(input),
+    });
+  }
+
+  async cancelScheduledContentItem(contentItemId: string): Promise<CancelScheduleResult> {
+    return hostedRequest<CancelScheduleResult>(this.baseUrl, this.apiKey, `/api/public/content-items/${encodeURIComponent(contentItemId)}/schedule`, {
+      method: "DELETE",
+    });
+  }
+
+  async getScheduleStatus(contentItemId: string): Promise<ScheduleStatus> {
+    return hostedRequest<ScheduleStatus>(this.baseUrl, this.apiKey, `/api/public/content-items/${encodeURIComponent(contentItemId)}/schedule`);
   }
 }

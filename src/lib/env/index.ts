@@ -50,6 +50,7 @@ const envSchema = z.object({
   ENCRYPTION_SECRET: z.string().optional(),
   HYPERFRAMES_ENABLED: z.coerce.boolean().default(false),
   HYPERFRAMES_BIN: z.string().default("hyperframes"),
+  SCHEDULER_SECRET: z.string().min(1).optional(),
 });
 
 export const env = envSchema.parse({
@@ -86,4 +87,5 @@ export const env = envSchema.parse({
   ENCRYPTION_SECRET: process.env.ENCRYPTION_SECRET,
   HYPERFRAMES_ENABLED: process.env.HYPERFRAMES_ENABLED,
   HYPERFRAMES_BIN: process.env.HYPERFRAMES_BIN,
+  SCHEDULER_SECRET: process.env.SCHEDULER_SECRET,
 });

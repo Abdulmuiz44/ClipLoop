@@ -16,6 +16,10 @@ API keys are managed in the [dashboard](https://app.cliploop.site/dashboard/sett
 
 ## Endpoints
 
+### Scheduled publishing
+
+See [Scheduled Publishing](./SCHEDULING.md) for the `content:schedule` API scope, endpoints, SDK methods, worker setup, and current direct-publisher limitations.
+
 ### POST /api/public/weekly-promo
 
 Generate a weekly promo video script + scene plan for your app. Ingest your app's website for brand-aligned content, produce a platform-optimized script and scene plan.

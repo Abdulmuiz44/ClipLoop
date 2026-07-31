@@ -97,6 +97,33 @@ test("hosted client uses baseUrl override", async () => {
   }
 });
 
+test("hosted scheduling methods use the public scheduling endpoint", async () => {
+  const requests: Array<{ url: string; method: string; body: string }> = [];
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
+    requests.push({ url: String(input), method: init?.method ?? "GET", body: String(init?.body ?? "") });
+    return new Response(JSON.stringify({ item: { id: "item_123", publishStatus: "scheduled", scheduledFor: "2027-01-01T00:00:00.000Z" }, job: { id: "job_123" }, mode: "created" }), { status: 200 });
+  }) as typeof fetch;
+
+  try {
+    const cliploop = new ClipLoop({ apiKey: "cliploop_test_key", baseUrl: "http://localhost:3000" });
+    await cliploop.scheduleContentItem("item/123", { scheduledFor: new Date("2027-01-01T00:00:00.000Z") });
+    await cliploop.rescheduleContentItem("item/123", { scheduledFor: "2027-01-02T00:00:00.000Z" });
+    await cliploop.cancelScheduledContentItem("item/123");
+    await cliploop.getScheduleStatus("item/123");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+
+  assert.deepEqual(requests.map(({ url, method }) => ({ url, method })), [
+    { url: "http://localhost:3000/api/public/content-items/item%2F123/schedule", method: "POST" },
+    { url: "http://localhost:3000/api/public/content-items/item%2F123/schedule", method: "PATCH" },
+    { url: "http://localhost:3000/api/public/content-items/item%2F123/schedule", method: "DELETE" },
+    { url: "http://localhost:3000/api/public/content-items/item%2F123/schedule", method: "GET" },
+  ]);
+  assert.match(requests[0]?.body ?? "", /2027-01-01T00:00:00.000Z/);
+});
+
 test("package exports work", async () => {
   const sdk = await import("../src/index.js");
   assert.equal(typeof sdk.ClipLoop, "function");

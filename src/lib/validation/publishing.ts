@@ -1,11 +1,15 @@
 import { z } from "zod";
 
 export const scheduleContentItemBodySchema = z.object({
-  scheduledFor: z.string().datetime({ offset: true }),
+  scheduledFor: z.string().datetime({ offset: true }).refine((value) => new Date(value).getTime() > Date.now(), {
+    message: "Scheduled time must be in the future",
+  }),
 });
 
 export const bulkScheduleBodySchema = z.object({
-  startAt: z.string().datetime({ offset: true }),
+  startAt: z.string().datetime({ offset: true }).refine((value) => new Date(value).getTime() > Date.now(), {
+    message: "Start time must be in the future",
+  }),
   spacingHours: z.number().int().min(1).max(168).default(24),
   onlyApproved: z.boolean().default(true),
 });

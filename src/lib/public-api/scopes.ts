@@ -8,6 +8,9 @@ export const PUBLIC_API_SCOPES = [
 
   // Project discovery (for mapping projectId)
   "projects:read",
+
+  // Schedule direct publishing for content within the key's project scope.
+  "content:schedule",
 ] as const;
 
 export type PublicApiScopeId = (typeof PUBLIC_API_SCOPES)[number];

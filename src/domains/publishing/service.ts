@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, lte, or } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
 import { getPublisher } from "@/lib/publisher";
 import { listContentItemsForStrategyCycle } from "@/domains/content-items/service";
@@ -7,6 +7,7 @@ import { assertPublishAllowed, incrementUsageCounter } from "@/domains/usage/ser
 import { env } from "@/lib/env";
 import { getChannelHealth, getProjectChannel } from "@/domains/channels/service";
 import { resolveContentItemTargetChannel } from "@/lib/utils/channels";
+import { assertFutureSchedule, JOB_LEASE_MS, retryDelayMs } from "@/domains/publishing/scheduling";
 
 type PublishJobPayload = { contentItemId: string };
 
@@ -90,6 +91,7 @@ export async function enqueuePublishJob(contentItemId: string, scheduledFor: Dat
 }
 
 export async function scheduleContentItem(contentItemId: string, scheduledFor: Date) {
+  assertFutureSchedule(scheduledFor);
   const item = await db.query.contentItems.findFirst({ where: eq(schema.contentItems.id, contentItemId) });
   if (!item) throw new Error("Content item not found");
   const project = await db.query.projects.findFirst({ where: eq(schema.projects.id, item.projectId) });
@@ -122,6 +124,27 @@ export async function scheduleContentItem(contentItemId: string, scheduledFor: D
     .returning();
 
   return { item: updatedItem, job, mode };
+}
+
+export async function cancelScheduledContentItem(contentItemId: string) {
+  const item = await db.query.contentItems.findFirst({ where: eq(schema.contentItems.id, contentItemId) });
+  if (!item) throw new Error("Content item not found");
+  if (item.publishStatus !== "scheduled") throw new Error("Only scheduled content can be cancelled");
+
+  const job = await findPendingPublishJob(contentItemId);
+  if (!job) throw new Error("Scheduled job is already being processed");
+  const [cancelledJob] = await db
+    .delete(schema.jobQueue)
+    .where(and(eq(schema.jobQueue.id, job.id), eq(schema.jobQueue.status, "pending")))
+    .returning();
+  if (!cancelledJob) throw new Error("Scheduled job is already being processed");
+
+  const [updated] = await db
+    .update(schema.contentItems)
+    .set({ scheduledFor: null, publishStatus: "approved", updatedAt: new Date() })
+    .where(eq(schema.contentItems.id, contentItemId))
+    .returning();
+  return { item: updated, cancelledJobId: cancelledJob.id };
 }
 
 export async function bulkScheduleStrategyCycleContent(
@@ -160,24 +183,6 @@ export async function bulkScheduleStrategyCycleContent(
   };
 }
 
-export async function markJobRunning(jobId: string) {
-  const job = await db.query.jobQueue.findFirst({ where: eq(schema.jobQueue.id, jobId) });
-  if (!job || (job.status !== "pending" && job.status !== "failed")) return null;
-
-  const [updated] = await db
-    .update(schema.jobQueue)
-    .set({
-      status: "running",
-      attempts: job.attempts + 1,
-      lockedAt: new Date(),
-      lastError: null,
-    })
-    .where(eq(schema.jobQueue.id, jobId))
-    .returning();
-
-  return updated;
-}
-
 export async function markJobCompleted(jobId: string) {
   const [updated] = await db
     .update(schema.jobQueue)
@@ -201,10 +206,12 @@ export async function markJobFailed(jobId: string, errorMessage: string) {
     return markJobDead(jobId, errorMessage);
   }
 
+  const retryAt = new Date(Date.now() + retryDelayMs(job.attempts));
   const [updated] = await db
     .update(schema.jobQueue)
     .set({
-      status: "failed",
+      status: "pending",
+      runAt: retryAt,
       lockedAt: null,
       lastError: errorMessage,
     })
@@ -228,12 +235,7 @@ export async function markJobDead(jobId: string, errorMessage: string) {
   return updated;
 }
 
-export async function processJob(jobId: string) {
-  const running = await markJobRunning(jobId);
-  if (!running) {
-    return { skipped: true, reason: "Job is not pending", jobId };
-  }
-
+async function processClaimedJob(running: typeof schema.jobQueue.$inferSelect) {
   try {
     const payload = parsePayload(running.payloadJson);
     const item = await db.query.contentItems.findFirst({ where: eq(schema.contentItems.id, payload.contentItemId) });
@@ -241,15 +243,15 @@ export async function processJob(jobId: string) {
     const project = await db.query.projects.findFirst({ where: eq(schema.projects.id, item.projectId) });
     if (!project) throw new Error("Project not found");
 
-    await db
-      .update(schema.contentItems)
-      .set({ publishStatus: "publishing", updatedAt: new Date() })
-      .where(eq(schema.contentItems.id, item.id));
-
     const targetChannel = resolveContentItemTargetChannel(item.targetChannel, item.platform);
     if (item.publishStrategy !== "direct_instagram" || targetChannel !== "instagram") {
       throw new Error(`Item is manual export or non-Instagram channel. Direct publish is blocked.`);
     }
+
+    await db
+      .update(schema.contentItems)
+      .set({ publishStatus: "publishing", updatedAt: new Date() })
+      .where(eq(schema.contentItems.id, item.id));
 
     const channel = await getProjectChannel(project.id, "instagram");
     const normalizedChannel = channel ?? null;
@@ -295,12 +297,12 @@ export async function processJob(jobId: string) {
       amount: 1,
     });
 
-    const job = await markJobCompleted(jobId);
+    const job = await markJobCompleted(running.id);
     return { skipped: false, success: true, job, contentItemId: item.id };
   } catch (error) {
     const message = error instanceof Error ? error.message : "Job failed";
 
-    const job = await db.query.jobQueue.findFirst({ where: eq(schema.jobQueue.id, jobId) });
+    const job = await db.query.jobQueue.findFirst({ where: eq(schema.jobQueue.id, running.id) });
     if (job) {
       const payload = job.payloadJson as { contentItemId?: string };
       if (payload.contentItemId) {
@@ -311,36 +313,73 @@ export async function processJob(jobId: string) {
       }
     }
 
-    const failedJob = await markJobFailed(jobId, message);
+    const failedJob = await markJobFailed(running.id, message);
     return { skipped: false, success: false, job: failedJob, error: message };
   }
 }
 
+export async function processJob(jobId: string) {
+  const result = await db.execute(sql`
+    UPDATE job_queue
+    SET status = 'running', attempts = attempts + 1, locked_at = now(), last_error = NULL
+    WHERE id = ${jobId}
+      AND status = 'pending'
+      AND run_at <= now()
+    RETURNING *
+  `);
+  const running = result.rows[0] as typeof schema.jobQueue.$inferSelect | undefined;
+  if (!running) return { skipped: true, reason: "Job is not due or already claimed", jobId };
+  return processClaimedJob(running);
+}
+
+async function claimDueJobs(limit: number) {
+  const staleBefore = new Date(Date.now() - JOB_LEASE_MS);
+  const result = await db.execute(sql`
+    WITH due AS (
+      SELECT id
+      FROM job_queue
+      WHERE type = 'publish_content_item'
+        AND ((status = 'pending' AND run_at <= now()) OR (status = 'running' AND locked_at < ${staleBefore}))
+      ORDER BY run_at ASC
+      FOR UPDATE SKIP LOCKED
+      LIMIT ${limit}
+    )
+    UPDATE job_queue AS job
+    SET status = 'running', attempts = job.attempts + 1, locked_at = now(), last_error = NULL
+    FROM due
+    WHERE job.id = due.id
+    RETURNING job.*
+  `);
+  return result.rows as Array<typeof schema.jobQueue.$inferSelect>;
+}
+
 export async function processDueJobs(limit = 20) {
-  const jobs = await db.query.jobQueue.findMany({
-    where: and(
-      lte(schema.jobQueue.runAt, new Date()),
-      or(eq(schema.jobQueue.status, "pending"), eq(schema.jobQueue.status, "failed")),
-    ),
-    orderBy: [asc(schema.jobQueue.runAt)],
-    limit,
-  });
+  const jobs = await claimDueJobs(limit);
 
   let successes = 0;
   let failures = 0;
+  let retriesScheduled = 0;
+  let dead = 0;
   const details: Array<Awaited<ReturnType<typeof processJob>>> = [];
 
   for (const job of jobs) {
-    const result = await processJob(job.id);
+    const result = await processClaimedJob(job);
     details.push(result);
     if (!result.skipped && result.success) successes += 1;
-    if (!result.skipped && !result.success) failures += 1;
+    if (!result.skipped && !result.success) {
+      failures += 1;
+      if (result.job?.status === "pending") retriesScheduled += 1;
+      if (result.job?.status === "dead") dead += 1;
+    }
   }
 
   return {
+    claimed: jobs.length,
     processed: jobs.length,
     successes,
     failures,
+    retriesScheduled,
+    dead,
     details,
   };
 }
