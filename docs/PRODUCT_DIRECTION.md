@@ -44,7 +44,7 @@ The public API is the long-lived contract. The dashboard is a consumer of that A
 
 ## Dashboard Role
 
-The dashboard (`app.cliplane.site/dashboard`) is:
+The dashboard (`https://dashboard.talocode.site/products/cliplane`) is:
 
 - the onboarding surface for new users
 - the API key management console
@@ -133,7 +133,7 @@ Monthly generation and render grants are applied automatically per plan.
 ## Near-Term Roadmap
 
 1. Finish API key testing and wire top-up / credit pack checkout
-2. Ship public weekly promo API docs at docs.cliplane.site
+2. Ship public weekly promo API docs at `https://docs.talocode.site/products/cliplane`
 3. Usage dashboard with credit wallet and transaction history
 4. SDK v0 (TypeScript, `generateWeeklyPromo`, `generateVideo`)
 5. CLI v0 (`cliplane generate`, `cliplane jobs`, `cliplane download`)

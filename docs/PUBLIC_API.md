@@ -1,6 +1,8 @@
 # ClipLane Public API
 
-Base URL: `https://api.talocode.site/v1/cliplane`
+Target API base URL: `https://api.talocode.site/v1/cliplane`
+
+> This is the target Talocode API architecture. It does not indicate that every documented endpoint is deployed.
 
 ---
 
@@ -10,7 +12,7 @@ All public API endpoints require a bearer API key.
 
 **Header:** `Authorization: Bearer <your_api_key>`
 
-API keys are managed in the [dashboard](https://app.cliplane.site/dashboard/settings/api-keys). The raw key is shown **once** at creation — copy it immediately. Only the prefix is stored server-side.
+API keys are managed in the [dashboard](https://dashboard.talocode.site/products/cliplane). The raw key is shown **once** at creation — copy it immediately. Only the prefix is stored server-side.
 
 ---
 

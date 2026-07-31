@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-const API_BASE = import.meta.env.DEV ? "/api" : "https://app.cliplane.site/api";
+const API_BASE = import.meta.env.DEV ? "/api" : "https://api.talocode.site/v1/cliplane";
 
 // ── Credit pack config (mirrors src/core/billing/policy.ts) ──
 interface CreditPack {
@@ -173,17 +173,17 @@ export default function BillingPage() {
                 <p className="mt-1 text-white">API Keys</p>
                 <p className="mt-1 text-xs text-[#555]">Create or revoke keys</p>
               </Link>
-              <a href="https://docs.cliplane.site/credits/" target="_blank" rel="noreferrer" className="rounded-xl border border-[#1F1F1F] bg-[#050505] p-4 text-sm text-[#A3A3A3] hover:border-neutral-600">
+              <a href="https://docs.talocode.site/products/cliplane/credits/" target="_blank" rel="noreferrer" className="rounded-xl border border-[#1F1F1F] bg-[#050505] p-4 text-sm text-[#A3A3A3] hover:border-neutral-600">
                 <p className="text-xs font-medium uppercase tracking-wider text-[#8B8B8B]">Docs</p>
                 <p className="mt-1 text-white">Credits & Billing</p>
                 <p className="mt-1 text-xs text-[#555]">Limits, top-up and usage</p>
               </a>
-              <a href="https://docs.cliplane.site/quickstart/" target="_blank" rel="noreferrer" className="rounded-xl border border-[#1F1F1F] bg-[#050505] p-4 text-sm text-[#A3A3A3] hover:border-neutral-600">
+              <a href="https://docs.talocode.site/products/cliplane/quickstart/" target="_blank" rel="noreferrer" className="rounded-xl border border-[#1F1F1F] bg-[#050505] p-4 text-sm text-[#A3A3A3] hover:border-neutral-600">
                 <p className="text-xs font-medium uppercase tracking-wider text-[#8B8B8B]">Docs</p>
                 <p className="mt-1 text-white">Quickstart</p>
                 <p className="mt-1 text-xs text-[#555]">First API call in under 5 min</p>
               </a>
-              <a href="https://docs.cliplane.site/weekly-promo-api/" target="_blank" rel="noreferrer" className="rounded-xl border border-[#1F1F1F] bg-[#050505] p-4 text-sm text-[#A3A3A3] hover:border-neutral-600">
+              <a href="https://docs.talocode.site/products/cliplane/weekly-promo-api/" target="_blank" rel="noreferrer" className="rounded-xl border border-[#1F1F1F] bg-[#050505] p-4 text-sm text-[#A3A3A3] hover:border-neutral-600">
                 <p className="text-xs font-medium uppercase tracking-wider text-[#8B8B8B]">Docs</p>
                 <p className="mt-1 text-white">Weekly Promo API</p>
                 <p className="mt-1 text-xs text-[#555]">Request, response, and examples</p>

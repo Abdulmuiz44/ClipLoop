@@ -2,7 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
 
-const API_BACKEND = "https://app.cliplane.site";
+const API_BACKEND = "https://api.talocode.site/v1/cliplane";
 
 export default defineConfig({
   plugins: [react()],
@@ -29,6 +29,7 @@ export default defineConfig({
     proxy: {
       "/api": {
         target: API_BACKEND,
+        rewrite: (path) => path.replace(/^\/api/, ""),
         changeOrigin: true,
         secure: true,
       },

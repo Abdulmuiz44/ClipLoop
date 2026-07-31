@@ -78,7 +78,7 @@ export default function PricingPage() {
             <Feature>Manual queue and export workflow included</Feature>
           </ul>
           <div className="mt-6">
-            <a href="https://app.cliplane.site/app" className="cl-btn-ghost inline-flex">
+            <a href="https://dashboard.talocode.site/products/cliplane" className="cl-btn-ghost inline-flex">
               Start in workspace
             </a>
           </div>
@@ -135,7 +135,7 @@ export default function PricingPage() {
                 whileTap={{ scale: 0.98 }}
               >
                 <a
-                  href="https://app.cliplane.site/signin"
+                  href="https://dashboard.talocode.site/products/cliplane/signin"
                   className="inline-flex rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-black shadow-sm transition hover:bg-neutral-200"
                 >
                   Start Pro checkout

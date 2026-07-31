@@ -288,7 +288,7 @@ export function ApiKeysManager({ projects }: { projects: ProjectOption[] }) {
         <h2 className="text-lg font-semibold tracking-tight text-slate-950">Quick start</h2>
         <p className="mt-1 text-slate-600">Example request to generate a weekly promo.</p>
         <pre className="mt-4 overflow-x-auto rounded-xl bg-slate-950 p-4 text-[11px] text-slate-100">
-{`curl -X POST "https://app.cliplane.site/api/public/weekly-promo" \\
+{`curl -X POST "https://api.talocode.site/v1/cliplane/weekly-promo" \\
   -H "Authorization: Bearer <YOUR_API_KEY>" \\
   -H "Idempotency-Key: my-request-001" \\
   -H "Content-Type: application/json" \\

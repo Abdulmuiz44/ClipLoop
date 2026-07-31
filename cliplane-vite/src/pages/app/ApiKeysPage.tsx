@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
-const API_BASE = import.meta.env.DEV ? "/api" : "https://app.cliplane.site/api";
+const API_BASE = import.meta.env.DEV ? "/api" : "https://api.talocode.site/v1/cliplane";
 
 type ApiKey = {
   id: string;
@@ -347,10 +347,10 @@ function ApiQuickStart({ keys }: { keys: ApiKey[] }) {
   const [endpointCopied, setEndpointCopied] = useState(false);
   const [curlCopied, setCurlCopied] = useState(false);
 
-  const endpoint = "POST https://app.cliplane.site/api/public/weekly-promo";
+  const endpoint = "POST https://api.talocode.site/v1/cliplane/weekly-promo";
   const sampleKey = keys.length > 0 ? `${keys[0].keyPrefix}...` : "clp_YOUR_API_KEY";
 
-  const curlExample = `curl -X POST https://app.cliplane.site/api/public/weekly-promo \\
+  const curlExample = `curl -X POST https://api.talocode.site/v1/cliplane/weekly-promo \\
   -H "Authorization: Bearer ${sampleKey}" \\
   -H "Idempotency-Key: my-unique-key-abc123" \\
   -H "Content-Type: application/json" \\
@@ -428,7 +428,7 @@ function ApiQuickStart({ keys }: { keys: ApiKey[] }) {
           {/* JS fetch */}
           <div>
             <p className="mb-1.5 text-sm font-medium text-white">JavaScript (fetch)</p>
-            <pre className="overflow-x-auto rounded-xl bg-[#0A0A0A] p-3 font-mono text-xs text-white/80">{`const res = await fetch("https://app.cliplane.site/api/public/weekly-promo", {
+            <pre className="overflow-x-auto rounded-xl bg-[#0A0A0A] p-3 font-mono text-xs text-white/80">{`const res = await fetch("https://api.talocode.site/v1/cliplane/weekly-promo", {
   method: "POST",
   headers: {
     Authorization: "Bearer ${sampleKey}",

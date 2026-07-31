@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
-const API_BASE = import.meta.env.DEV ? "/api" : "https://app.cliplane.site/api";
+const API_BASE = import.meta.env.DEV ? "/api" : "https://api.talocode.site/v1/cliplane";
 
 type SessionUser = {
   id: string;
@@ -263,7 +263,7 @@ export default function DashboardHome() {
               </p>
 
               <div className="mt-4 rounded-xl bg-[#111111] p-4 font-mono text-xs leading-relaxed text-[#A3A3A3]">
-                <p className="text-white font-semibold mb-2 text-sm not-italic">POST https://app.cliplane.site/api/public/weekly-promo</p>
+                <p className="text-white font-semibold mb-2 text-sm not-italic">POST https://api.talocode.site/v1/cliplane/weekly-promo</p>
                 <p><span className="text-white">Headers:</span></p>
                 <p className="ml-3">Authorization: Bearer &lt;your_api_key&gt;</p>
                 <p className="ml-3">Idempotency-Key: &lt;unique_key&gt;</p>

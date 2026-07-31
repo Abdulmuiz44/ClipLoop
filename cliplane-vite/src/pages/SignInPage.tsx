@@ -3,7 +3,7 @@ import { ClipLaneLogo } from "@/components/ui/ClipLaneLogo";
 import { motion } from "framer-motion";
 import { useEffect } from "react";
 
-const API_BASE = import.meta.env.DEV ? "/api" : "https://app.cliplane.site/api";
+const API_BASE = import.meta.env.DEV ? "/api" : "https://api.talocode.site/v1/cliplane";
 
 export default function SignInPage() {
   const [searchParams] = useSearchParams();
@@ -25,7 +25,7 @@ export default function SignInPage() {
   const handleGoogleSignIn = () => {
     const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
     window.location.href = `${API_BASE}/auth/signin?callbackUrl=${encodeURIComponent(
-      "https://app.cliplane.site" + callbackUrl
+      "https://dashboard.talocode.site/products/cliplane" + callbackUrl
     )}`;
   };
 

@@ -3,7 +3,7 @@ import { ClipLaneLogo } from "@/components/ui/ClipLaneLogo";
 import { motion } from "framer-motion";
 import { useState, useEffect, useCallback, useRef } from "react";
 
-const API_BASE = import.meta.env.DEV ? "/api" : "https://app.cliplane.site/api";
+const API_BASE = import.meta.env.DEV ? "/api" : "https://api.talocode.site/v1/cliplane";
 
 type SessionUser = {
   id: string;

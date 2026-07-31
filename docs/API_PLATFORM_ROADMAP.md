@@ -20,7 +20,7 @@
   - `cliplane generate weekly-promo <url>`
   - `cliplane jobs`
   - `cliplane download <id>`
-- docs.cliplane.site live with 8-page docs (home, quickstart, API ref, auth, credits/billing, errors, examples, changelog)
+- Target docs location: `https://docs.talocode.site/products/cliplane` with 8 pages (home, quickstart, API ref, auth, credits/billing, errors, examples, changelog)
 
 ## v0.2 — Generic Video Generation
 

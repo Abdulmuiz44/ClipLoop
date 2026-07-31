@@ -10,7 +10,7 @@ cliplane/              ← existing Next.js project (API backend)
 ```
 
 - **Frontend:** Vite + React 19 + TypeScript + Tailwind + Framer Motion
-- **API Backend:** Existing Next.js app at `www.cliplane.site` (handles auth, DB, billing)
+- **API Backend target:** `https://api.talocode.site/v1/cliplane` (auth, DB, and billing remain backend responsibilities)
 
 ## Getting Started
 
@@ -19,12 +19,12 @@ npm install
 npm run dev
 ```
 
-Dev server runs at `http://localhost:5173`. The Vite proxy forwards `/api/*` to `https://www.cliplane.site`.
+Dev server runs at `http://localhost:5173`. The Vite proxy forwards `/api/*` to the target `https://api.talocode.site/v1/cliplane` API.
 
 ## Auth Flow
 
 1. User clicks "Continue with Google"
-2. Redirected to Next.js backend: `www.cliplane.site/api/auth/signin`
+2. Redirected through the target Talocode API: `https://api.talocode.site/v1/cliplane/auth/signin`
 3. Google OAuth redirects back to the Vite app (via `callbackUrl`)
 4. The Vite app reads session by calling `GET /api/auth/session`
 
@@ -57,9 +57,11 @@ Dev server runs at `http://localhost:5173`. The Vite proxy forwards `/api/*` to 
 **Important:** After deploying, update `SignInPage.tsx` if the API URL changes:
 
 ```ts
-const API_BASE = "https://www.cliplane.site/api"; // update this
+const API_BASE = "https://api.talocode.site/v1/cliplane";
 ```
 
 The Vite app must be served from a domain that:
-- The user visits directly (e.g., `app.cliplane.site` or `www.cliplane.site`)
+- The user visits the [ClipLane landing page](https://talocode.site/products/cliplane) or [dashboard](https://dashboard.talocode.site/products/cliplane)
+
+The Talocode URLs above describe the target architecture and do not indicate deployment status.
 - Has the Next.js backend available at `/api` (dev) or a separate domain (production)

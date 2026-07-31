@@ -1,6 +1,6 @@
 # ClipLane API Keys
 
-Get your ClipLane API key at [https://cliplane.site](https://cliplane.site).
+Get your ClipLane API key from the [ClipLane dashboard](https://dashboard.talocode.site/products/cliplane).
 
 ## What you need a key for
 

@@ -66,7 +66,7 @@ export default function LandingPage() {
             </p>
             <div className="flex flex-wrap gap-3">
               <a
-                href="https://app.cliplane.site/app"
+                href="https://dashboard.talocode.site/products/cliplane"
                 className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-neutral-200"
               >
                 Open workspace
@@ -113,10 +113,10 @@ export default function LandingPage() {
             <a href="https://github.com/talocode/cliplane" className="transition hover:text-white">
               GitHub
             </a>
-            <a href="https://cliplane.site" className="transition hover:text-white">
+            <a href="https://talocode.site/products/cliplane" className="transition hover:text-white">
               Main site
             </a>
-            <a href="https://app.cliplane.site/app" className="transition hover:text-white">
+            <a href="https://dashboard.talocode.site/products/cliplane" className="transition hover:text-white">
               App
             </a>
           </div>

@@ -37,7 +37,7 @@ The two surfaces share the same GitHub repository (`talocode/cliplane`) but have
 
 **Auth flow:**
 - User clicks sign-in on Vite frontend
-- Redirects to Next.js backend (`cliplane.site`) for Google OAuth
+- Redirects through the target Talocode API for Google OAuth
 - Next.js handles the OAuth callback and session management
 - Vite frontend proxies `/api/*` to the Next.js backend
 
@@ -76,17 +76,20 @@ The two surfaces share the same GitHub repository (`talocode/cliplane`) but have
 
 | Domain | Surface | Host | Deployment Method |
 |--------|---------|------|-------------------|
-| `cliplane.site` | Vite marketing frontend | Render (static site) | Auto-deploy from `main` branch, `cliplane-vite/` rootDir |
-| `www.cliplane.site` | Vite marketing frontend (or redirect) | Render (static site) | Same as above — CNAME alias |
-| `app.cliplane.site` | Next.js product app/backend/API | Render (web service) | Auto-deploy from `main` branch |
+| `https://talocode.site/products/cliplane` | Vite marketing frontend | Talocode product landing | Target location |
+| `https://dashboard.talocode.site/products/cliplane` | Product dashboard | Talocode dashboard | Target location |
+| `https://api.talocode.site/v1/cliplane` | API | Talocode API | Target location |
 
-### Current live URLs:
-- **Vite frontend (target):** `cliplane.site` / `www.cliplane.site`
-- **Next.js backend (target):** `app.cliplane.site`
-- **Render raw URLs:** `cliplane-app.onrender.com` (Vite static site), `cliplane.site` (Next.js web service)
+### Target public URLs
+- **Marketing:** `https://talocode.site/products/cliplane`
+- **Dashboard:** `https://dashboard.talocode.site/products/cliplane`
+- **API:** `https://api.talocode.site/v1/cliplane`
+- **Docs:** `https://docs.talocode.site/products/cliplane`
+
+These are target architecture URLs, not a statement of current deployment status.
 
 ### Vite → Next.js proxy:
-In development, `vite.config.ts` proxies `/api/*` requests to `https://app.cliplane.site` (the Next.js production backend). In production, the Vite frontend's SignInPage also uses this domain for OAuth redirects. This keeps auth and API calls working without the Vite frontend ever handling secrets.
+In development, `vite.config.ts` strips the local `/api` prefix and proxies requests to the target `https://api.talocode.site/v1/cliplane` API. In production, the Vite frontend's SignInPage uses the Talocode dashboard for OAuth callbacks. This keeps auth and API calls working without the Vite frontend ever handling secrets.
 
 ### SPA routing:
 The Vite frontend uses a `public/_redirects` file (`/* /index.html 200`) so Render serves `index.html` for all non-file routes. This enables direct URL access (e.g., `/pricing`, `/app`) in the SPA without 404 errors.
@@ -95,7 +98,7 @@ The Vite frontend uses a `public/_redirects` file (`/* /index.html 200`) so Rend
 
 ## Styling Rules
 
-### Marketing site (`cliplane.site`)
+### Marketing site (`https://talocode.site/products/cliplane`)
 - **Strict Talocode dark/white design**
 - Background: `#050505`, surfaces: `#0E0E0E`, borders: `#1F1F1F`
 - Text: white primary, `#A3A3A3` secondary, `#8B8B8B` muted
@@ -103,7 +106,7 @@ The Vite frontend uses a `public/_redirects` file (`/* /index.html 200`) so Rend
 - Framer Motion animations for page transitions, staggered reveals, hover effects
 - Marketing-focussed: bold CTAs, testimonials, feature cards, pricing tables
 
-### Product app (`app.cliplane.site`)
+### Product app (`https://dashboard.talocode.site/products/cliplane`)
 - Same dark/white base palette as marketing site
 - **Green (`#22C55E`) used only for functional states:**
   - Success indicators

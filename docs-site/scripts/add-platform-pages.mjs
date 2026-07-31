@@ -56,8 +56,8 @@ const shell = (title, body) => `<!DOCTYPE html>
     <div class="nav-section-title">More</div>
     <a href="/roadmap/" class="nav-link ">Roadmap</a>
     <a href="/changelog/" class="nav-link ">Changelog</a>
-    <a href="https://app.cliplane.site" class="nav-link">App Dashboard →</a>
-    <a href="https://cliplane.site" class="nav-link">Marketing Site →</a>
+    <a href="https://dashboard.talocode.site/products/cliplane" class="nav-link">App Dashboard →</a>
+    <a href="https://talocode.site/products/cliplane" class="nav-link">Marketing Site →</a>
   </div>
 </nav>
 <main class="main" id="content">
@@ -67,8 +67,8 @@ const shell = (title, body) => `<!DOCTYPE html>
       <p style="display:flex; flex-wrap:wrap; gap:14px; align-items:center; justify-content:space-between">
         <span>© 2026 ClipLane · Built by <a href="https://talocode.com" style="color:var(--text3)">Talocode</a></span>
         <span style="display:flex; gap:14px">
-          <a href="https://cliplane.site">Marketing</a>
-          <a href="https://app.cliplane.site">Dashboard</a>
+          <a href="https://talocode.site/products/cliplane">Marketing</a>
+          <a href="https://dashboard.talocode.site/products/cliplane">Dashboard</a>
           <a href="https://github.com/talocode/cliplane">GitHub</a>
         </span>
       </p>
@@ -88,7 +88,7 @@ document.getElementById('overlay').addEventListener('click', function(){
 write('api-keys', shell('API Keys', `<h1>API Keys</h1>
 <p class="lead">ClipLane API keys follow a simple creation, usage, and rotation model.</p>
 <h2 id="creating-keys">Creating keys</h2>
-<p>Create API keys in the dashboard: <a href="https://app.cliplane.site/dashboard/settings/api-keys">https://app.cliplane.site/dashboard/settings/api-keys</a>.</p>
+<p>Create API keys in the <a href="https://dashboard.talocode.site/products/cliplane">ClipLane dashboard</a>.</p>
 <p>When creating a key, assign only the minimum scopes your use case needs. The Weekly Promo API requires the <code>weekly_promo:generate</code> scope.</p>
 <h2 id="treating-keys-like-secrets">Treating keys like secrets</h2>
 <p class="callout">ClipLane shows each key once on creation. After that, you will only ever see its prefix in the dashboard again.</p>
@@ -169,7 +169,7 @@ const result = await client.generateWeeklyPromo({
   weeklyUpdate: "We shipped the first SDK foundation.",
   channel: "x",
   tone: "clear, sharp, builder focused",
-  appWebsiteUrl: "https://cliplane.site",
+  appWebsiteUrl: "https://talocode.site/products/cliplane",
   targetAudience: "indie app builders and SaaS founders",
   callToAction: "Try ClipLane"
 });
@@ -211,12 +211,12 @@ write('changelog', shell('Changelog', `<h1>Changelog</h1>
 <p class="lead">Key changes to the ClipLane developer platform and API.</p>
 <h2 id="recent-updates">Recent updates</h2>
 <ul>
-<li>Three-surface architecture available: cliplane.site, app.cliplane.site, and docs.cliplane.site.</li>
+<li>Target Talocode architecture: product landing, dashboard, and docs surfaces.</li>
 <li>Google authentication working.</li>
-<li>API keys dashboard available at <a href="https://app.cliplane.site/dashboard/settings/api-keys">https://app.cliplane.site/dashboard/settings/api-keys</a>.</li>
+<li>API keys are managed in the <a href="https://dashboard.talocode.site/products/cliplane">ClipLane dashboard</a>.</li>
 <li>Public Weekly Promo API available.</li>
 <li>Usage and credits dashboard available.</li>
-<li>Billing page with credits view available at <a href="https://app.cliplane.site/dashboard/billing">https://app.cliplane.site/dashboard/billing</a>.</li>
+<li>Billing and credits are managed in the <a href="https://dashboard.talocode.site/products/cliplane">ClipLane dashboard</a>.</li>
 <li>Multi-page developer docs shipped.</li>
 <li>API platform direction documented.</li>
 </ul>

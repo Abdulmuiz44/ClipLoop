@@ -4,7 +4,7 @@ import { createTelegramPublisher } from "@/lib/publisher/telegram";
 
 const readyItem = {
   caption: "A concise update",
-  destinationUrl: "https://cliplane.site/post",
+  destinationUrl: "https://talocode.site/products/cliplane/post",
   approvedAt: new Date("2026-01-01T00:00:00.000Z"),
   scheduledFor: new Date("2026-01-01T00:00:00.000Z"),
 };
@@ -23,7 +23,7 @@ test("Telegram publisher sends content text and returns a public message URL", a
     assert.equal(request?.url, "https://api.telegram.org/bottest-token/sendMessage");
     assert.deepEqual(await request?.json(), {
       chat_id: "@cliplane_news",
-      text: "A concise update\n\nhttps://cliplane.site/post",
+      text: "A concise update\n\nhttps://talocode.site/products/cliplane/post",
       disable_web_page_preview: false,
     });
     assert.equal(result.externalPostId, "42");

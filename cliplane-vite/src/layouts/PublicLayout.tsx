@@ -21,7 +21,7 @@ export function PublicLayout() {
           <ClipLaneLogo href="/" />
           <div className="flex items-center gap-1.5 md:gap-2">
             <a
-              href="https://app.cliplane.site/dashboard"
+              href="https://dashboard.talocode.site/products/cliplane"
               className="rounded-md px-2.5 py-1.5 text-sm text-slate-300 transition hover:bg-[#1F1F1F] hover:text-white md:px-3"
             >
               Open App
