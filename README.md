@@ -17,6 +17,8 @@ cliplane render
 cliplane export x
 ```
 
+For a runnable first-result example, see [Get a first result](docs/FIRST_RESULT.md) or run `bash examples/local-launch-workflow.sh "Shipped a faster export workflow"` from this repository.
+
 `cliplane init` creates a `.cliplane/` workspace in the current project:
 
 | Path | Purpose |
@@ -93,10 +95,14 @@ The root application also provides `npm run db:migrate`, `npm run db:seed`, and 
 
 ## Documentation
 
+- [Get a first result](docs/FIRST_RESULT.md)
+- [Troubleshooting](docs/TROUBLESHOOTING.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [SDK reference](docs/SDK.md)
 - [Current public API notes](docs/PUBLIC_API.md)
 - [Scheduling notes](docs/SCHEDULING.md)
+- [Release and verification checklist](docs/RELEASE_CHECKLIST.md)
+- [Contributing](CONTRIBUTING.md)
 - [Open source mission](docs/OPEN_SOURCE_MISSION.md)
 
 ## Talocode Ecosystem
