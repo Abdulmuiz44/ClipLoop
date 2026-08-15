@@ -53,7 +53,7 @@ export const hyperframesRenderAdapter: RenderAdapter = {
       recommendedTemplateFamily: renderTemplate.id,
       cta: input.ctaText,
       tone: "energetic",
-      durationSec: Math.max(8, Math.round((input.slides.length || 4) * renderTemplate.slideDurationSec)),
+      durationSec: input.durationSec ?? Math.max(8, Math.round((input.slides.length || 4) * renderTemplate.slideDurationSec)),
       sceneOutline: input.slides.join("\n"),
       visualDirectionNotes: `Template: ${renderTemplate.displayName}`,
     };

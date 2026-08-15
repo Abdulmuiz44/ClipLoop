@@ -20,24 +20,28 @@ const quickActions = [
   {
     title: "Generate Video",
     detail: "Turn your idea into a scroll-stopping video.",
+    href: "/app/idea-video",
     iconBg: "bg-emerald-500/10",
     iconFg: "text-emerald-600",
   },
   {
     title: "Generate Copy",
     detail: "Create hooks, captions and ad copy.",
+    href: "/app/create",
     iconBg: "bg-violet-500/10",
     iconFg: "text-violet-600",
   },
   {
     title: "New Project",
     detail: "Create a new project for your brand.",
+    href: "/app/create",
     iconBg: "bg-sky-500/10",
     iconFg: "text-sky-600",
   },
   {
     title: "Import Website",
     detail: "Import your website to learn about your brand.",
+    href: "/app/create",
     iconBg: "bg-amber-500/10",
     iconFg: "text-amber-600",
   },
@@ -74,7 +78,7 @@ export default async function StudioDashboardPage() {
 
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {quickActions.map((item) => (
-              <Link key={item.title} href="/app/create" className="group rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900">
+                <Link key={item.title} href={item.href} className="group rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900">
                 <ActionIcon bg={item.iconBg}>
                   <span className={item.iconFg}>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">

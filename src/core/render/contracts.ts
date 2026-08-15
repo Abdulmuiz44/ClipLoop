@@ -12,6 +12,7 @@ export type RenderAdapterInput = {
   caption: string;
   ctaText: string;
   businessName: string;
+  durationSec?: number;
   logoUrl?: string | null;
   backgroundUrl?: string | null;
   output: {
@@ -40,4 +41,3 @@ export interface RenderAdapter {
   backend: RenderBackend;
   render(input: RenderAdapterInput): Promise<RenderAdapterResult>;
 }
-
