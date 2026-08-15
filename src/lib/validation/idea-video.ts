@@ -19,7 +19,7 @@ export const ideaVideoPlanSchema = z.object({
     narration: z.string().min(1),
     visualPrompt: z.string().min(1),
     motion: z.string().min(1),
-  })).min(3).max(8),
+  })).min(6).max(12),
 });
 
 export type IdeaVideoInput = z.infer<typeof ideaVideoInputSchema>;

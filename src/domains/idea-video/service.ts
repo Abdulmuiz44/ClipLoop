@@ -65,7 +65,10 @@ function createFallbackPlan(input: IdeaVideoInput): IdeaVideoPlan {
     cta,
     scenes: [
       { purpose: "Hook", onScreenText: input.idea, narration: input.idea, visualPrompt: "High-contrast editorial image that makes the central idea immediately clear, vertical composition.", motion: "Fast push in" },
-      { purpose: "Explanation", onScreenText: "Here is what matters.", narration: "Here is the part that matters most for the viewer.", visualPrompt: "Clean visual metaphor illustrating the key mechanism, vertical composition.", motion: "Slow pan left" },
+      { purpose: "Problem", onScreenText: "The usual workflow loses momentum.", narration: "Most ideas lose momentum before they become a finished video.", visualPrompt: "A dense unfinished checklist collapsing into one clear path, vertical composition.", motion: "Fast lateral slide" },
+      { purpose: "Script", onScreenText: "Start with the script.", narration: "Turn the idea into a tight script with one job per beat.", visualPrompt: "A concise script card with a highlighted hook, vertical composition.", motion: "Quick push in" },
+      { purpose: "Visuals", onScreenText: "Give every beat a visual.", narration: "Match each beat with a visual direction and movement cue.", visualPrompt: "A vertical storyboard of distinct visual beats, vertical composition.", motion: "Snap cut" },
+      { purpose: "Proof", onScreenText: "Review the output before you publish.", narration: "Review the draft and its production plan before publishing.", visualPrompt: "A clean review screen with script, scenes, and preview, vertical composition.", motion: "Fast rack focus" },
       { purpose: "Takeaway", onScreenText: cta, narration: cta, visualPrompt: "Simple confident closing frame with ample negative space, vertical composition.", motion: "Gentle pull back" },
     ],
   };
@@ -92,8 +95,8 @@ export async function runIdeaVideoMvp(rawInput: unknown, deps: IdeaVideoDeps = d
     prompt: [
       "Create an original vertical YouTube Short production plan.",
       "The plan must be factual to the supplied idea. Do not invent evidence, names, results, or quotes.",
-      "Each scene needs concise on-screen text, a full narration line, an image-generation prompt, and a specific motion direction.",
-      "Make scene one compelling within two seconds. The narration lines together must form a complete voiceover.",
+      "Create 6 to 12 short scenes. Each scene needs concise on-screen text, a full narration line, an image-generation prompt, and a specific motion direction.",
+      "Make scene one compelling within two seconds. Use rapid visual beats and pattern interrupts. The narration lines together must form a complete voiceover.",
       `Idea: ${input.idea}`,
       `Audience: ${input.audience || "general YouTube viewers"}`,
       `Tone: ${input.tone}`,

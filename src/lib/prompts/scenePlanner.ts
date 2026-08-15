@@ -10,9 +10,6 @@ export function generateScenePlan(brief: CreativeBrief): SceneBlock[] {
   // This logic is a starting point and can be significantly enhanced.
   // It attempts to parse the sceneOutline and assign basic properties.
 
-  // Default scene duration if not specified by outline or brief
-  const defaultSceneDurationMs = 3000; 
-
   // Parse scene outline if available
   const sceneLines = brief.sceneOutline?.split("\n").map((line) => line.trim()).filter((line) => line);
 
@@ -26,13 +23,8 @@ export function generateScenePlan(brief: CreativeBrief): SceneBlock[] {
                          'generic' : 'generic';
       const scenePurpose = match ? match[3] || line : line;
 
-      // Assign duration - could be more sophisticated (e.g., based on brief.durationSec, stylePreset, etc.)
-      let sceneDurationMs = defaultSceneDurationMs; 
-      if (currentTimeMs + sceneDurationMs > totalDurationMs) {
-        // Adjust last scene duration if it exceeds total
-        sceneDurationMs = totalDurationMs - currentTimeMs;
-        if (sceneDurationMs < 1000) sceneDurationMs = 1000; // Minimum duration
-      }
+      const remainingScenes = sceneLines.length - index;
+      const sceneDurationMs = Math.max(1000, Math.floor((totalDurationMs - currentTimeMs) / remainingScenes));
 
       const newScene: SceneBlock = {
         type: sceneType,
@@ -56,7 +48,7 @@ export function generateScenePlan(brief: CreativeBrief): SceneBlock[] {
     });
   } else {
     // Fallback if no scene outline is provided - create a default scene structure
-    const fallbackDuration = Math.max(1000, Math.min(totalDurationMs, defaultSceneDurationMs));
+    const fallbackDuration = Math.max(1000, Math.floor(totalDurationMs / 2));
     scenePlan.push({
       type: "intro",
       purpose: brief.concept || "Video Introduction",
@@ -70,7 +62,7 @@ export function generateScenePlan(brief: CreativeBrief): SceneBlock[] {
         scenePlan.push({
             type: "cta",
             purpose: "Call to Action",
-            timing: { startMs: fallbackDuration, durationMs: Math.min(totalDurationMs - fallbackDuration, 2000) },
+            timing: { startMs: fallbackDuration, durationMs: totalDurationMs - fallbackDuration },
             primaryText: brief.cta,
             cta: brief.cta,
             assetHints: ["brand_logo", "cta_button"],

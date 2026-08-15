@@ -51,7 +51,9 @@ test("hyperframes composition applies template styling and scene plan summary", 
   assert.match(html, /color: #1e7e34;/);
   assert.match(html, /Scene flow: 1\. 50% off today • 2\. Trusted by 1,000\+ buyers/);
   assert.match(html, /<div class="caption">1\. 50% off today • 2\. Trusted by 1,000\+ buyers<\/div>/);
-  assert.match(html, /animation-duration: 6s;/);
+  assert.match(html, /animation: scene-cycle/);
+  assert.match(html, /animation: copy-punch/);
+  assert.match(html, /class="scene-block scene-variant-0"/);
   assert.match(html, /--scene-start-ms:0;--scene-duration-ms:2000;/);
   assert.match(html, /--scene-start-ms:2000;--scene-duration-ms:2000;/);
   assert.match(html, /<div class="scene-primary">50% off today<\/div>/);

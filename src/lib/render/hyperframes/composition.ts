@@ -67,12 +67,13 @@ function buildSceneBlocksMarkup(input: HyperframesCompositionInput): string {
       const cta = scene.cta?.trim() || "";
 
       const chunks = [
+        `<div class="scene-kicker">${escapeHtml(scene.purpose)}</div>`,
         `<div class="scene-primary">${escapeHtml(primary)}</div>`,
         secondary ? `<div class="scene-secondary">${escapeHtml(secondary)}</div>` : "",
         cta ? `<div class="scene-cta">${escapeHtml(cta)}</div>` : "",
       ].filter(Boolean);
 
-      return `<div class="scene-block" style="--scene-start-ms:${scene.timing.startMs};--scene-duration-ms:${scene.timing.durationMs};" data-scene-index="${index}">${chunks.join("")}</div>`;
+      return `<div class="scene-block scene-variant-${index % 4}" style="--scene-start-ms:${scene.timing.startMs};--scene-duration-ms:${scene.timing.durationMs};" data-scene-index="${index}"><div class="scene-orb"></div><div class="scene-progress"></div><div class="scene-copy"><div class="scene-count">${String(index + 1).padStart(2, "0")}</div>${chunks.join("")}</div></div>`;
     })
     .join("\n");
 }
